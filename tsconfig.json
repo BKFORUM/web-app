@@ -22,13 +22,13 @@
       "@pages/*": ["src/pages/*"],
       "@components/*": ["src/components/*"],
       "@interfaces/*": ["src/interfaces/*"],
-      "@constants/*": ["src/constants/*"],
+      "@commom/*": ["src/commom/*"],
       "@hooks/*": ["src/hooks/*"],
       "@layouts/*": ["src/layouts/*"],
       "@routes/*": ["src/routes/*"],
       "@services/*": ["src/@services/*"],
       "@utils/*": ["src/utils/*"],
-      "@redux/*": ["src/redux/*"]
+      "@store/*": ["src/store/*"]
     }
   },
   "include": ["src"],
