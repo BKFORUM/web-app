@@ -5,9 +5,9 @@ interface IProps {
 }
 
 function ProtectedRoute(props: IProps): JSX.Element {
-  const user = localStorage.getItem('user')
-  if (user === null) {
-    return <Navigate to='/login' />
+  const auth = localStorage.getItem('auth')
+  if (auth === null) {
+    return <Navigate to="/login" />
   }
 
   return props.children

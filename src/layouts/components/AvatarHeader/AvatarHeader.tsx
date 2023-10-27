@@ -1,17 +1,25 @@
 import { Transition } from '@headlessui/react'
-import { FC, Fragment, useState } from 'react'
-import test from '../../../assets/images/test.jpg'
+import { FC, Fragment, useEffect, useState } from 'react'
 import { useClickOutside } from '@hooks/useClickOutside'
 import { ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/outline'
 import { useNavigate } from 'react-router-dom'
 import { Tooltip } from '@mui/material'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import { notifyActionSelector, userStateSelector } from '@store/index'
 
 interface Props {}
 
 const AvatarHeader: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
+  const { currentUserSuccess, messageErrorUser } = useStoreState(userStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const [open, setOpen] = useState<boolean>(false)
-  //   const user = JSON.parse(String(localStorage.getItem('user')))
+
+  useEffect(() => {
+    if (currentUserSuccess === null) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorUser })
+    }
+  }, [currentUserSuccess])
 
   let elementRef: any = useClickOutside(() => {
     if (open) {
@@ -19,7 +27,7 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
     }
   })
   const _logout = (): void => {
-    localStorage.removeItem('user')
+    localStorage.removeItem('auth')
     navigate('/login')
   }
   return (
@@ -32,7 +40,7 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
           {open && (
             <img
               className="h-10 w-10 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2"
-              src={test}
+              src={currentUserSuccess?.avatarUrl}
               alt="avatar"
             />
           )}
@@ -40,7 +48,7 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
             <Tooltip title={<h1 className="text-sm">Account </h1>}>
               <img
                 className="h-10 w-10 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2"
-                src={test}
+                src={currentUserSuccess?.avatarUrl}
                 alt="avatar"
               />
             </Tooltip>
@@ -63,29 +71,29 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
           }}
           className={`absolute rounded right-2 top-[120%] z-50 py-0.5 bg-white border shadow-md`}
           style={{ minWidth: '18rem' }}>
-          <li className="relative group ">
+          <li className="relative group list-none ">
             <a className="block w-full py-2 px-6 text-center clear-both whitespace-nowrap hover:text-primary-400 cursor-pointer group-hover:opacity-50 ">
               <img
-                className="h-10 w-10 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 inline"
-                src={test}
+                className="h-10 w-10 rounded-full border border-gray-500 bg-gray-5  00 object-cover mr-2 inline"
+                src={currentUserSuccess?.avatarUrl}
                 alt="avatar"
               />
-              <span className="font-semibold">Trương Quang Khang</span>
+              <span className="font-semibold">{currentUserSuccess?.fullName}</span>
             </a>
           </li>
-          <li className="relative">
+          <li className="relative list-none">
             <hr className="border-t border-gray-200 my-0" />
           </li>
-          <li className="relative group ">
+          <li className="relative group list-none ">
             <a className="block w-full py-2 px-6 clear-both whitespace-nowrap hover:text-primary-400 cursor-pointer group-hover:opacity-50 ">
               <Cog6ToothIcon className="inline w-4 h-4 mr-2 mb-0.5" />
               <span>Change Password</span>
             </a>
           </li>
-          <li className="relative">
+          <li className="relative list-none">
             <hr className="border-t border-gray-200 my-0" />
           </li>
-          <li className="relative group">
+          <li className="relative group list-none">
             <a
               className="block w-full py-2 px-6 clear-both whitespace-nowrap hover:text-primary-400 cursor-pointer text-red-600 group-hover:opacity-70"
               onClick={_logout}>

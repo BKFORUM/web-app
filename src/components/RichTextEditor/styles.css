@@ -1,0 +1,8 @@
+.height-content {
+  min-height: 200px;
+  max-height: 200px;
+}
+
+.height-content-image {
+  min-height: 50px;
+}

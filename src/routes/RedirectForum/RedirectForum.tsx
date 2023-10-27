@@ -5,11 +5,11 @@ interface IProps {
 }
 
 function RedirectForum(props: IProps): JSX.Element {
-  const user = localStorage.getItem('user')
+  const auth = localStorage.getItem('auth')
   const { pathname } = useLocation()
 
-  if (user && pathname.split('/')[1] === 'login') {
-    return <Navigate to='/forum-management' />
+  if (auth && pathname.split('/')[1] === 'login') {
+    return <Navigate to="/" />
   }
   return props.children
 }

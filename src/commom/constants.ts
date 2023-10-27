@@ -5,7 +5,8 @@ export const ROUTER = Object.freeze({
     EVENT: '/event',
     MESSAGE: '/message',
     MESSAGE_GROUP: '/message/:id',
-    PROFILE: '/profile/:slug'
+    PROFILE: '/profile/:slug',
+    FORUM: '/forums/:id'
 });
 
 export const DATA_SIDEBAR = [
@@ -30,30 +31,4 @@ export const DATA_SIDEBAR = [
         icon: "event",
         children: [],
     },
-    //   {
-    //     id: 2,
-    //     name: i18n.t("sidebar.contact_management"),
-    //     pathName: "/contact/facility",
-    //     icon: "contact",
-    //     children: [
-    //       {
-    //         id: 3,
-    //         name: i18n.t("sidebar.facility_contact_management"),
-    //         pathName: "/contact/facility",
-    //         children: [],
-    //       },
-    //       {
-    //         id: 4,
-    //         name: i18n.t("sidebar.service_contact_management"),
-    //         pathName: "/contact/service",
-    //         children: [],
-    //       },
-    //       {
-    //         id: 20,
-    //         name: i18n.t("sidebar.user_contact_management"),
-    //         pathName: "/contact/user",
-    //         children: [],
-    //       },
-    //     ],
-    //   },
 ];

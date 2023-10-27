@@ -1,4 +1,3 @@
-import DefaultLayout from '@layouts/DefaultLayout'
 import { Routes, Route } from 'react-router-dom'
 import { routerUser } from '@routes/router'
 import Login from '@pages/Login'
@@ -6,8 +5,23 @@ import NotFound from '@pages/NotFound'
 import ProtectedRoute from '@routes/ProtectedRoute'
 import RedirectForum from '@routes/RedirectForum'
 import './App.css'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import { notifyActionSelector, notifyStateSelector, userActionSelector } from './store'
+import Notify from '@components/Notify'
+import { useEffect } from 'react'
 
 function App() {
+  const { notifySetting } = useStoreState(notifyStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { getCurrentUser } = useStoreActions(userActionSelector)
+
+  const getCurrentUserApp = async (): Promise<void> => {
+    await getCurrentUser()
+  }
+
+  useEffect(() => {
+    getCurrentUserApp()
+  }, [])
   return (
     <>
       <Routes>
@@ -18,12 +32,13 @@ function App() {
               path={route.path}
               element={
                 <ProtectedRoute>
-                  <DefaultLayout>
-                    <route.element />
-                  </DefaultLayout>
+                  <>
+                    <route.layout>
+                      <route.element />
+                    </route.layout>
+                  </>
                 </ProtectedRoute>
-              }
-            />
+              }></Route>
           )
         })}
         <Route
@@ -39,6 +54,10 @@ function App() {
           element={<NotFound />}
         />
       </Routes>
+      <Notify
+        notifySetting={notifySetting}
+        setNotifySetting={setNotifySetting}
+      />
     </>
   )
 }

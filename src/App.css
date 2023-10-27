@@ -16,3 +16,20 @@
 *::-webkit-scrollbar-button {
   display: none;
 }
+
+ul li {
+  list-style: disc;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  height: 16px !important;
+}
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 10px !important;
+  font-weight: 600;
+  background-color: #e7e7e7;
+  padding: 6px 9px;
+  border-radius: 100%;
+}

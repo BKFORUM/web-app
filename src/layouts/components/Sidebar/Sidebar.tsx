@@ -12,7 +12,7 @@ interface IProps {
 
 const FakeData = [
   {
-    id: 1,
+    id: '0398106c-d356-4143-88a4-48b24bcd5af1',
     name: '20TCLC_DT4',
     image: test,
   },
@@ -103,7 +103,7 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
       const height = contentRef.current.scrollHeight
       setContentHeight(height)
     }
-  }, [openListForum])
+  }, [])
   useEffect(() => {
     const routePath = `/${pathname.split('/')[1]}`
     DATA_SIDEBAR.map((item) => {
@@ -136,8 +136,8 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
   }, [])
   return (
     <div
-      className={`hover:overflow-y-auto overflow-hidden`}
-      style={{ height: 'calc(100vh - 60px)' }}>
+      className={`hover:overflow-y-auto overflow-hidden fixed left-0 top-[60px]`}
+      style={{ height: 'calc(100vh - 60px)', width: '305px' }}>
       <ul
         id="side-menu"
         className="w-full float-none flex flex-col font-medium">
@@ -202,6 +202,7 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
             {listForum.map((item) => (
               <li
                 key={item.id}
+                onClick={() => navigate('/forums/' + item.id)}
                 className="flex items-center p-2 pl-4 hover:text-primary-400 cursor-pointer  hover:bg-gray-200 transition-all duration-200 ">
                 <div className="flex-shrink-0 h-8 w-8 rounded-xl overflow-hidden mr-2 border border-gray-700 bg-gray-700">
                   <img

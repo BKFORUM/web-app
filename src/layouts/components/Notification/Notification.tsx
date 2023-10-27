@@ -10,9 +10,7 @@ import { Tooltip } from '@mui/material'
 interface Props {}
 
 const Notification: FC<Props> = (): JSX.Element => {
-  //   const navigate = useNavigate()
   const [open, setOpen] = useState<boolean>(false)
-  //   const user = JSON.parse(String(localStorage.getItem('user')))
   let elementRef: any = useClickOutside(() => {
     if (open) {
       setOpen(false)

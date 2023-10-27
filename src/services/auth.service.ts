@@ -1,12 +1,12 @@
+import { IUserLogin } from "@interfaces/IUser";
 import BaseURL from "@utils/api/baseURL";
 
-const login = () => {
+const login = (data: IUserLogin) => {
     return BaseURL({
-        url: `/login/1`,
-        method: "GET",
-        // data,
+        url: `/auth/login`,
+        method: "POST",
+        data,
     });
 };
 
-
-export { login }
+export { login }    
