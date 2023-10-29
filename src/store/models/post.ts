@@ -1,5 +1,6 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addPost, postImage } from "../../services/post.service";
+import { addPost, getAllPostByForum, postImage } from "../../services/post.service";
+import { IParams } from "@interfaces/IClient";
 
 export interface IPostModel {
     //MessageError
@@ -10,6 +11,11 @@ export interface IPostModel {
     isAddPostSuccess: boolean;
     setIsAddPostSuccess: Action<IPostModel, boolean>;
     addPost: Thunk<IPostModel, any>;
+
+    //getAllPostByForum
+    isGetAllPostByForumSuccess: boolean;
+    setIsGetAllPostByForumSuccess: Action<IPostModel, boolean>;
+    getAllPostByForum: Thunk<IPostModel, IParams>;
 
     //PostImage
     isPostImageSuccess: boolean;
@@ -24,6 +30,23 @@ export const postModel: IPostModel = persist({
         state.messageError = payload;
     }),
 
+    // getAllPostByForum
+    isGetAllPostByForumSuccess: true,
+    setIsGetAllPostByForumSuccess: action((state, payload) => {
+        state.isGetAllPostByForumSuccess = payload;
+    }),
+    getAllPostByForum: thunk(async (actions, payload) => {
+        return getAllPostByForum(payload)
+            .then(async (res) => {
+                actions.setIsGetAllPostByForumSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllPostByForumSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
     //AddPost
     isAddPostSuccess: true,
     setIsAddPostSuccess: action((state, payload) => {
@@ -33,7 +56,7 @@ export const postModel: IPostModel = persist({
         return addPost(payload)
             .then(async (res) => {
                 actions.setIsAddPostSuccess(true)
-                return res.data;
+                return res;
             })
             .catch((error) => {
                 actions.setIsAddPostSuccess(false)
@@ -41,7 +64,7 @@ export const postModel: IPostModel = persist({
             });
     }),
 
-    //AddPost
+    //PostImage
     isPostImageSuccess: true,
     setIsPostImageSuccess: action((state, payload) => {
         state.isPostImageSuccess = payload;

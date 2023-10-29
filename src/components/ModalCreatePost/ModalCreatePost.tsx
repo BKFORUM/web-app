@@ -6,19 +6,20 @@ import { FaRegImages, FaRegSmile } from 'react-icons/fa'
 import { EditorState, convertToRaw } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
 import MultiImage from '@components/MultiImage'
-
-// import htmlToDraft from 'html-to-draftjs'
+import Button from '@components/Button'
 
 interface Props {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   handleAction: (data: any) => Promise<void>
+  isLoading: boolean
 }
 
 const ModalCreatePost: FC<Props> = ({
   open,
   setOpen,
   handleAction,
+  isLoading,
 }: Props): JSX.Element => {
   const ImageRef: any = useRef()
   const [step, setStep] = useState('post')
@@ -31,8 +32,9 @@ const ModalCreatePost: FC<Props> = ({
   }
 
   const _deleteImage = (image: any) => {
-    const newImage = Images.filter((file: any) => file.name !== image.name)
+    const newImage = Images.filter((file: any) => file !== image)
     setImages(newImage)
+    setFileImages(newImage)
   }
 
   const handleFileChange = (file: any) => {
@@ -154,17 +156,17 @@ const ModalCreatePost: FC<Props> = ({
                       </Tooltip>
                     </div>
 
-                    <button
-                      type="button"
+                    <Button
+                      loading={isLoading}
                       disabled={!!editorState.getCurrentContent().hasText() === false}
-                      className={`mt-4 flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-base font-medium text-blue-900 ${
+                      className={`mt-4 flex justify-center rounded-md border border-transparent bg-blue-400 hover:bg-blue-400 px-4 py-2 text-base font-medium text-blue-900 ${
                         !!editorState.getCurrentContent().hasText()
-                          ? 'hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2'
+                          ? 'hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2'
                           : 'cursor-not-allowed'
                       } `}
                       onClick={() => handleCreatePost()}>
                       Đăng
-                    </button>
+                    </Button>
                   </Dialog.Panel>
                 </Transition.Child>
               </div>

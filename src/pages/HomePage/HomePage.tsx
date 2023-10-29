@@ -5,10 +5,14 @@ import ModalCreatePost from '@components/ModalCreatePost/ModalCreatePost'
 import avatartest from '../../assets/images/avatartest.jpg'
 import { HiOutlineChatBubbleLeftRight } from 'react-icons/hi2'
 import PostItem from '@components/PostItem'
+import { useStoreState } from 'easy-peasy'
+import { userStateSelector } from '@store/index'
 
 interface Props {}
 
 const HomePage: FC<Props> = (): JSX.Element => {
+  const { currentUserSuccess } = useStoreState(userStateSelector)
+
   const [forumSelected, setForumSelected] = useState('')
   const [error, setError] = useState('')
   const [openModal, setOpenModal] = useState<boolean>(false)
@@ -33,8 +37,8 @@ const HomePage: FC<Props> = (): JSX.Element => {
             <div className=" flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mr-2 border border-gray-700 bg-gray-700">
               <img
                 className="w-full h-full "
-                src={test}
-                alt="avatar"
+                src={currentUserSuccess?.avatarUrl}
+                alt={currentUserSuccess?.fullName}
               />
             </div>
             <input
@@ -58,7 +62,7 @@ const HomePage: FC<Props> = (): JSX.Element => {
           </div>
 
           <div className="my-4   bg-white min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
-            <PostItem />
+            {/* <PostItem /> */}
           </div>
         </div>
 
@@ -137,10 +141,10 @@ const HomePage: FC<Props> = (): JSX.Element => {
         </div>
       </div>
 
-      <ModalCreatePost
+      {/* <ModalCreatePost
         open={openModal}
         setOpen={setOpenModal}
-      />
+      /> */}
     </>
   )
 }

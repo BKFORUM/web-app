@@ -8,10 +8,13 @@ import {
   HiOutlineChatBubbleLeftEllipsis,
 } from 'react-icons/hi2'
 import { useLocation } from 'react-router-dom'
+import { IPostViewForum } from '@interfaces/IPost'
 
-interface Props {}
+interface Props {
+  item: IPostViewForum
+}
 
-const PostItem: FC<Props> = (): JSX.Element => {
+const PostItem: FC<Props> = ({ item }: Props): JSX.Element => {
   const { pathname } = useLocation()
   const [isFavourite, setIsFavourite] = useState<boolean>(false)
 
@@ -54,7 +57,10 @@ const PostItem: FC<Props> = (): JSX.Element => {
       )}
 
       <div className="">
-        <PostContent />
+        <PostContent
+          content={item.content}
+          images={item.documents}
+        />
       </div>
 
       <div className="mx-3 py-1 flex justify-around border-t border-gray-300 ">

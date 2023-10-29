@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import test from '../../assets/images/test.jpg'
 import ModalCreatePost from '@components/ModalCreatePost/ModalCreatePost'
 import avatartest from '../../assets/images/avatartest.jpg'
@@ -10,37 +10,86 @@ import {
 import PostItem from '@components/PostItem'
 import OptionForum from './components/OptionsForum'
 import { useParams } from 'react-router-dom'
-import { useStoreActions } from 'easy-peasy'
-import { notifyActionSelector, postActionSelector } from '@store/index'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import { notifyActionSelector, postActionSelector, userStateSelector } from '@store/index'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { IPostViewForum } from '@interfaces/IPost'
 
 interface Props {}
 
 const Forum: FC<Props> = (): JSX.Element => {
   const { id } = useParams()
-  const { addPost, postImage } = useStoreActions(postActionSelector)
+  const { currentUserSuccess } = useStoreState(userStateSelector)
+  const { addPost, postImage, getAllPostByForum } = useStoreActions(postActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
-
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [openModal, setOpenModal] = useState<boolean>(false)
+  const [data, setData] = useState<IPostViewForum[]>([])
+  const [totalRowCount, setTotalRowCount] = useState<number>(0)
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  })
+
+  const getAllPostByForumData = async (): Promise<void> => {
+    if (id) {
+      const res = await getAllPostByForum({
+        id: id,
+        params: {
+          skip: paginationModel.page * 10,
+          take: paginationModel.pageSize,
+          status: 'ACTIVE',
+        },
+      })
+      if (res) {
+        setTotalRowCount(res.totalRecords)
+        setData([...data, ...res.data])
+      }
+    }
+  }
+
+  useEffect(() => {
+    getAllPostByForumData()
+  }, [paginationModel])
 
   const handleAction = async (data: any): Promise<void> => {
+    setIsLoading(true)
     const formData = new FormData()
-    for (let i = 0; i < data.FileImages.length; i++) {
-      formData.append(`documents`, data.FileImages[i])
+    for (let i = 0; i < data?.files?.length; i++) {
+      formData.append(`documents`, data.files[i])
     }
-    const resImage = await postImage(formData)
-    if (resImage) {
+    if (data.files?.length > 0) {
+      const resImage = await postImage(formData)
+      if (resImage) {
+        const res = await addPost({
+          forumId: id,
+          content: data.content,
+          documents: resImage,
+        })
+        if (res) {
+          setNotifySetting({
+            show: true,
+            status: 'success',
+            message: 'Add post successfully',
+          })
+        }
+      }
+      setIsLoading(false)
+      setOpenModal(false)
+    } else {
       const res = await addPost({
         forumId: id,
-        content: data.dataHTML,
-        documents: resImage,
+        content: data.content,
       })
       if (res) {
         setNotifySetting({
           show: true,
-          status: 'error',
+          status: 'success',
           message: 'Add post successfully',
         })
       }
+      setIsLoading(false)
+      setOpenModal(false)
     }
   }
 
@@ -66,11 +115,11 @@ const Forum: FC<Props> = (): JSX.Element => {
             <OptionForum />
           </div>
           <div className=" mt-4 relative flex-1 flex gap-2 items-center px-6 py-6 bg-white shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md">
-            <div className=" flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mr-2 border border-gray-700 bg-gray-700">
+            <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mr-2 border border-gray-400 bg-gray-400">
               <img
                 className="w-full h-full "
-                src={avatartest}
-                alt="avatar"
+                src={currentUserSuccess?.avatarUrl}
+                alt={currentUserSuccess?.fullName}
               />
             </div>
             <input
@@ -80,9 +129,27 @@ const Forum: FC<Props> = (): JSX.Element => {
               value="Viết bài tại đây...."
             />
           </div>
-
-          <div className="my-4   bg-white min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
-            <PostItem />
+          <div>
+            <InfiniteScroll
+              dataLength={data.length}
+              next={() =>
+                setPaginationModel({ page: paginationModel.page + 1, pageSize: 10 })
+              }
+              hasMore={data.length !== totalRowCount}
+              loader={<h4>Loading...</h4>}
+              endMessage={
+                <p style={{ textAlign: 'center' }}>
+                  <b>Yay! You have seen it all</b>
+                </p>
+              }>
+              {data.map((item, index) => (
+                <div
+                  key={index}
+                  className="my-4 bg-white min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
+                  <PostItem item={item} />
+                </div>
+              ))}
+            </InfiniteScroll>
           </div>
         </div>
 
@@ -140,6 +207,7 @@ const Forum: FC<Props> = (): JSX.Element => {
         open={openModal}
         setOpen={setOpenModal}
         handleAction={handleAction}
+        isLoading={isLoading}
       />
     </>
   )

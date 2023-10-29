@@ -5,7 +5,7 @@ export const ROUTER = Object.freeze({
     EVENT: '/event',
     MESSAGE: '/message',
     MESSAGE_GROUP: '/message/:id',
-    PROFILE: '/profile/:slug',
+    PROFILE: '/profile/:id',
     FORUM: '/forums/:id'
 });
 

@@ -71,7 +71,9 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
           }}
           className={`absolute rounded right-2 top-[120%] z-50 py-0.5 bg-white border shadow-md`}
           style={{ minWidth: '18rem' }}>
-          <li className="relative group list-none ">
+          <li
+            className="relative group list-none"
+            onClick={() => navigate('/profile/' + currentUserSuccess?.id)}>
             <a className="block w-full py-2 px-6 text-center clear-both whitespace-nowrap hover:text-primary-400 cursor-pointer group-hover:opacity-50 ">
               <img
                 className="h-10 w-10 rounded-full border border-gray-500 bg-gray-5  00 object-cover mr-2 inline"
