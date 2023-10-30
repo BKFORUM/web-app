@@ -1,21 +1,41 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addPost, getAllPostByForum, postImage } from "../../services/post.service";
+import { addPost, deletePost, editPost, getAllPostByForum, getAllPostByUser, postImage } from "../../services/post.service";
 import { IParams } from "@interfaces/IClient";
+import { IPostViewForum } from "@interfaces/IPost";
 
 export interface IPostModel {
     //MessageError
     messageError: string;
     setMessageError: Action<IPostModel, string>;
 
+    //postSelected
+    postSelected: null | IPostViewForum;
+    setPostSelected: Action<IPostModel, IPostViewForum | null>;
+
     //AddPost
     isAddPostSuccess: boolean;
     setIsAddPostSuccess: Action<IPostModel, boolean>;
     addPost: Thunk<IPostModel, any>;
 
+    //EditPost
+    isEditPostSuccess: boolean;
+    setIsEditPostSuccess: Action<IPostModel, boolean>;
+    editPost: Thunk<IPostModel, any>;
+
+    //DeletePost
+    isDeletePostSuccess: boolean;
+    setIsDeletePostSuccess: Action<IPostModel, boolean>;
+    deletePost: Thunk<IPostModel, string>;
+
     //getAllPostByForum
     isGetAllPostByForumSuccess: boolean;
     setIsGetAllPostByForumSuccess: Action<IPostModel, boolean>;
     getAllPostByForum: Thunk<IPostModel, IParams>;
+
+    //getAllPostByUser
+    isGetAllPostByUserSuccess: boolean;
+    setIsGetAllPostByUserSuccess: Action<IPostModel, boolean>;
+    getAllPostByUser: Thunk<IPostModel, IParams>;
 
     //PostImage
     isPostImageSuccess: boolean;
@@ -28,6 +48,12 @@ export const postModel: IPostModel = persist({
     messageError: "",
     setMessageError: action((state, payload) => {
         state.messageError = payload;
+    }),
+
+    //postSelected
+    postSelected: null,
+    setPostSelected: action((state, payload) => {
+        state.postSelected = payload;
     }),
 
     // getAllPostByForum
@@ -47,6 +73,23 @@ export const postModel: IPostModel = persist({
             });
     }),
 
+    // getAllPostByForum
+    isGetAllPostByUserSuccess: true,
+    setIsGetAllPostByUserSuccess: action((state, payload) => {
+        state.isGetAllPostByUserSuccess = payload;
+    }),
+    getAllPostByUser: thunk(async (actions, payload) => {
+        return getAllPostByUser(payload)
+            .then(async (res) => {
+                actions.setIsGetAllPostByUserSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllPostByUserSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
     //AddPost
     isAddPostSuccess: true,
     setIsAddPostSuccess: action((state, payload) => {
@@ -54,6 +97,23 @@ export const postModel: IPostModel = persist({
     }),
     addPost: thunk(async (actions, payload) => {
         return addPost(payload)
+            .then(async (res) => {
+                actions.setIsAddPostSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsAddPostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //EditPost
+    isEditPostSuccess: true,
+    setIsEditPostSuccess: action((state, payload) => {
+        state.isEditPostSuccess = payload;
+    }),
+    editPost: thunk(async (actions, payload) => {
+        return editPost(payload)
             .then(async (res) => {
                 actions.setIsAddPostSuccess(true)
                 return res;
@@ -78,6 +138,23 @@ export const postModel: IPostModel = persist({
             .catch((error) => {
                 console.log(error)
                 actions.setIsPostImageSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //DeletePost
+    isDeletePostSuccess: true,
+    setIsDeletePostSuccess: action((state, payload) => {
+        state.isDeletePostSuccess = payload;
+    }),
+    deletePost: thunk(async (actions, payload,) => {
+        return deletePost(payload)
+            .then(async (res) => {
+                actions.setIsDeletePostSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsDeletePostSuccess(false)
                 actions.setMessageError(error?.response?.data?.message)
             });
     }),

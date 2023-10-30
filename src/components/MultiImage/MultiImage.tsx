@@ -126,7 +126,7 @@ IMultiImage) => {
               <img
                 alt="not found"
                 className="h-[300px] w-full object-contain rounded-md border border-gray-300"
-                src={image}
+                src={image.fileUrl}
               />
             </div>
           ))}

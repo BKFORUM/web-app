@@ -18,7 +18,12 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import Button from '@components/Button/Button'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import { authActionSelector, authStateSelector, notifyActionSelector } from '@store/index'
+import {
+  authActionSelector,
+  authStateSelector,
+  notifyActionSelector,
+  userActionSelector,
+} from '@store/index'
 import { useNavigate } from 'react-router-dom'
 import { IUserLogin } from '@interfaces/IUser'
 
@@ -30,16 +35,15 @@ const defaultValues: IUserLogin = {
 }
 
 const schema = yup.object().shape({
-  email: yup
-    .string()
-    .required('Email is required')
-    .matches(/[0-9]{9}@sv1.dut.udn.vn/, `Please use format: 123456789@sv1.dut.udn.vn`),
+  email: yup.string().required('Email is required'),
+  // .matches(/[0-9]{9}@sv1.dut.udn.vn/, `Please use format: 123456789@sv1.dut.udn.vn`)
   password: yup.string().required('Password is required'),
 })
 
 const Login: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
   const { messageError, isLoginSuccess } = useStoreState(authStateSelector)
+  const { getCurrentUser } = useStoreActions(userActionSelector)
   const { login, setIsLoginSuccess } = useStoreActions(authActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
@@ -63,11 +67,16 @@ const Login: FC<Props> = (): JSX.Element => {
     event.preventDefault()
   }
 
+  const getCurrentUserApp = async (): Promise<void> => {
+    await getCurrentUser()
+  }
+
   const onSubmit = async (data: IUserLogin) => {
     setIsLoading(true)
     const res = await login(data)
     if (res) {
       setNotifySetting({ show: true, status: 'success', message: 'Login successful' })
+      getCurrentUserApp()
       navigate('/')
       setIsLoading(false)
     } else {

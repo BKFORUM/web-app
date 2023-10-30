@@ -23,7 +23,6 @@ export interface ICurrentUser {
     type: string
     updatedAt: string
     phoneNumber: string
-    forum: any[]
     faculty: {
         id: string
         name: string
@@ -34,4 +33,21 @@ export interface ICurrentUser {
             name: string
         }
     ]
+}
+
+export interface IUserData {
+    id: string
+    fullName: string
+    gender: string
+    dateOfBirth: string
+    avatarUrl: string
+    type: string
+    faculty?: {
+        id: string
+        name: string
+    }
+    facultyId: string
+    phoneNumber: string
+    email: string
+
 }

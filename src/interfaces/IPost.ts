@@ -11,8 +11,17 @@ export interface IDocuments {
 export interface IPostViewForum {
     id: string;
     content: string;
-    createAt: string
+    createdAt: string
     documents: IDocuments[]
     status: string
     updateAt: string
+    forum: {
+        name: string
+        fileUrl: string
+    }
+    user: {
+        id: string
+        fullName: string
+        avatarUrl: string
+    }
 }

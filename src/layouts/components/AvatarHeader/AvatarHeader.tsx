@@ -5,21 +5,25 @@ import { ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/ou
 import { useNavigate } from 'react-router-dom'
 import { Tooltip } from '@mui/material'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import { notifyActionSelector, userStateSelector } from '@store/index'
+import { notifyActionSelector, userActionSelector, userStateSelector } from '@store/index'
 
 interface Props {}
 
 const AvatarHeader: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
-  const { currentUserSuccess, messageErrorUser } = useStoreState(userStateSelector)
+  const { setCurrentUserSuccess, setIsGetCurrentUserSuccess } =
+    useStoreActions(userActionSelector)
+  const { currentUserSuccess, messageErrorUser, isGetCurrentUserSuccess } =
+    useStoreState(userStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const [open, setOpen] = useState<boolean>(false)
 
   useEffect(() => {
-    if (currentUserSuccess === null) {
+    if (!isGetCurrentUserSuccess) {
       setNotifySetting({ show: true, status: 'error', message: messageErrorUser })
+      setIsGetCurrentUserSuccess(true)
     }
-  }, [currentUserSuccess])
+  }, [isGetCurrentUserSuccess])
 
   let elementRef: any = useClickOutside(() => {
     if (open) {
@@ -27,6 +31,7 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
     }
   })
   const _logout = (): void => {
+    setCurrentUserSuccess(null)
     localStorage.removeItem('auth')
     navigate('/login')
   }

@@ -15,4 +15,18 @@ const getAllUser = (params: any) => {
     });
 }
 
-export { getAllUser, getCurrentUser }
+const getUserById = (id: string) => {
+    return BaseURL({
+        url: `/users/` + id,
+        method: "GET",
+    });
+}
+
+const getAllForumByUser = (id: string) => {
+    return BaseURL({
+        url: `/users/${id}/forums`,
+        method: "GET",
+    });
+}
+
+export { getAllUser, getCurrentUser, getUserById, getAllForumByUser }

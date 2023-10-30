@@ -9,22 +9,22 @@ import { authModel as auth, IAuthModel } from "./models/auth";
 import { userModel as user, IUserModel } from "./models/user";
 import { notifyModel as notify, INotifyModel } from "./models/notify";
 import { postModel as post, IPostModel } from "./models/post";
-
-
-
+import { forumModel as forum, IForumModel } from "./models/forum";
 
 export interface IStoreModel {
     auth: IAuthModel;
     user: IUserModel;
     notify: INotifyModel;
     post: IPostModel
+    forum: IForumModel;
 }
 
 const storeModel: IStoreModel = {
     auth,
     user,
     notify,
-    post
+    post,
+    forum
 }
 
 export const { useStoreActions, useStoreState, useStoreDispatch, useStore } =
@@ -44,6 +44,10 @@ export const notifyActionSelector = (state: IActionMapper) => state.notify;
 //User
 export const userStateSelector = (state: IStateMapper) => state.user;
 export const userActionSelector = (state: IActionMapper) => state.user;
+
+//Forum
+export const forumStateSelector = (state: IStateMapper) => state.forum;
+export const forumActionSelector = (state: IActionMapper) => state.forum;
 
 //Post
 export const postStateSelector = (state: IStateMapper) => state.post;

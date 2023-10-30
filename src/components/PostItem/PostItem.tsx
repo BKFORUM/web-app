@@ -1,7 +1,6 @@
 import { FC, useState } from 'react'
 import PostContent from '@components/PostContent'
 import test from '../../assets/images/test.jpg'
-import avatar from '../../assets/images/avatartest.jpg'
 import {
   HiOutlineHeart,
   HiMiniHeart,
@@ -9,49 +8,88 @@ import {
 } from 'react-icons/hi2'
 import { useLocation } from 'react-router-dom'
 import { IPostViewForum } from '@interfaces/IPost'
+import { formatDateLocalV2 } from '@utils/functions/formatDay'
+import { useStoreState } from 'easy-peasy'
+import { userStateSelector } from '@store/index'
+import OptionPost from '@components/OptionPost'
 
 interface Props {
+  isModerator?: boolean
   item: IPostViewForum
+  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>
+  setOpenModalDelete: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const PostItem: FC<Props> = ({ item }: Props): JSX.Element => {
+const PostItem: FC<Props> = ({
+  item,
+  isModerator,
+  setOpenModal,
+  setOpenModalDelete,
+}: Props): JSX.Element => {
   const { pathname } = useLocation()
+  const { currentUserSuccess } = useStoreState(userStateSelector)
+
   const [isFavourite, setIsFavourite] = useState<boolean>(false)
 
   return (
     <div>
       {pathname.split('/')[1] === 'forums' ? (
-        <div className="flex items-center  p-3 cursor-pointer">
-          <div className="relative flex-shrink-0  mr-2 ">
-            <img
-              className="h-10 w-10 object-cover rounded-full border border-gray-500 bg-gray-500 "
-              src={avatar}
-              alt="logo"
-            />
-          </div>
-          <span className="text-base font-medium">Trương Quang Khang</span>
-        </div>
-      ) : (
-        <div className="flex  p-3 cursor-pointer">
-          <div className="relative flex-shrink-0  mr-4 ">
-            <div className="h-10 w-10 rounded-xl overflow-hidden border border-gray-700 bg-gray-700 ">
+        <div className="flex items-center justify-between  p-3 ">
+          <div className="flex items-center cursor-pointer">
+            <div className="relative flex-shrink-0  mr-2 ">
               <img
-                className="h-full w-full object-cover"
-                src={test}
+                className="h-10 w-10 object-cover rounded-full border border-gray-500 bg-gray-500 "
+                src={item.user.avatarUrl}
                 alt="logo"
               />
             </div>
-            <img
-              className="absolute right-[-20%] bottom-[-10%] h-[30px] w-[30px] object-cover rounded-full border border-gray-500 bg-gray-500 "
-              src={avatar}
-              alt="logo"
-            />
+            <span className="text-base font-medium">{item.user.fullName}</span>
           </div>
-          <div className="block">
-            <h6 className="text-base font-medium leading-[18px] ">Vì yêu mà đến</h6>
-            <span className="text-sm font-medium leading-[0px]  text-gray-700">
-              Trương Quang Khang
-            </span>
+
+          <div className="flex items-center">
+            <span className="text-sm font-thin">{formatDateLocalV2(item.createdAt)}</span>
+            {(isModerator || item.user.id === currentUserSuccess?.id) && (
+              <OptionPost
+                item={item}
+                setOpenModal={setOpenModal}
+                setOpenModalDelete={setOpenModalDelete}
+              />
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="flex p-3 cursor-pointer justify-between">
+          <div className="flex items-center">
+            <div className="relative flex-shrink-0  mr-4 ">
+              <div className="h-10 w-10 rounded-xl overflow-hidden border border-gray-700 bg-gray-700 ">
+                <img
+                  className="h-full w-full object-cover"
+                  src={test}
+                  alt="logo"
+                />
+              </div>
+              <img
+                className="absolute right-[-20%] bottom-[-10%] h-[30px] w-[30px] object-cover rounded-full border border-gray-500 bg-gray-500 "
+                src={item.user.avatarUrl}
+                alt={item.user.fullName}
+              />
+            </div>
+            <div className="block">
+              <h6 className="text-base font-medium leading-[18px] ">{item.forum.name}</h6>
+              <span className="text-sm font-medium leading-[0px]  text-gray-700">
+                {item.user.fullName}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center">
+            <span className="text-sm font-thin">{formatDateLocalV2(item.createdAt)}</span>
+            {(isModerator || item.user.id === currentUserSuccess?.id) && (
+              <OptionPost
+                item={item}
+                setOpenModal={setOpenModal}
+                setOpenModalDelete={setOpenModalDelete}
+              />
+            )}
           </div>
         </div>
       )}

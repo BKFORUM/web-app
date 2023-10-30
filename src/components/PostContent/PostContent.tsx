@@ -1,10 +1,6 @@
 import { FC } from 'react'
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import test from '../../assets/images/test.jpg'
-import avatar from '../../assets/images/avatartest.jpg'
-import IUImage from '../../assets/images/UI.jpg'
-import test666 from '../../assets/images/test666.jpg'
 
 import 'swiper/css'
 import 'swiper/css/navigation'

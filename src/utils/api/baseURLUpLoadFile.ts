@@ -20,10 +20,10 @@ BaseURLUpLoadFile.interceptors.request.use(
     }
 );
 
-BaseURLUpLoadFile.interceptors.request.use(request => {
-    console.log('Starting Request', JSON.stringify(request, null, 2))
-    return request
-})
+// BaseURLUpLoadFile.interceptors.request.use(request => {
+//     console.log('Starting Request', JSON.stringify(request, null, 2))
+//     return request
+// })
 
 // after send request
 BaseURLUpLoadFile.interceptors.response.use(

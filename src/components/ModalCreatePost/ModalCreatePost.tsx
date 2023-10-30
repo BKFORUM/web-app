@@ -3,16 +3,24 @@ import { Dialog, Transition } from '@headlessui/react'
 import { Tooltip } from '@mui/material'
 import { FC, Fragment, useEffect, useRef, useState } from 'react'
 import { FaRegImages, FaRegSmile } from 'react-icons/fa'
-import { EditorState, convertToRaw } from 'draft-js'
+import { EditorState, convertToRaw, ContentState } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
 import MultiImage from '@components/MultiImage'
 import Button from '@components/Button'
+import { IDocuments, IPostViewForum } from '@interfaces/IPost'
+import htmlToDraft from 'html-to-draftjs'
 
 interface Props {
+  postSelected: IPostViewForum | null
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   handleAction: (data: any) => Promise<void>
   isLoading: boolean
+}
+
+interface Image {
+  name: string
+  fileUrl: string
 }
 
 const ModalCreatePost: FC<Props> = ({
@@ -20,21 +28,50 @@ const ModalCreatePost: FC<Props> = ({
   setOpen,
   handleAction,
   isLoading,
+  postSelected,
 }: Props): JSX.Element => {
   const ImageRef: any = useRef()
   const [step, setStep] = useState('post')
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
-  const [Images, setImages] = useState([])
+  const [Images, setImages] = useState<Image[]>([])
   const [FileImages, setFileImages] = useState<File[]>([])
+  const [imageEdit, setImageEdit] = useState<IDocuments[]>([])
+
+  useEffect(() => {
+    if (postSelected) {
+      const contentBlock = htmlToDraft(postSelected.content)
+      const { contentBlocks, entityMap } = contentBlock
+      const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap)
+      const editorState = EditorState.createWithContent(contentState)
+      setEditorState(editorState)
+      const image = postSelected.documents.map((item) => {
+        return { fileUrl: item.fileUrl, name: item.fileName }
+      })
+      setImageEdit(postSelected.documents)
+      if (image.length > 0) {
+        setStep('image')
+        setImages(image)
+      }
+    }
+  }, [postSelected, open])
 
   const onEditorStateChange = (editorState: EditorState) => {
     setEditorState(editorState)
   }
 
   const _deleteImage = (image: any) => {
-    const newImage = Images.filter((file: any) => file !== image)
+    const newImage = Images.filter((file: any) => file.name !== image.name.split('.')[0])
     setImages(newImage)
-    setFileImages(newImage)
+    const newFileImages = FileImages.filter(
+      (file: any) => file.name !== image.name.split('.')[0],
+    )
+    setFileImages(newFileImages)
+    if (postSelected) {
+      const newImageEdit = imageEdit.filter(
+        (file: any) => file.fileName !== image.name.split('.')[0],
+      )
+      setImageEdit(newImageEdit)
+    }
   }
 
   const handleFileChange = (file: any) => {
@@ -44,7 +81,10 @@ const ModalCreatePost: FC<Props> = ({
     setFileImages(newImages)
     const newImagePreview: any = newImages.map((fileImage: any) => {
       if (fileImage.size) {
-        return URL.createObjectURL(fileImage)
+        return {
+          name: fileImage.name.split('.')[0],
+          fileUrl: URL.createObjectURL(fileImage),
+        }
       }
       return fileImage
     })
@@ -53,7 +93,7 @@ const ModalCreatePost: FC<Props> = ({
 
   const handleCreatePost = async (): Promise<void> => {
     const dataHTML = draftToHtml(convertToRaw(editorState.getCurrentContent()))
-    handleAction({ content: dataHTML, files: FileImages })
+    handleAction({ content: dataHTML, files: FileImages, imageEdit: imageEdit })
   }
 
   useEffect(() => {
@@ -100,7 +140,7 @@ const ModalCreatePost: FC<Props> = ({
                     <Dialog.Title
                       as="h3"
                       className="text-lg font-medium leading-6 text-gray-900 text-center  ">
-                      Create Post
+                      {!postSelected ? 'Tạo' : 'Chỉnh sửa'} bài viết
                     </Dialog.Title>
                     <span
                       onClick={() => setOpen(false)}
@@ -165,7 +205,7 @@ const ModalCreatePost: FC<Props> = ({
                           : 'cursor-not-allowed'
                       } `}
                       onClick={() => handleCreatePost()}>
-                      Đăng
+                      {!postSelected ? 'Đăng' : 'Lưu'}
                     </Button>
                   </Dialog.Panel>
                 </Transition.Child>

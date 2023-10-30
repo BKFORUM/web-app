@@ -136,11 +136,11 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
   }, [])
   return (
     <div
-      className={`hover:overflow-y-auto overflow-hidden fixed left-0 top-[60px]`}
+      className={`hover:overflow-y-auto overflow-hidden fixed left-0 top-[60px] shadow-[1px_1px_42px_8px_#00000028]`}
       style={{ height: 'calc(100vh - 60px)', width: '305px' }}>
       <ul
         id="side-menu"
-        className="w-full float-none flex flex-col font-medium">
+        className="w-full float-none flex flex-col font-medium ">
         {DATA_SIDEBAR.map((dataItem: any, index: number) => (
           <li
             className={`relative`}

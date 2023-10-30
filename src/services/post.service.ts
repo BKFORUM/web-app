@@ -34,4 +34,27 @@ const getAllPostByForum = ({ id, params }: IParams) => {
     });
 }
 
-export { addPost, postImage, getAllPost, getAllPostByForum }    
+const getAllPostByUser = ({ id, params }: IParams) => {
+    return BaseURL({
+        url: `/users/${id}/posts`,
+        method: "GET",
+        params,
+    });
+}
+
+const editPost = (data: any) => {
+    return BaseURL({
+        url: `/posts/${data.id}`,
+        method: "PUT",
+        data
+    });
+};
+
+const deletePost = (id: string) => {
+    return BaseURL({
+        url: `/posts/${id}`,
+        method: "DELETE",
+    });
+};
+
+export { addPost, postImage, getAllPost, getAllPostByForum, getAllPostByUser, deletePost, editPost }    
