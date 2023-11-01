@@ -1,24 +1,85 @@
-import { FC, useState } from 'react'
-import Selected from '@components/Select'
-import test from '../../assets/images/test.jpg'
+import { FC, useEffect, useState } from 'react'
 import ModalCreatePost from '@components/ModalCreatePost/ModalCreatePost'
-import avatartest from '../../assets/images/avatartest.jpg'
-import { HiOutlineChatBubbleLeftRight } from 'react-icons/hi2'
 import PostItem from '@components/PostItem'
-import { useStoreState } from 'easy-peasy'
-import { userStateSelector } from '@store/index'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import {
+  notifyActionSelector,
+  postActionSelector,
+  postStateSelector,
+  userActionSelector,
+  userStateSelector,
+} from '@store/index'
+import AutocompleteCustom from '@components/Autocomplete/Autocomplete'
+import { IOption, IUserForumResponse } from '@interfaces/IForum'
+import UserActive from './components/UserActive'
+import ModalConfirm from '@components/ModalConfirm'
+import { IPostViewForum } from '@interfaces/IPost'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 interface Props {}
 
 const HomePage: FC<Props> = (): JSX.Element => {
-  const { currentUserSuccess } = useStoreState(userStateSelector)
+  const { getAllForumByUser, setIsGetAllAgain } = useStoreActions(userActionSelector)
+  const { currentUserSuccess, isGetAllAgain } = useStoreState(userStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { addPost, postImage, deletePost, editPost, getAllPost } =
+    useStoreActions(postActionSelector)
+  const { postSelected } = useStoreState(postStateSelector)
+
+  const [openModalDelete, setOpenModalDelete] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const [forumSelected, setForumSelected] = useState('')
   const [error, setError] = useState('')
   const [openModal, setOpenModal] = useState<boolean>(false)
+  const [dataForum, setDataForum] = useState<IOption[]>([])
+  const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
+  const [totalRowCount, setTotalRowCount] = useState<number>(0)
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  })
 
-  const handleChange = (value: any): void => {
-    setForumSelected(value?.target.value)
+  const getAllForumByUserData = async (): Promise<void> => {
+    if (currentUserSuccess?.id) {
+      const res = await getAllForumByUser(currentUserSuccess.id)
+      if (res) {
+        const option = res.map((item: IUserForumResponse) => {
+          return { id: item.id, name: item.name }
+        })
+        setDataForum(option)
+      }
+    }
+  }
+
+  const getAllPostData = async (): Promise<void> => {
+    const res = await getAllPost({
+      skip: paginationModel.page * 10,
+      take: paginationModel.pageSize,
+    })
+    if (res) {
+      setTotalRowCount(res.totalRecords)
+      setDataPost([...dataPost, ...res.data])
+    }
+  }
+
+  useEffect(() => {
+    getAllPostData()
+  }, [paginationModel])
+
+  useEffect(() => {
+    if (isGetAllAgain) {
+      getAllForumByUserData()
+      setIsGetAllAgain(false)
+    }
+  }, [isGetAllAgain])
+
+  useEffect(() => {
+    getAllForumByUserData()
+  }, [])
+
+  const handleChange = (value: string): void => {
+    setForumSelected(value)
   }
 
   const handleCreatePost = (): void => {
@@ -29,10 +90,130 @@ const HomePage: FC<Props> = (): JSX.Element => {
     setError('')
     setOpenModal(true)
   }
+
+  const handleAction = async (data: any): Promise<void> => {
+    setIsLoading(true)
+    const formData = new FormData()
+    for (let i = 0; i < data?.files?.length; i++) {
+      formData.append(`documents`, data.files[i])
+    }
+
+    const newUrls = data?.imageEdit.map((image: any) => {
+      return { fileUrl: image.fileUrl, fileName: image.fileName }
+    })
+
+    if (postSelected) {
+      if (data.files?.length > 0) {
+        const resImage = await postImage(formData)
+        if (resImage) {
+          const res = await editPost({
+            id: postSelected.id,
+            content: data.content,
+            documents: [...resImage, ...newUrls],
+          })
+          if (res) {
+            setNotifySetting({
+              show: true,
+              status: 'success',
+              message: 'Edit post successfully',
+            })
+            const updatedPosts = dataPost.map((post: IPostViewForum) =>
+              post.id === postSelected.id
+                ? { ...post, content: data.content, documents: [...resImage, ...newUrls] }
+                : post,
+            )
+            setDataPost(updatedPosts)
+          }
+          setIsLoading(false)
+          setOpenModal(false)
+        }
+      } else {
+        const res = await editPost({
+          id: postSelected.id,
+          content: data.content,
+          documents: newUrls,
+        })
+        if (res) {
+          setNotifySetting({
+            show: true,
+            status: 'success',
+            message: 'Edit post successfully',
+          })
+          const updatedPosts = dataPost.map((post: IPostViewForum) =>
+            post.id === postSelected.id
+              ? { ...post, content: data.content, documents: [...newUrls] }
+              : post,
+          )
+          setDataPost(updatedPosts)
+        }
+        setIsLoading(false)
+        setOpenModal(false)
+      }
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      if (data.files?.length > 0) {
+        const resImage = await postImage(formData)
+
+        if (resImage) {
+          const res = await addPost({
+            forumId: forumSelected,
+            content: data.content,
+            documents: resImage,
+          })
+          if (res) {
+            setNotifySetting({
+              show: true,
+              status: 'success',
+              message: 'Add post successfully',
+            })
+            setDataPost([])
+            setPaginationModel({ page: 0, pageSize: 10 })
+          }
+        }
+        setIsLoading(false)
+        setOpenModal(false)
+      } else {
+        const res = await addPost({
+          forumId: forumSelected,
+          content: data.content,
+        })
+        if (res) {
+          setNotifySetting({
+            show: true,
+            status: 'success',
+            message: 'Add post successfully',
+          })
+          setDataPost([])
+          setPaginationModel({ page: 0, pageSize: 10 })
+        }
+        setIsLoading(false)
+        setOpenModal(false)
+      }
+    }
+  }
+
+  const handleDelete = async (): Promise<void> => {
+    setIsLoading(true)
+    if (postSelected?.id !== undefined) {
+      const res = await deletePost(postSelected?.id)
+      if (res) {
+        setNotifySetting({
+          show: true,
+          status: 'success',
+          message: 'Delete post successfully',
+        })
+        const updatedPosts = dataPost.filter((post) => post.id !== postSelected?.id)
+        setDataPost(updatedPosts)
+      }
+      setIsLoading(false)
+      setOpenModalDelete(false)
+    }
+  }
+
   return (
     <>
       <div className="grid grid-cols-10 pt-6 flex-1">
-        <div className="col-span-7 ml-52 mr-16 ">
+        <div className="col-span-7 ml-40 mr-16 ">
           <div className="relative flex-1 flex gap-2 items-center px-6 py-6 bg-white shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md">
             <div className=" flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mr-2 border border-gray-700 bg-gray-700">
               <img
@@ -47,11 +228,12 @@ const HomePage: FC<Props> = (): JSX.Element => {
               type="button"
               value="Viết bài tại đây...."
             />
-            <Selected
+            <AutocompleteCustom
               value={forumSelected}
               onChange={handleChange}
-              empty="Select forum"
-              width="180px"
+              placeholder="Select forum"
+              options={dataForum}
+              width="300px"
             />
 
             {forumSelected === '' && (
@@ -61,90 +243,60 @@ const HomePage: FC<Props> = (): JSX.Element => {
             )}
           </div>
 
-          <div className="my-4   bg-white min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
-            {/* <PostItem /> */}
+          <div>
+            <InfiniteScroll
+              dataLength={dataPost.length}
+              next={() =>
+                setPaginationModel({
+                  page: paginationModel.page + 1,
+                  pageSize: 10,
+                })
+              }
+              hasMore={dataPost.length !== totalRowCount}
+              loader={<h4>Loading...</h4>}
+              endMessage={
+                <p style={{ textAlign: 'center' }}>
+                  <b>Yay! You have seen it all</b>
+                </p>
+              }>
+              {dataPost.map((item, index) => (
+                <div
+                  key={index}
+                  className="my-4 bg-white min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
+                  <PostItem
+                    item={item}
+                    // moderatorId={moderatorId}
+                    setOpenModal={setOpenModal}
+                    setOpenModalDelete={setOpenModalDelete}
+                  />
+                </div>
+              ))}
+            </InfiniteScroll>
           </div>
         </div>
 
         <div className="col-span-3 px-4 ">
-          <div className="bg-white px-1  py-3 shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md">
-            <div className="flex items-center gap-2 px-3 text-[#0001CB] mb-2">
-              <HiOutlineChatBubbleLeftRight className="w-8 h-8  " />
-              <span className="font-medium">Đang hoạt động</span>
-            </div>
-            <li className="relative group list-none ">
-              <a className="relative block w-full py-1.5 px-3  text-left clear-both whitespace-nowrap rounded-md hover:bg-gray-200 hover:text-primary-400 cursor-pointer group-hover:opacity-80 transition-all duration-200 ">
-                <img
-                  className="h-10 w-10 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 inline"
-                  src={avatartest}
-                  alt="avatar"
-                />
-                <span
-                  title="online"
-                  className="flex justify-center absolute left-10 bottom-2  text-center bg-green-500 border border-white w-[10px] h-[10px] rounded-full"></span>
-                <span className="font-semibold">Trương Quang Khang</span>
-              </a>
-            </li>
-            <li className="relative group list-none ">
-              <a className="relative block w-full py-1.5 px-3  text-left clear-both whitespace-nowrap rounded-md hover:bg-gray-200 hover:text-primary-400 cursor-pointer group-hover:opacity-80 transition-all duration-200 ">
-                <img
-                  className="h-10 w-10 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 inline"
-                  src={avatartest}
-                  alt="avatar"
-                />
-                <span
-                  title="online"
-                  className="flex justify-center absolute left-10 bottom-2  text-center bg-green-500 border border-white w-[10px] h-[10px] rounded-full"></span>
-                <span className="font-semibold">Trương Quang Khang</span>
-              </a>
-            </li>
-            <li className="relative group list-none ">
-              <a className="relative block w-full py-1.5 px-3  text-left clear-both whitespace-nowrap rounded-md hover:bg-gray-200 hover:text-primary-400 cursor-pointer group-hover:opacity-80 transition-all duration-200 ">
-                <img
-                  className="h-10 w-10 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 inline"
-                  src={avatartest}
-                  alt="avatar"
-                />
-                <span
-                  title="online"
-                  className="flex justify-center absolute left-10 bottom-2  text-center bg-green-500 border border-white w-[10px] h-[10px] rounded-full"></span>
-                <span className="font-semibold">Trương Quang Khang</span>
-              </a>
-            </li>
-            <li className="relative group list-none ">
-              <a className="relative block w-full py-1.5 px-3  text-left clear-both whitespace-nowrap rounded-md hover:bg-gray-200 hover:text-primary-400 cursor-pointer group-hover:opacity-80 transition-all duration-200 ">
-                <img
-                  className="h-10 w-10 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 inline"
-                  src={avatartest}
-                  alt="avatar"
-                />
-                <span
-                  title="online"
-                  className="flex justify-center absolute left-10 bottom-2  text-center bg-green-500 border border-white w-[10px] h-[10px] rounded-full"></span>
-                <span className="font-semibold">Trương Quang Khang</span>
-              </a>
-            </li>
-            <li className="relative group list-none ">
-              <a className="relative block w-full py-1.5 px-3  text-left clear-both whitespace-nowrap rounded-md hover:bg-gray-200 hover:text-primary-400 cursor-pointer group-hover:opacity-80 transition-all duration-200 ">
-                <img
-                  className="h-10 w-10 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 inline"
-                  src={avatartest}
-                  alt="avatar"
-                />
-                <span
-                  title="online"
-                  className="flex justify-center absolute left-10 bottom-2  text-center bg-green-500 border border-white w-[10px] h-[10px] rounded-full"></span>
-                <span className="font-semibold">Trương Quang Khang</span>
-              </a>
-            </li>
-          </div>
+          <UserActive />
         </div>
       </div>
 
-      {/* <ModalCreatePost
-        open={openModal}
-        setOpen={setOpenModal}
-      /> */}
+      {openModal && (
+        <ModalCreatePost
+          postSelected={!postSelected ? null : postSelected}
+          open={openModal}
+          setOpen={setOpenModal}
+          handleAction={handleAction}
+          isLoading={isLoading}
+        />
+      )}
+
+      <ModalConfirm
+        open={openModalDelete}
+        handleClose={() => {
+          setOpenModalDelete(false)
+        }}
+        handleDelete={handleDelete}
+      />
     </>
   )
 }

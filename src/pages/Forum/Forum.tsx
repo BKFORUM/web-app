@@ -31,11 +31,11 @@ const Forum: FC<Props> = (): JSX.Element => {
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
   const [value, setValue] = useState(0)
-  const [openModalDelete, setOpenModalDelete] = useState<boolean>(false)
   const [openModal, setOpenModal] = useState<boolean>(false)
+  const [openModalDelete, setOpenModalDelete] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [detailForum, setDetailForum] = useState<IForumDetail | null>(null)
-  const [data, setData] = useState<IPostViewForum[]>([])
+  const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -61,17 +61,22 @@ const Forum: FC<Props> = (): JSX.Element => {
       })
       if (res) {
         setTotalRowCount(res.totalRecords)
-        setData([...data, ...res.data])
+        setDataPost([...dataPost, ...res.data])
       }
     }
   }
   useEffect(() => {
-    getForumData()
+    window.scrollTo(0, 0)
+    if (id) {
+      getForumData()
+      setDataPost([])
+      setPaginationModel({ ...paginationModel, page: 0 })
+    }
   }, [id])
 
   useEffect(() => {
     getAllPostByForumData()
-  }, [paginationModel, id])
+  }, [paginationModel])
 
   const handleAction = async (data: any): Promise<void> => {
     setIsLoading(true)
@@ -81,13 +86,12 @@ const Forum: FC<Props> = (): JSX.Element => {
     }
 
     const newUrls = data?.imageEdit.map((image: any) => {
-      return { fileName: image.fileName, fileUrl: image.fileUrl }
+      return { fileUrl: image.fileUrl, fileName: image.fileName }
     })
 
     if (postSelected) {
       if (data.files?.length > 0) {
         const resImage = await postImage(formData)
-        // console.log([...resImage, ...newUrls])
         if (resImage) {
           const res = await editPost({
             id: postSelected.id,
@@ -100,17 +104,21 @@ const Forum: FC<Props> = (): JSX.Element => {
               status: 'success',
               message: 'Edit post successfully',
             })
-            // setPaginationModel({ page: 0, pageSize: 10 })
+            const updatedPosts = dataPost.map((post: IPostViewForum) =>
+              post.id === postSelected.id
+                ? { ...post, content: data.content, documents: [...resImage, ...newUrls] }
+                : post,
+            )
+            setDataPost(updatedPosts)
           }
+          setIsLoading(false)
+          setOpenModal(false)
         }
-        setIsLoading(false)
-        setOpenModal(false)
       } else {
-        // console.log(newUrls)
         const res = await editPost({
           id: postSelected.id,
           content: data.content,
-          document: newUrls,
+          documents: newUrls,
         })
         if (res) {
           setNotifySetting({
@@ -118,14 +126,21 @@ const Forum: FC<Props> = (): JSX.Element => {
             status: 'success',
             message: 'Edit post successfully',
           })
-          // setPaginationModel({ page: 0, pageSize: 10 })
+          const updatedPosts = dataPost.map((post: IPostViewForum) =>
+            post.id === postSelected.id
+              ? { ...post, content: data.content, documents: [...newUrls] }
+              : post,
+          )
+          setDataPost(updatedPosts)
         }
         setIsLoading(false)
         setOpenModal(false)
       }
     } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       if (data.files?.length > 0) {
         const resImage = await postImage(formData)
+
         if (resImage) {
           const res = await addPost({
             forumId: id,
@@ -138,6 +153,7 @@ const Forum: FC<Props> = (): JSX.Element => {
               status: 'success',
               message: 'Add post successfully',
             })
+            setDataPost([])
             setPaginationModel({ page: 0, pageSize: 10 })
           }
         }
@@ -154,6 +170,7 @@ const Forum: FC<Props> = (): JSX.Element => {
             status: 'success',
             message: 'Add post successfully',
           })
+          setDataPost([])
           setPaginationModel({ page: 0, pageSize: 10 })
         }
         setIsLoading(false)
@@ -172,8 +189,8 @@ const Forum: FC<Props> = (): JSX.Element => {
           status: 'success',
           message: 'Delete post successfully',
         })
-        const updatedPosts = data.filter((post) => post.id !== postSelected?.id)
-        setData(updatedPosts)
+        const updatedPosts = dataPost.filter((post) => post.id !== postSelected?.id)
+        setDataPost(updatedPosts)
       }
       setIsLoading(false)
       setOpenModalDelete(false)
@@ -239,26 +256,28 @@ const Forum: FC<Props> = (): JSX.Element => {
             index={0}>
             <div className="mx-72">
               <PostForum
-                data={data}
+                data={dataPost}
                 paginationModel={paginationModel}
                 setOpenModal={setOpenModal}
                 setOpenModalDelete={setOpenModalDelete}
                 setPaginationModel={setPaginationModel}
                 totalRowCount={totalRowCount}
-                isModerator={detailForum?.moderator.id === currentUserSuccess?.id}
+                moderatorId={detailForum?.moderator.id}
               />
             </div>
           </TabPanel>
         </div>
       </div>
 
-      <ModalCreatePost
-        postSelected={!postSelected ? null : postSelected}
-        open={openModal}
-        setOpen={setOpenModal}
-        handleAction={handleAction}
-        isLoading={isLoading}
-      />
+      {openModal && (
+        <ModalCreatePost
+          postSelected={!postSelected ? null : postSelected}
+          open={openModal}
+          setOpen={setOpenModal}
+          handleAction={handleAction}
+          isLoading={isLoading}
+        />
+      )}
 
       <ModalConfirm
         open={openModalDelete}

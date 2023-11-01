@@ -6,7 +6,7 @@ import { FC } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 interface Props {
-  isModerator?: boolean
+  moderatorId?: string
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>
   setOpenModalDelete: React.Dispatch<React.SetStateAction<boolean>>
   data: IPostViewForum[]
@@ -68,7 +68,7 @@ const PostForum: FC<Props> = ({ ...props }: Props): JSX.Element => {
               className="my-4 bg-white min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
               <PostItem
                 item={item}
-                isModerator={props.isModerator}
+                moderatorId={props.moderatorId}
                 setOpenModal={props.setOpenModal}
                 setOpenModalDelete={props.setOpenModalDelete}
               />

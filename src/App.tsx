@@ -6,12 +6,23 @@ import ProtectedRoute from '@routes/ProtectedRoute'
 import RedirectForum from '@routes/RedirectForum'
 import './App.css'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import { notifyActionSelector, notifyStateSelector } from './store'
+import { notifyActionSelector, notifyStateSelector, userActionSelector } from './store'
 import Notify from '@components/Notify'
+import { useEffect } from 'react'
 
 function App() {
   const { notifySetting } = useStoreState(notifyStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { getCurrentUser } = useStoreActions(userActionSelector)
+  const auth: any = JSON.parse(String(localStorage.getItem('auth')))
+
+  const getCurrentUserApp = async (): Promise<void> => {
+    await getCurrentUser()
+  }
+
+  useEffect(() => {
+    if (auth?.accessToken) getCurrentUserApp()
+  }, [auth])
   return (
     <>
       <Routes>

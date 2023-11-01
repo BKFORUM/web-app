@@ -43,7 +43,7 @@ const schema = yup.object().shape({
 const Login: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
   const { messageError, isLoginSuccess } = useStoreState(authStateSelector)
-  const { getCurrentUser } = useStoreActions(userActionSelector)
+
   const { login, setIsLoginSuccess } = useStoreActions(authActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
@@ -67,16 +67,11 @@ const Login: FC<Props> = (): JSX.Element => {
     event.preventDefault()
   }
 
-  const getCurrentUserApp = async (): Promise<void> => {
-    await getCurrentUser()
-  }
-
   const onSubmit = async (data: IUserLogin) => {
     setIsLoading(true)
     const res = await login(data)
     if (res) {
       setNotifySetting({ show: true, status: 'success', message: 'Login successful' })
-      getCurrentUserApp()
       navigate('/')
       setIsLoading(false)
     } else {

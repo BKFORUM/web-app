@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addPost, deletePost, editPost, getAllPostByForum, getAllPostByUser, postImage } from "../../services/post.service";
+import { addPost, deletePost, editPost, getAllPost, getAllPostByForum, getAllPostByUser, postImage } from "../../services/post.service";
 import { IParams } from "@interfaces/IClient";
 import { IPostViewForum } from "@interfaces/IPost";
 
@@ -26,6 +26,11 @@ export interface IPostModel {
     isDeletePostSuccess: boolean;
     setIsDeletePostSuccess: Action<IPostModel, boolean>;
     deletePost: Thunk<IPostModel, string>;
+
+    //getAllPost
+    isGetAllPostSuccess: boolean;
+    setIsGetAllPostSuccess: Action<IPostModel, boolean>;
+    getAllPost: Thunk<IPostModel, any>;
 
     //getAllPostByForum
     isGetAllPostByForumSuccess: boolean;
@@ -54,6 +59,23 @@ export const postModel: IPostModel = persist({
     postSelected: null,
     setPostSelected: action((state, payload) => {
         state.postSelected = payload;
+    }),
+
+    // getAllPost
+    isGetAllPostSuccess: true,
+    setIsGetAllPostSuccess: action((state, payload) => {
+        state.isGetAllPostSuccess = payload;
+    }),
+    getAllPost: thunk(async (actions, payload) => {
+        return getAllPost(payload)
+            .then(async (res) => {
+                actions.setIsGetAllPostSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllPostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
     }),
 
     // getAllPostByForum

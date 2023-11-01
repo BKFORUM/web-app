@@ -1,15 +1,19 @@
-import { ITopic, IUserForumResponse } from '@interfaces/IForum'
+import { IUserForumResponse } from '@interfaces/IForum'
 import TabPanel from '@layouts/components/TabPanel'
 import { Box, Tab, Tabs } from '@mui/material'
-import { HiOutlineUser } from 'react-icons/hi'
+import { GrUserSettings } from 'react-icons/gr'
 import { FC, useState } from 'react'
 import test from '../../../../assets/images/avatartest.jpg'
+import { HiUser } from 'react-icons/hi2'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
   dataForum: IUserForumResponse[]
+  idUser?: string
 }
 
-const ForumUserItem: FC<Props> = ({ dataForum }: Props): JSX.Element => {
+const ForumUserItem: FC<Props> = ({ dataForum, idUser }: Props): JSX.Element => {
+  const navigate = useNavigate()
   const [value, setValue] = useState(0)
 
   const a11yProps = (index: number) => {
@@ -41,49 +45,96 @@ const ForumUserItem: FC<Props> = ({ dataForum }: Props): JSX.Element => {
         </Tabs>
       </Box>
 
-      <div className="mt-4 px-4">
+      <div className="mt-8 px-12">
         <TabPanel
           value={value}
           index={0}>
-          <div className="grid grid-cols-2 gap-4 pb-4">
-            {dataForum.map((item, index) => (
-              <div
-                key={index}
-                className="p-3 border border-gray-400 rounded-xl flex items-start flex-1 gap-4">
-                <div className="h-20 w-20 rounded-lg overflow-hidden">
-                  <img
-                    className="h-full w-full object-cover"
-                    src={test}
-                    alt=""
-                  />
-                </div>
-                <div className="flex flex-col flex-1 gap-1 mb-auto">
-                  <h4 className="text-xl font-semibold pt-0">{item.name}</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {item.topics.map((data: any, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-[#E6F0F6] rounded-2xl text-sm">
-                        {data?.topic.name}
-                      </span>
-                    ))}
+          <div className="grid grid-cols-2 gap-8 pb-4">
+            {dataForum.map((item, index) => {
+              if (item.moderator.id === idUser)
+                return (
+                  <div
+                    key={index}
+                    onClick={() => navigate('/forums/' + item.id)}
+                    className="p-2 rounded-xl flex items-start flex-1 gap-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]
+                    transform hover:scale-105 duration-500 ease-in-out cursor-pointer
+                    ">
+                    <div className="h-20 w-20 rounded-lg overflow-hidden">
+                      <img
+                        className="h-full w-full object-cover"
+                        src={test}
+                        alt=""
+                      />
+                    </div>
+                    <div className="flex flex-col flex-1 gap-1 mb-auto">
+                      <h4 className="text-xl font-semibold pt-0">{item.name}</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {item.topics.map((data: any, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-[#E6F0F6] rounded-2xl text-xs">
+                            {data?.topic.name}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="flex items-center">
+                          <GrUserSettings className="w-4 h-4 mr-2" />
+                          <span className="text-sm font-medium">Moderator</span>
+                        </div>
+                        <span className="text-sm ml-1">
+                          {item._count.users} <span>member</span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <HiOutlineUser className="w-5 h-5" />
-                    <span className="font-thin text-sm">
-                      {item._count.users} <span>member</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+                )
+            })}
           </div>
         </TabPanel>
 
         <TabPanel
           value={value}
           index={1}>
-          <div>bbbbb</div>
+          <div className="grid grid-cols-2 gap-6 pb-8">
+            {dataForum.map((item, index) => {
+              if (item.moderator.id !== idUser)
+                return (
+                  <div
+                    key={index}
+                    onClick={() => navigate('/forums/' + item.id)}
+                    className="p-2 rounded-xl flex items-start flex-1 gap-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]
+                    transform hover:scale-105 duration-500 ease-in-out cursor-pointer
+                    ">
+                    <div className="h-20 w-20 rounded-lg overflow-hidden">
+                      <img
+                        className="h-full w-full object-cover"
+                        src={test}
+                        alt=""
+                      />
+                    </div>
+                    <div className="flex flex-col flex-1 gap-1 mb-auto">
+                      <h4 className="text-xl font-semibold pt-0">{item.name}</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {item.topics.map((data: any, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-[#E6F0F6] rounded-2xl text-xs">
+                            {data?.topic.name}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-1 ">
+                        <HiUser className="w-4 h-4" />
+                        <span className="text-sm ">
+                          {item._count.users} <span>member</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )
+            })}
+          </div>
         </TabPanel>
       </div>
     </div>

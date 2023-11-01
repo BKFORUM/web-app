@@ -1,3 +1,4 @@
+import { IUserData } from "@interfaces/IUser";
 import BaseURL from "@utils/api/baseURL";
 
 const getCurrentUser = () => {
@@ -29,4 +30,12 @@ const getAllForumByUser = (id: string) => {
     });
 }
 
-export { getAllUser, getCurrentUser, getUserById, getAllForumByUser }
+const editUser = (data: IUserData) => {
+    return BaseURL({
+        url: `/users/` + data.id,
+        method: "PUT",
+        data,
+    });
+}
+
+export { getAllUser, getCurrentUser, getUserById, getAllForumByUser, editUser }

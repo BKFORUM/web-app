@@ -5,11 +5,16 @@ export interface ITopic {
     name: string
 }
 
+export interface IOption extends ITopic {
+
+}
+
 export interface IUserForumResponse {
     id: string
     name: string
     createdAt: string
     status: string
+    avatarUrl?: string
     type: string
     moderator: IUserData
     topics: [

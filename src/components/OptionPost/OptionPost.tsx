@@ -1,7 +1,8 @@
 import { Transition } from '@headlessui/react'
 import { useClickOutside } from '@hooks/useClickOutside'
 import { IPostViewForum } from '@interfaces/IPost'
-import { postActionSelector, useStoreActions } from '@store/index'
+import { postActionSelector, useStoreActions, userStateSelector } from '@store/index'
+import { useStoreState } from 'easy-peasy'
 import { FC, Fragment, useState } from 'react'
 import {
   HiEllipsisVertical,
@@ -21,6 +22,7 @@ const OptionPost: FC<Props> = ({
   item,
 }): JSX.Element => {
   const { setPostSelected } = useStoreActions(postActionSelector)
+  const { currentUserSuccess } = useStoreState(userStateSelector)
   const [open, setOpen] = useState<boolean>(false)
   let elementRef: any = useClickOutside(() => {
     if (open) {
@@ -53,15 +55,18 @@ const OptionPost: FC<Props> = ({
           }}
           className={`absolute rounded right-2 top-[120%] z-50  bg-white border shadow-md`}
           style={{ width: '8rem' }}>
-          <li
-            className="list-none flex items-center gap-4 hover:bg-gray-200 cursor-pointer py-2 px-4 transition-all duration-300"
-            onClick={() => {
-              setOpenModal(true)
-              setPostSelected(item)
-            }}>
-            <HiOutlinePencilSquare className="h-6 w-6" />
-            <span className="font-semibold">Edit</span>
-          </li>
+          {item.user.id === currentUserSuccess?.id && (
+            <li
+              className="list-none flex items-center gap-4 hover:bg-gray-200 cursor-pointer py-2 px-4 transition-all duration-300"
+              onClick={() => {
+                setOpenModal(true)
+                setPostSelected(item)
+              }}>
+              <HiOutlinePencilSquare className="h-6 w-6" />
+              <span className="font-semibold">Edit</span>
+            </li>
+          )}
+
           <li
             className="list-none flex items-center gap-4 hover:bg-gray-200 cursor-pointer py-2 px-4 transition-all duration-300 text-red-500"
             onClick={() => {

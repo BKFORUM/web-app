@@ -36,18 +36,20 @@ export interface ICurrentUser {
 }
 
 export interface IUserData {
-    id: string
+    id?: string
     fullName: string
     gender: string
     dateOfBirth: string
-    avatarUrl: string
+    avatarUrl?: string
     type: string
     faculty?: {
         id: string
         name: string
     }
-    facultyId: string
+    facultyId?: string
+    facultyName?: string
     phoneNumber: string
     email: string
+    address?: string
 
 }

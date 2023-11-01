@@ -42,8 +42,10 @@ const ModalCreatePost: FC<Props> = ({
       const contentBlock = htmlToDraft(postSelected.content)
       const { contentBlocks, entityMap } = contentBlock
       const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap)
-      const editorState = EditorState.createWithContent(contentState)
-      setEditorState(editorState)
+      const newEditorState = EditorState.createWithContent(contentState)
+      setTimeout(() => {
+        setEditorState(newEditorState)
+      }, 50)
       const image = postSelected.documents.map((item) => {
         return { fileUrl: item.fileUrl, name: item.fileName }
       })
@@ -53,23 +55,21 @@ const ModalCreatePost: FC<Props> = ({
         setImages(image)
       }
     }
-  }, [postSelected, open])
+  }, [postSelected])
 
   const onEditorStateChange = (editorState: EditorState) => {
     setEditorState(editorState)
   }
 
   const _deleteImage = (image: any) => {
-    const newImage = Images.filter((file: any) => file.name !== image.name.split('.')[0])
+    const newImage = Images.filter((file: any) => file.name !== image.name)
     setImages(newImage)
     const newFileImages = FileImages.filter(
-      (file: any) => file.name !== image.name.split('.')[0],
+      (file: any) => file.name.split('.')[0] !== image.name,
     )
     setFileImages(newFileImages)
     if (postSelected) {
-      const newImageEdit = imageEdit.filter(
-        (file: any) => file.fileName !== image.name.split('.')[0],
-      )
+      const newImageEdit = imageEdit.filter((file: any) => file.fileName !== image.name)
       setImageEdit(newImageEdit)
     }
   }
@@ -95,14 +95,6 @@ const ModalCreatePost: FC<Props> = ({
     const dataHTML = draftToHtml(convertToRaw(editorState.getCurrentContent()))
     handleAction({ content: dataHTML, files: FileImages, imageEdit: imageEdit })
   }
-
-  useEffect(() => {
-    if (!open) {
-      setEditorState(EditorState.createEmpty())
-      setImages([])
-      setStep('')
-    }
-  }, [open])
 
   return (
     <>
@@ -168,6 +160,7 @@ const ModalCreatePost: FC<Props> = ({
                           </div>
                           <div className="mt-2 ">
                             <MultiImage
+                              single={false}
                               listImage={Images}
                               deleteImage={_deleteImage}
                               handleFileChange={handleFileChange}

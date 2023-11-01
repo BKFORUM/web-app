@@ -38,7 +38,7 @@ BaseURLUpLoadFile.interceptors.response.use(
                 originalConfig._retry = true;
                 const auth: any = JSON.parse(String(localStorage.getItem("auth")));
                 try {
-                    const res = await axios.get('http://52.139.152.154/auth/refresh', {
+                    const res = await axios.get('http://52.139.152.154/api/v1/auth/refresh', {
                         headers: {
                             Authorization: `Bearer ${auth?.refreshToken}`
                         }

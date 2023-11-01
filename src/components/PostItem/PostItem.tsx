@@ -6,7 +6,7 @@ import {
   HiMiniHeart,
   HiOutlineChatBubbleLeftEllipsis,
 } from 'react-icons/hi2'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { IPostViewForum } from '@interfaces/IPost'
 import { formatDateLocalV2 } from '@utils/functions/formatDay'
 import { useStoreState } from 'easy-peasy'
@@ -14,7 +14,7 @@ import { userStateSelector } from '@store/index'
 import OptionPost from '@components/OptionPost'
 
 interface Props {
-  isModerator?: boolean
+  moderatorId?: string
   item: IPostViewForum
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>
   setOpenModalDelete: React.Dispatch<React.SetStateAction<boolean>>
@@ -22,10 +22,11 @@ interface Props {
 
 const PostItem: FC<Props> = ({
   item,
-  isModerator,
+  moderatorId,
   setOpenModal,
   setOpenModalDelete,
 }: Props): JSX.Element => {
+  const navigate = useNavigate()
   const { pathname } = useLocation()
   const { currentUserSuccess } = useStoreState(userStateSelector)
 
@@ -36,19 +37,29 @@ const PostItem: FC<Props> = ({
       {pathname.split('/')[1] === 'forums' ? (
         <div className="flex items-center justify-between  p-3 ">
           <div className="flex items-center cursor-pointer">
-            <div className="relative flex-shrink-0  mr-2 ">
+            <div
+              onClick={() => navigate('/profile/' + item.user.id)}
+              className="relative flex-shrink-0  mr-2 ">
               <img
                 className="h-10 w-10 object-cover rounded-full border border-gray-500 bg-gray-500 "
                 src={item.user.avatarUrl}
                 alt="logo"
               />
             </div>
-            <span className="text-base font-medium">{item.user.fullName}</span>
+            <span className="text-base font-medium">
+              {item.user.fullName}
+              {moderatorId === item.user.id && (
+                <span className="px-2 py-0.5 text-xs ml-3 bg-sky-200 rounded-xl">
+                  Quản trị viên
+                </span>
+              )}
+            </span>
           </div>
 
           <div className="flex items-center">
             <span className="text-sm font-thin">{formatDateLocalV2(item.createdAt)}</span>
-            {(isModerator || item.user.id === currentUserSuccess?.id) && (
+            {(moderatorId === currentUserSuccess?.id ||
+              item.user.id === currentUserSuccess?.id) && (
               <OptionPost
                 item={item}
                 setOpenModal={setOpenModal}
@@ -69,6 +80,7 @@ const PostItem: FC<Props> = ({
                 />
               </div>
               <img
+                onClick={() => navigate('/profile/' + item.user.id)}
                 className="absolute right-[-20%] bottom-[-10%] h-[30px] w-[30px] object-cover rounded-full border border-gray-500 bg-gray-500 "
                 src={item.user.avatarUrl}
                 alt={item.user.fullName}
@@ -78,12 +90,18 @@ const PostItem: FC<Props> = ({
               <h6 className="text-base font-medium leading-[18px] ">{item.forum.name}</h6>
               <span className="text-sm font-medium leading-[0px]  text-gray-700">
                 {item.user.fullName}
+                {moderatorId === item.user.id && (
+                  <span className="px-2 py-0.5 text-xs ml-3 bg-sky-200 rounded-xl">
+                    Quản trị viên
+                  </span>
+                )}
               </span>
             </div>
           </div>
           <div className="flex items-center">
             <span className="text-sm font-thin">{formatDateLocalV2(item.createdAt)}</span>
-            {(isModerator || item.user.id === currentUserSuccess?.id) && (
+            {(moderatorId === currentUserSuccess?.id ||
+              item.user.id === currentUserSuccess?.id) && (
               <OptionPost
                 item={item}
                 setOpenModal={setOpenModal}

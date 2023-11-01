@@ -11,7 +11,7 @@ interface IMultiImage {
   handleFileChange?: (e: any) => void
   error?: boolean
   numberItem?: number
-  single?: boolean
+  single: boolean
   id?: any
   // isRequired?: boolean
   // classNameLabel?: any
@@ -24,6 +24,7 @@ interface IMultiImage {
 
 const MultiImage = ({
   listImage,
+  single,
   deleteImage,
   handleFileChange,
   InputRef,
@@ -59,7 +60,6 @@ IMultiImage) => {
     if (listImage?.length >= maxItem) setHiddenBtnAdd('hidden')
     else setHiddenBtnAdd('')
   }
-
   return (
     <div>
       <div
@@ -67,7 +67,7 @@ IMultiImage) => {
         {...getRootProps({
           onClick: (e: any) => handleClick(e),
         })}>
-        {listImage.length > 0 && (
+        {listImage.length > 0 && single === false && (
           <div className="absolute top-1 left-1/2 -translate-x-1/2">
             <button
               className="bg-amber-400 text-white px-4 py-0.5 rounded-md"
@@ -77,7 +77,7 @@ IMultiImage) => {
             <input
               type="file"
               {...getInputProps()}
-              multiple={true}
+              multiple={!single}
               ref={InputRef}
               className="hidden"
             />
@@ -99,7 +99,7 @@ IMultiImage) => {
               <input
                 type="file"
                 {...getInputProps()}
-                multiple={true}
+                multiple={!single}
                 ref={InputRef}
                 className="hidden"
               />
@@ -123,11 +123,16 @@ IMultiImage) => {
                 }}>
                 <XMarkIcon className="w-5 h-5 rounded-full" />
               </span>
-              <img
-                alt="not found"
-                className="h-[300px] w-full object-contain rounded-md border border-gray-300"
-                src={image.fileUrl}
-              />
+              <div
+                className={`${
+                  single === true ? 'w-full h-[200px]' : 'h-[300px] w-full'
+                }`}>
+                <img
+                  alt="not found"
+                  className={`object-contain rounded-md border border-gray-300 h-full w-full `}
+                  src={image.fileUrl}
+                />
+              </div>
             </div>
           ))}
         </div>

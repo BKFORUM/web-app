@@ -1,14 +1,6 @@
 import { FC, useEffect, useState } from 'react'
-import {
-  HiPencilAlt,
-  HiOutlineLocationMarker,
-  HiOutlineMail,
-  HiOutlineOfficeBuilding,
-  HiOutlinePhone,
-} from 'react-icons/hi'
-import { AiOutlineMan, AiOutlineWoman } from 'react-icons/ai'
-import { MdOutlinePermContactCalendar } from 'react-icons/md'
-import { GrUserSettings } from 'react-icons/gr'
+import { HiPencilAlt } from 'react-icons/hi'
+
 import { Box, Tab, Tabs } from '@mui/material'
 import TabPanel from '@layouts/components/TabPanel'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -17,33 +9,37 @@ import {
   postActionSelector,
   postStateSelector,
   userActionSelector,
+  userStateSelector,
 } from '@store/index'
 import { useParams } from 'react-router-dom'
 import { ICurrentUser } from '@interfaces/IUser'
-import { formatDateFormDateLocal } from '@utils/functions/formatDay'
 import { IPostViewForum } from '@interfaces/IPost'
-import InfiniteScroll from 'react-infinite-scroll-component'
-import PostItem from '@components/PostItem'
 import { IUserForumResponse } from '@interfaces/IForum'
 import ForumUserItem from './components/ForumUserItem'
 import ModalCreatePost from '@components/ModalCreatePost/ModalCreatePost'
 import ModalConfirm from '@components/ModalConfirm'
+import ModalEditUser from './components/ModalEditUser'
+import PostProfile from './components/PostProfile'
 
 interface Props {}
 
 const Profile: FC<Props> = (): JSX.Element => {
   const { id } = useParams()
-  const { getUserById, getAllForumByUser } = useStoreActions(userActionSelector)
-  const { getAllPostByUser, deletePost } = useStoreActions(postActionSelector)
+  const { getUserById, getAllForumByUser, editEdit, setCurrentUserSuccess } =
+    useStoreActions(userActionSelector)
+  const { getAllPostByUser, deletePost, editPost, postImage } =
+    useStoreActions(postActionSelector)
   const { postSelected } = useStoreState(postStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { currentUserSuccess } = useStoreState(userStateSelector)
 
   const [value, setValue] = useState(0)
   const [openModalDelete, setOpenModalDelete] = useState<boolean>(false)
   const [openModal, setOpenModal] = useState<boolean>(false)
+  const [openModalEditUser, setOpenModalEditUser] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [user, setUser] = useState<ICurrentUser>()
-  const [data, setData] = useState<IPostViewForum[]>([])
+  const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
   const [dataForum, setDataForum] = useState<IUserForumResponse[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
   const [paginationModel, setPaginationModel] = useState({
@@ -63,7 +59,7 @@ const Profile: FC<Props> = (): JSX.Element => {
       })
       if (res) {
         setTotalRowCount(res.totalRecords)
-        setData([...data, ...res.data])
+        setDataPost([...dataPost, ...res.data])
       }
     }
   }
@@ -72,7 +68,6 @@ const Profile: FC<Props> = (): JSX.Element => {
     if (id) {
       const res = await getAllForumByUser(id)
       if (res) {
-        console.log(res)
         setDataForum(res)
       }
     }
@@ -94,10 +89,67 @@ const Profile: FC<Props> = (): JSX.Element => {
 
   useEffect(() => {
     getProfile()
-  }, [])
+  }, [id])
 
   const handleAction = async (data: any): Promise<void> => {
-    console.log(data)
+    setIsLoading(true)
+    const formData = new FormData()
+    for (let i = 0; i < data?.files?.length; i++) {
+      formData.append(`documents`, data.files[i])
+    }
+
+    const newUrls = data?.imageEdit.map((image: any) => {
+      return { fileUrl: image.fileUrl, fileName: image.fileName }
+    })
+
+    if (postSelected) {
+      if (data.files?.length > 0) {
+        const resImage = await postImage(formData)
+        if (resImage) {
+          const res = await editPost({
+            id: postSelected.id,
+            content: data.content,
+            documents: [...resImage, ...newUrls],
+          })
+          if (res) {
+            setNotifySetting({
+              show: true,
+              status: 'success',
+              message: 'Edit post successfully',
+            })
+            const updatedPosts = dataPost.map((post: IPostViewForum) =>
+              post.id === postSelected.id
+                ? { ...post, content: data.content, documents: [...resImage, ...newUrls] }
+                : post,
+            )
+            setDataPost(updatedPosts)
+          }
+          setIsLoading(false)
+          setOpenModal(false)
+        }
+      } else {
+        const res = await editPost({
+          id: postSelected.id,
+          content: data.content,
+          documents: newUrls,
+        })
+        if (res) {
+          setNotifySetting({
+            show: true,
+            status: 'success',
+            message: 'Edit post successfully',
+          })
+          const updatedPosts = dataPost.map((post: IPostViewForum) =>
+            post.id === postSelected.id
+              ? { ...post, content: data.content, documents: [...newUrls] }
+              : post,
+          )
+          setDataPost(updatedPosts)
+        }
+        setIsLoading(false)
+        setOpenModal(false)
+      }
+    }
   }
 
   const handleDelete = async (): Promise<void> => {
@@ -110,11 +162,52 @@ const Profile: FC<Props> = (): JSX.Element => {
           status: 'success',
           message: 'Delete post successfully',
         })
-        const updatedPosts = data.filter((post) => post.id !== postSelected?.id)
-        setData(updatedPosts)
+        const updatedPosts = dataPost.filter((post) => post.id !== postSelected?.id)
+        setDataPost(updatedPosts)
       }
       setIsLoading(false)
       setOpenModalDelete(false)
+    }
+  }
+
+  const handleEditUser = async (data: any): Promise<void> => {
+    if (data?.avatarUrl.length === 0) {
+      const res = await editEdit({
+        ...data,
+        avatarUrl: user?.avatarUrl,
+      })
+      if (res) {
+        setNotifySetting({
+          show: true,
+          status: 'success',
+          message: 'Edit user successfully',
+        })
+        getProfile()
+        setOpenModalEditUser(false)
+        if (currentUserSuccess?.id === user?.id) {
+          setCurrentUserSuccess(res)
+        }
+      }
+    } else {
+      const resImage = await postImage(data?.avatarUrl)
+      if (resImage) {
+        const res = await editEdit({
+          ...data,
+          avatarUrl: resImage?.fileUrl,
+        })
+        if (res) {
+          setNotifySetting({
+            show: true,
+            status: 'success',
+            message: 'Edit user successfully',
+          })
+          getProfile()
+          setOpenModalEditUser(false)
+          if (currentUserSuccess?.id === user?.id) {
+            setCurrentUserSuccess(res)
+          }
+        }
+      }
     }
   }
 
@@ -143,10 +236,14 @@ const Profile: FC<Props> = (): JSX.Element => {
             <div className="flex flex-col gap-2">
               <div className="flex items-center">
                 <h4 className="text-2xl font-semibold mr-4 mb-1">{user?.fullName}</h4>
-                <button className="px-4 py-1 bg-[#E6F0F6] text-black rounded-2xl flex items-center hover:bg-blue-300 transition-all duration-200">
-                  <HiPencilAlt className="h-6 w-6 mr-2" />
-                  <span>Edit profile</span>
-                </button>
+                {currentUserSuccess?.id === user?.id && (
+                  <button
+                    onClick={() => setOpenModalEditUser(true)}
+                    className="px-4 py-1 bg-[#E6F0F6] text-black rounded-2xl flex items-center hover:bg-blue-300 transition-all duration-200">
+                    <HiPencilAlt className="h-6 w-6 mr-2" />
+                    <span>Edit profile</span>
+                  </button>
+                )}
               </div>
               <div>
                 <span className="px-4 py-1 bg-[#E6F0F6] rounded-2xl">445 bạn bè</span>
@@ -171,98 +268,39 @@ const Profile: FC<Props> = (): JSX.Element => {
           </Box>
         </div>
       </div>
-
       <div className="container mx-auto sm:px-0 lg:px-60">
         <TabPanel
           value={value}
           index={0}>
-          <div className="grid grid-cols-6 gap-4 ">
-            <div className="col-span-2">
-              <div className="flex flex-col px-4 gap-6 bg-white rounded-md py-4 mt-4">
-                <div className="flex items-center">
-                  <MdOutlinePermContactCalendar className="w-7 h-7 " />
-                  <span className="text-base font-semibold ml-4">
-                    {formatDateFormDateLocal(String(user?.dateOfBirth))}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  {user?.gender === 'MALE' && <AiOutlineMan className="w-7 h-7 " />}
-                  {user?.gender === 'FEMALE' && <AiOutlineWoman className="w-7 h-7 " />}
-                  <span className="text-base font-semibold ml-4">{user?.gender}</span>
-                </div>
-                <div className="flex items-center">
-                  <HiOutlineLocationMarker className="w-7 h-7 " />
-                  <span className="text-base font-semibold ml-4">{user?.address}</span>
-                </div>
-                <div className="flex items-center">
-                  <HiOutlineMail className="w-6 h-6 " />
-                  <span className="text-base font-semibold ml-4 line-clamp-1 ">
-                    {user?.email}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <GrUserSettings className="w-6 h-6 ml-0.5 " />
-                  <span className="text-base font-semibold ml-4">{user?.type}</span>
-                </div>
-                <div className="flex items-center">
-                  <HiOutlineOfficeBuilding className="w-6 h-6 " />
-                  <span className="text-base font-semibold ml-4">
-                    {user?.faculty.name}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <HiOutlinePhone className="w-6 h-6 " />
-                  <span className="text-base font-semibold ml-4">
-                    {user?.phoneNumber}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-span-4 ">
-              <InfiniteScroll
-                dataLength={data.length}
-                next={() =>
-                  setPaginationModel({ page: paginationModel.page + 1, pageSize: 10 })
-                }
-                hasMore={data.length !== totalRowCount}
-                loader={<h4>Loading...</h4>}
-                endMessage={
-                  <p style={{ textAlign: 'center' }}>
-                    <b>Yay! You have seen it all</b>
-                  </p>
-                }>
-                {data.map((item, index) => (
-                  <div
-                    key={index}
-                    className="my-4 bg-white min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
-                    <PostItem
-                      item={item}
-                      setOpenModal={setOpenModal}
-                      setOpenModalDelete={setOpenModalDelete}
-                    />
-                  </div>
-                ))}
-              </InfiniteScroll>
-            </div>
-          </div>
+          <PostProfile
+            user={user}
+            dataPost={dataPost}
+            paginationModel={paginationModel}
+            setOpenModal={setOpenModal}
+            setOpenModalDelete={setOpenModalDelete}
+            setPaginationModel={setPaginationModel}
+            totalRowCount={totalRowCount}
+          />
         </TabPanel>
 
         <TabPanel
           value={value}
           index={1}>
-          <ForumUserItem dataForum={dataForum} />
+          <ForumUserItem
+            dataForum={dataForum}
+            idUser={user?.id}
+          />
         </TabPanel>
       </div>
-
-      <ModalCreatePost
-        postSelected={postSelected}
-        open={openModal}
-        setOpen={setOpenModal}
-        handleAction={handleAction}
-        isLoading={isLoading}
-      />
-
+      {openModal && (
+        <ModalCreatePost
+          postSelected={!postSelected ? null : postSelected}
+          open={openModal}
+          setOpen={setOpenModal}
+          handleAction={handleAction}
+          isLoading={isLoading}
+        />
+      )}
       <ModalConfirm
         open={openModalDelete}
         handleClose={() => {
@@ -270,6 +308,15 @@ const Profile: FC<Props> = (): JSX.Element => {
         }}
         handleDelete={handleDelete}
       />
+      {openModalEditUser && (
+        <ModalEditUser
+          user={user}
+          isLoading={isLoading}
+          open={openModalEditUser}
+          handleAction={handleEditUser}
+          setOpen={setOpenModalEditUser}
+        />
+      )}
     </>
   )
 }
