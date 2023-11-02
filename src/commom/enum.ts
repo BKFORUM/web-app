@@ -3,4 +3,9 @@ enum Gender {
     FEMALE = 'FEMALE'
 }
 
-export { Gender }
+enum Type {
+    HOMEROOM = 'HOMEROOM',
+    TOPIC = 'TOPIC'
+}
+
+export { Gender, Type }

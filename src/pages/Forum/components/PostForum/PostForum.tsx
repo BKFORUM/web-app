@@ -1,4 +1,5 @@
 import PostItem from '@components/PostItem'
+import { pageMode } from '@interfaces/IClient'
 import { IPostViewForum } from '@interfaces/IPost'
 import { postActionSelector, userStateSelector } from '@store/index'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -11,16 +12,8 @@ interface Props {
   setOpenModalDelete: React.Dispatch<React.SetStateAction<boolean>>
   data: IPostViewForum[]
   totalRowCount: number
-  setPaginationModel: React.Dispatch<
-    React.SetStateAction<{
-      page: number
-      pageSize: number
-    }>
-  >
-  paginationModel: {
-    page: number
-    pageSize: number
-  }
+  setPaginationModel: React.Dispatch<React.SetStateAction<pageMode | null>>
+  paginationModel: pageMode | null
 }
 
 const PostForum: FC<Props> = ({ ...props }: Props): JSX.Element => {
@@ -50,10 +43,10 @@ const PostForum: FC<Props> = ({ ...props }: Props): JSX.Element => {
         <InfiniteScroll
           dataLength={props.data.length}
           next={() =>
-            props.setPaginationModel({
-              page: props.paginationModel.page + 1,
+            props.setPaginationModel((prevPaginationModel) => ({
+              page: prevPaginationModel ? prevPaginationModel.page + 1 : 0,
               pageSize: 10,
-            })
+            }))
           }
           hasMore={props.data.length !== props.totalRowCount}
           loader={<h4>Loading...</h4>}

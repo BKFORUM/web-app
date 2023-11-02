@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react'
-import test from '../../assets/images/test.jpg'
 import ModalCreatePost from '@components/ModalCreatePost/ModalCreatePost'
 import { HiPencilAlt } from 'react-icons/hi'
 import OptionForum from './components/OptionsForum'
@@ -10,6 +9,7 @@ import {
   notifyActionSelector,
   postActionSelector,
   postStateSelector,
+  userActionSelector,
   userStateSelector,
 } from '@store/index'
 import { IPostViewForum } from '@interfaces/IPost'
@@ -18,6 +18,13 @@ import PostForum from './components/PostForum'
 import TabPanel from '@layouts/components/TabPanel'
 import { IForumDetail } from '@interfaces/IForum'
 import ModalConfirm from '@components/ModalConfirm'
+import ModalEditForum from './components/ModalEditForum'
+import MembersForum from './components/MembersForum'
+import defaultAvatar from '../../assets/images/default_forum.png'
+import PostRequest from './components/PostRequest'
+import MemberRequest from './components/MemberRequest'
+import EventsForum from './components/EventsForum'
+import { pageMode } from '@interfaces/IClient'
 
 interface Props {}
 
@@ -27,20 +34,20 @@ const Forum: FC<Props> = (): JSX.Element => {
   const { addPost, postImage, getAllPostByForum, deletePost, editPost } =
     useStoreActions(postActionSelector)
   const { postSelected } = useStoreState(postStateSelector)
-  const { getForumById } = useStoreActions(forumActionSelector)
+  const { getForumById, editForum } = useStoreActions(forumActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { setIsGetAllAgain } = useStoreActions(userActionSelector)
 
   const [value, setValue] = useState(0)
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [openModalDelete, setOpenModalDelete] = useState<boolean>(false)
+  const [openModalEditForum, setOpenModalEditForum] = useState<boolean>(false)
+
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [detailForum, setDetailForum] = useState<IForumDetail | null>(null)
   const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10,
-  })
+  const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
 
   const getForumData = async (): Promise<void> => {
     if (id) {
@@ -50,7 +57,7 @@ const Forum: FC<Props> = (): JSX.Element => {
   }
 
   const getAllPostByForumData = async (): Promise<void> => {
-    if (id) {
+    if (id && paginationModel) {
       const res = await getAllPostByForum({
         id: id,
         params: {
@@ -65,12 +72,13 @@ const Forum: FC<Props> = (): JSX.Element => {
       }
     }
   }
+
   useEffect(() => {
     window.scrollTo(0, 0)
     if (id) {
       getForumData()
       setDataPost([])
-      setPaginationModel({ ...paginationModel, page: 0 })
+      setPaginationModel({ page: 0, pageSize: 10 })
     }
   }, [id])
 
@@ -197,6 +205,43 @@ const Forum: FC<Props> = (): JSX.Element => {
     }
   }
 
+  const handleEditForum = async (data: any): Promise<void> => {
+    setIsLoading(true)
+    if (data.avatarUrl.length === 0) {
+      const { avatarUrl, ...others } = data
+      const res = await editForum(others)
+      if (res) {
+        setNotifySetting({
+          show: true,
+          status: 'success',
+          message: 'Edit forum successfully',
+        })
+        getForumData()
+        setIsGetAllAgain(true)
+      }
+      setIsLoading(false)
+      setOpenModalEditForum(false)
+    } else {
+      const formData = new FormData()
+      formData.append(`documents`, data?.avatarUrl[0])
+      const resImage = await postImage(formData)
+      if (resImage) {
+        const res = await editForum({ ...data, avatarUrl: resImage[0].fileUrl })
+        if (res) {
+          setNotifySetting({
+            show: true,
+            status: 'success',
+            message: 'Edit forum successfully',
+          })
+          getForumData()
+          setIsGetAllAgain(true)
+        }
+      }
+      setIsLoading(false)
+      setOpenModalEditForum(false)
+    }
+  }
+
   const a11yProps = (index: number) => {
     return {
       id: `simple-tab-${index}`,
@@ -216,13 +261,15 @@ const Forum: FC<Props> = (): JSX.Element => {
               <a className="relative flex items-center w-full   text-left clear-both whitespace-nowrap rounded-md">
                 <img
                   className="h-32 w-32 rounded-full border border-gray-700 bg-gray-700 object-cover mr-4 inline"
-                  src={test}
+                  src={detailForum?.avatarUrl || defaultAvatar}
                   alt="avatar"
                 />
                 <div>
                   <span className="font-bold text-2xl">{detailForum?.name}</span>
                   {detailForum?.moderator.id === currentUserSuccess?.id && (
-                    <button className="mt-2 px-4 py-1 bg-[#E6F0F6] text-black rounded-2xl flex items-center hover:bg-blue-300 transition-all duration-200">
+                    <button
+                      onClick={() => setOpenModalEditForum(true)}
+                      className="mt-2 px-4 py-1 bg-[#E6F0F6] text-black rounded-2xl flex items-center hover:bg-blue-300 transition-all duration-200">
                       <HiPencilAlt className="h-6 w-6 mr-2" />
                       <span>Edit profile</span>
                     </button>
@@ -239,32 +286,78 @@ const Forum: FC<Props> = (): JSX.Element => {
               onChange={handleChange}
               aria-label="basic tabs example">
               <Tab
+                sx={{ textTransform: 'none' }}
                 label="Posts"
                 {...a11yProps(0)}
               />
               <Tab
+                sx={{ textTransform: 'none' }}
                 label="Members"
                 {...a11yProps(1)}
               />
+              <Tab
+                sx={{ textTransform: 'none' }}
+                label="Events"
+                {...a11yProps(2)}
+              />
+              {detailForum?.moderator.id === currentUserSuccess?.id && (
+                <Tab
+                  sx={{ textTransform: 'none' }}
+                  label="Members request"
+                  {...a11yProps(3)}
+                />
+              )}
+              {detailForum?.moderator.id === currentUserSuccess?.id && (
+                <Tab
+                  sx={{ textTransform: 'none' }}
+                  label="Posts request"
+                  {...a11yProps(4)}
+                />
+              )}
             </Tabs>
           </Box>
         </div>
 
-        <div>
+        <div className="mx-72">
           <TabPanel
             value={value}
             index={0}>
-            <div className="mx-72">
-              <PostForum
-                data={dataPost}
-                paginationModel={paginationModel}
-                setOpenModal={setOpenModal}
-                setOpenModalDelete={setOpenModalDelete}
-                setPaginationModel={setPaginationModel}
-                totalRowCount={totalRowCount}
-                moderatorId={detailForum?.moderator.id}
-              />
-            </div>
+            <PostForum
+              data={dataPost}
+              paginationModel={paginationModel}
+              setOpenModal={setOpenModal}
+              setOpenModalDelete={setOpenModalDelete}
+              setPaginationModel={setPaginationModel}
+              totalRowCount={totalRowCount}
+              moderatorId={detailForum?.moderator.id}
+            />
+          </TabPanel>
+
+          <TabPanel
+            value={value}
+            index={1}>
+            <MembersForum
+              users={detailForum?.users}
+              moderator={detailForum?.moderator}
+            />
+          </TabPanel>
+
+          <TabPanel
+            value={value}
+            index={2}>
+            <EventsForum />
+          </TabPanel>
+
+          <TabPanel
+            value={value}
+            index={3}>
+            <MemberRequest />
+          </TabPanel>
+
+          <TabPanel
+            value={value}
+            index={4}>
+            <PostRequest />
           </TabPanel>
         </div>
       </div>
@@ -278,14 +371,24 @@ const Forum: FC<Props> = (): JSX.Element => {
           isLoading={isLoading}
         />
       )}
-
-      <ModalConfirm
-        open={openModalDelete}
-        handleClose={() => {
-          setOpenModalDelete(false)
-        }}
-        handleDelete={handleDelete}
-      />
+      {openModalEditForum && (
+        <ModalEditForum
+          forum={detailForum}
+          open={openModalEditForum}
+          setOpen={setOpenModalEditForum}
+          handleAction={handleEditForum}
+          isLoading={isLoading}
+        />
+      )}
+      {openModalDelete && (
+        <ModalConfirm
+          open={openModalDelete}
+          handleClose={() => {
+            setOpenModalDelete(false)
+          }}
+          handleDelete={handleDelete}
+        />
+      )}
     </>
   )
 }

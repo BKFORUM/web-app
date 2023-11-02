@@ -1,12 +1,13 @@
 import Button from '@components/Button'
 import SearchInput from '@components/SearchInput'
-import avatar from '../../../../assets/images/test666.jpg'
 import { Dialog, Transition } from '@headlessui/react'
 import { Checkbox } from '@mui/material'
 import { FC, Fragment, useEffect, useRef, useState } from 'react'
 import { useStoreActions } from 'easy-peasy'
 import { IViewUserAddList } from '@interfaces/IUser'
 import { userActionSelector } from '@store/index'
+import { useDebounce } from '@hooks/useDebounce'
+import notFoundSearch from '../../assets/images/notFoundSearch.jpg'
 
 interface Props {
   isOpen: boolean
@@ -31,16 +32,15 @@ const AddUserToGroup: FC<Props> = ({
   const getAllUserNoForumCurrent = async (): Promise<void> => {
     setIsLoading(true)
     const res = await getAllUser({
+      search: inputSearch,
       take: 100000000,
       forumId: id,
       isInForum: false,
     })
     if (res) {
-      console.log(res)
       const data = res?.data?.map((item: any) => ({
         ...item,
-        avatarUrl: avatar,
-        checked: false,
+        checked: userSelected.some((user) => user.id === item.id),
       }))
       setData(data)
       setIsLoading(false)
@@ -64,22 +64,30 @@ const AddUserToGroup: FC<Props> = ({
         item.id === itemId ? { ...item, checked: !item.checked } : item,
       ),
     )
+    const user = userSelected.find((item) => item.id === itemId)
+    if (user === undefined) {
+      const userTmp = data.find((item) => item.id === itemId)
+      if (userTmp) setUserSelected([...userSelected, userTmp])
+    } else {
+      const updatedUserSelected = userSelected.filter((item) => item.id !== itemId)
+      setUserSelected(updatedUserSelected)
+    }
   }
 
   const handleAdd = (): void => {
-    const userIds = userSelected.map((item) => item.id)
-    handleAction({ userIds })
+    handleAction(userSelected)
   }
 
   const label = { inputProps: { 'aria-label': 'Checkbox demo' } }
 
-  useEffect(() => {
-    getAllUserNoForumCurrent()
-  }, [])
+  const debouncedInputValue = useDebounce(inputSearch, 500)
 
   useEffect(() => {
-    const listUserSelected = data.filter((item) => item.checked)
-    setUserSelected(listUserSelected)
+    getAllUserNoForumCurrent()
+  }, [debouncedInputValue])
+
+  useEffect(() => {
+    console.log(userSelected)
   }, [data])
 
   useEffect(() => {
@@ -145,7 +153,7 @@ const AddUserToGroup: FC<Props> = ({
                               <div
                                 key={index}
                                 className="flex flex-col gap-1 items-start  w-20 relative mt-">
-                                <div className="h-12 w-12  rounded-[50%] overflow-hidden ml-3">
+                                <div className="h-12 w-12  rounded-full overflow-hidden ml-3">
                                   <img
                                     src={item.avatarUrl}
                                     alt="avatar"
@@ -169,8 +177,43 @@ const AddUserToGroup: FC<Props> = ({
                         data.length > 4 && 'overflow-y-scroll'
                       }`}>
                       <span className="text-lg font-semibold">List user</span>
-                      {isLoading && <span>Loading</span>}
-                      {data.length === 0 && <span>ko có user</span>}
+                      {isLoading && (
+                        <>
+                          <div className="animate-pulse flex justify-between items-center rounded-xl py-1.5">
+                            <div className="flex gap-2 items-center ">
+                              <div className="h-12 w-12 rounded-full bg-slate-200 ml-3 "></div>
+                              <div className="h-2 w-[250px] bg-slate-200 rounded mr-2 "></div>
+                            </div>
+                            <div className="h-4 w-4 bg-slate-200 rounded mr-2"></div>
+                          </div>
+                          <div className="animate-pulse flex justify-between items-center rounded-xl py-1.5">
+                            <div className="flex gap-2 items-center ">
+                              <div className="h-12 w-12 rounded-full bg-slate-200 ml-3 "></div>
+                              <div className="h-2 w-[250px] bg-slate-200 rounded mr-2 "></div>
+                            </div>
+                            <div className="h-4 w-4 bg-slate-200 rounded mr-2"></div>
+                          </div>
+                          <div className="animate-pulse flex justify-between items-center rounded-xl py-1.5">
+                            <div className="flex gap-2 items-center ">
+                              <div className="h-12 w-12 rounded-full bg-slate-200 ml-3 "></div>
+                              <div className="h-2 w-[250px] bg-slate-200 rounded mr-2 "></div>
+                            </div>
+                            <div className="h-4 w-4 bg-slate-200 rounded mr-2"></div>
+                          </div>
+                        </>
+                      )}
+                      {data.length === 0 && !isLoading && (
+                        <div className="flex-1 flex flex-col items-center justify-center">
+                          <div className="h-40 w-40">
+                            <img
+                              className="h-full w-full"
+                              src={notFoundSearch}
+                              alt="not found search"
+                            />
+                          </div>
+                          <span>We're sorry. We were not able to find a match</span>
+                        </div>
+                      )}
                       {!isLoading &&
                         data?.map((item, index) => {
                           return (
@@ -181,11 +224,14 @@ const AddUserToGroup: FC<Props> = ({
                               } `}
                               onClick={() => handleCheckboxChange(item.id)}>
                               <div className="flex gap-2 items-center">
-                                <div className="h-12 w-12  rounded-[50%] overflow-hidden ml-3">
-                                  <img
-                                    src={item.avatarUrl}
-                                    alt="avatar"
-                                  />
+                                <div>
+                                  <div className="h-12 w-12 flex-shrink rounded-full border border-gray-400 overflow-hidden ml-3">
+                                    <img
+                                      className="h-full w-full object-fill "
+                                      src={item.avatarUrl}
+                                      alt="avatar"
+                                    />
+                                  </div>
                                 </div>
                                 <span>
                                   {item?.fullName} <span>({item.email})</span>
@@ -208,7 +254,7 @@ const AddUserToGroup: FC<Props> = ({
                         setIsOpen(false)
                       }}
                       disabled={userSelected.length === 0 ? true : false}
-                      className={`mt-4`}>
+                      className={`mt-8`}>
                       Add
                     </Button>
                   </div>

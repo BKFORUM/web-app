@@ -7,6 +7,10 @@ export interface IAuthModel {
     messageError: string;
     setMessageError: Action<IAuthModel, string>;
 
+    //isAccessToken
+    accessToken: string;
+    setAccessToken: Action<IAuthModel, string>
+
     //Login
     isLoginSuccess: boolean;
     setIsLoginSuccess: Action<IAuthModel, boolean>;
@@ -19,6 +23,11 @@ export const authModel: IAuthModel = persist({
     setMessageError: action((state, payload) => {
         state.messageError = payload;
     }),
+    //accessToken
+    accessToken: '',
+    setAccessToken: action((state, payload) => {
+        state.accessToken = payload;
+    }),
 
     //Login
     isLoginSuccess: true,
@@ -28,6 +37,7 @@ export const authModel: IAuthModel = persist({
     login: thunk(async (actions, payload) => {
         return login(payload)
             .then(async (res) => {
+                actions.setAccessToken(res.data?.accessToken)
                 localStorage.setItem('auth', JSON.stringify(res.data))
                 actions.setIsLoginSuccess(true)
                 return res.data;

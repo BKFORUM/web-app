@@ -51,5 +51,9 @@ export interface IUserData {
     phoneNumber: string
     email: string
     address?: string
+}
 
+export interface IListUserRequest {
+    id: string
+    userIds: string[]
 }

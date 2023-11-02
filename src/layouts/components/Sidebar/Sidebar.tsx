@@ -4,7 +4,7 @@ import { MdOutlineCalendarMonth } from 'react-icons/md'
 import { HiOutlineUserGroup, HiOutlineStar, HiOutlineHome } from 'react-icons/hi2'
 import { useLocation, useNavigate } from 'react-router-dom'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import test from '../../../assets/images/test.jpg'
+import defaultAvatar from '../../../assets/images/default_forum.png'
 import { IUserForumResponse } from '@interfaces/IForum'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { userActionSelector, userStateSelector } from '@store/index'
@@ -20,7 +20,7 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
   const { getAllForumByUser, setIsGetAllAgain } = useStoreActions(userActionSelector)
   const { currentUserSuccess, isGetAllAgain } = useStoreState(userStateSelector)
 
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selected, setSelected] = useState<number | null | string>(null)
   const [openListForum, setOpenListForum] = useState<boolean>(false)
   const [contentHeight, setContentHeight] = useState(0)
   const [dataForum, setDataForum] = useState<IUserForumResponse[]>([])
@@ -43,13 +43,18 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
 
   useEffect(() => {
     getAllForumByUserData()
-  }, [])
+  }, [currentUserSuccess])
 
   useEffect(() => {
     if (contentRef.current) {
       const height = contentRef.current.scrollHeight
       setContentHeight(height)
     }
+    dataForum.map((item) => {
+      if (item.id === pathname.split('/')[2]) {
+        setSelected(item.id)
+      }
+    })
   }, [dataForum])
 
   useEffect(() => {
@@ -85,6 +90,7 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
   }, [])
 
   const handleNavigate = (id: string) => {
+    setSelected(id)
     navigate('/forums/' + id)
   }
   return (
@@ -156,11 +162,13 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
               <li
                 key={item.id}
                 onClick={() => handleNavigate(item.id)}
-                className="flex items-center p-2 pl-4 hover:text-primary-400 cursor-pointer  hover:bg-gray-200 transition-all duration-200 ">
-                <div className="flex-shrink-0 h-8 w-8 rounded-xl overflow-hidden mr-2 border border-gray-700 bg-gray-700">
+                className={`flex gap-1 items-center p-2 pl-4 hover:text-primary-400 cursor-pointer  transition-all duration-200
+                 ${selected === item.id ? 'bg-gray-200' : 'hover:bg-gray-300'}
+                `}>
+                <div className="flex-shrink-0 h-8 w-8 rounded-xl overflow-hidden mr-2 border border-gray-500 bg-gray-500">
                   <img
                     className="h-full w-full object-cover "
-                    src={test}
+                    src={item?.avatarUrl || defaultAvatar}
                     alt="logo"
                   />
                 </div>

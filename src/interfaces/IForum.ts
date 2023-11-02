@@ -9,6 +9,15 @@ export interface IOption extends ITopic {
 
 }
 
+export interface IFormDataForum {
+    id?: string
+    name: string
+    moderatorId: string
+    avatarUrl?: string
+    type: string
+    topicIds: string[]
+}
+
 export interface IUserForumResponse {
     id: string
     name: string
@@ -27,6 +36,7 @@ export interface IUserForumResponse {
 
 export interface IForumDetail {
     name: string
+    avatarUrl?: string
     moderator: IUserData
     topics?: [{
         topic: ITopic

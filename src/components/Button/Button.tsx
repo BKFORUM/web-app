@@ -66,7 +66,7 @@ const Button = ({ typeButton = 'primary', loading, ...props }: IButton) =>
         case TypesButton[0]:
         default: {
           result =
-            'transition-all duration-300 bg-[#154dc5] hover:bg-[#1a55d1] text-white font-semibold py-1.5 px-6 border border-[#3367d6] rounded-2xl shadow focus:outline-none focus:ring-0'
+            'transition-all duration-300 bg-[#154dc5] hover:bg-[#1a55d1] text-white font-semibold py-1.5 px-4 border border-[#3367d6] rounded-2xl shadow focus:outline-none focus:ring-0'
           break
         }
       }

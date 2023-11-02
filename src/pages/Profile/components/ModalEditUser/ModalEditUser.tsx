@@ -56,6 +56,7 @@ const ModalEditUser: FC<Props> = ({
   setOpen,
   handleAction,
   user,
+  isLoading,
 }: Props): JSX.Element => {
   const ImageRef: any = useRef()
   const formRef = useRef<HTMLFormElement>(null)
@@ -211,12 +212,20 @@ const ModalEditUser: FC<Props> = ({
                               className="font-semibold text-gray-700">
                               Name <span className="text-red-600">*</span>
                             </label>
-                            <div>
-                              <TextFieldV2
-                                name="fullName"
-                                control={control}
-                              />
-                            </div>
+                            <Controller
+                              name="fullName"
+                              control={control}
+                              render={({
+                                field: { onChange, value },
+                                fieldState: { error },
+                              }) => (
+                                <TextFieldV2
+                                  error={error}
+                                  onChange={onChange}
+                                  value={value}
+                                />
+                              )}
+                            />
                           </div>
                           <div className="flex flex-col">
                             <label
@@ -270,10 +279,20 @@ const ModalEditUser: FC<Props> = ({
                               className="font-semibold text-gray-700">
                               Role <span className="text-red-600">*</span>
                             </label>
-                            <TextFieldV2
+                            <Controller
                               name="type"
                               control={control}
-                              disabled={true}
+                              render={({
+                                field: { onChange, value },
+                                fieldState: { error },
+                              }) => (
+                                <TextFieldV2
+                                  error={error}
+                                  onChange={onChange}
+                                  value={value}
+                                  disabled={true}
+                                />
+                              )}
                             />
                           </div>
 
@@ -283,10 +302,20 @@ const ModalEditUser: FC<Props> = ({
                               className="font-semibold text-gray-700">
                               Faculty <span className="text-red-600">*</span>
                             </label>
-                            <TextFieldV2
+                            <Controller
                               name="facultyName"
                               control={control}
-                              disabled={true}
+                              render={({
+                                field: { onChange, value },
+                                fieldState: { error },
+                              }) => (
+                                <TextFieldV2
+                                  error={error}
+                                  onChange={onChange}
+                                  value={value}
+                                  disabled={true}
+                                />
+                              )}
                             />
                           </div>
 
@@ -296,9 +325,19 @@ const ModalEditUser: FC<Props> = ({
                               className="font-semibold text-gray-700">
                               Phone Number <span className="text-red-600">*</span>
                             </label>
-                            <TextFieldV2
+                            <Controller
                               name="phoneNumber"
                               control={control}
+                              render={({
+                                field: { onChange, value },
+                                fieldState: { error },
+                              }) => (
+                                <TextFieldV2
+                                  error={error}
+                                  onChange={onChange}
+                                  value={value}
+                                />
+                              )}
                             />
                           </div>
                         </div>
@@ -309,10 +348,20 @@ const ModalEditUser: FC<Props> = ({
                             className="font-semibold text-gray-700">
                             Email <span className="text-red-600">*</span>
                           </label>
-                          <TextFieldV2
+                          <Controller
                             name="email"
                             control={control}
-                            disabled={true}
+                            render={({
+                              field: { onChange, value },
+                              fieldState: { error },
+                            }) => (
+                              <TextFieldV2
+                                error={error}
+                                onChange={onChange}
+                                value={value}
+                                disabled={true}
+                              />
+                            )}
                           />
                         </div>
 
@@ -322,9 +371,19 @@ const ModalEditUser: FC<Props> = ({
                             className="font-semibold text-gray-700">
                             Address
                           </label>
-                          <TextFieldV2
+                          <Controller
                             name="address"
                             control={control}
+                            render={({
+                              field: { onChange, value },
+                              fieldState: { error },
+                            }) => (
+                              <TextFieldV2
+                                error={error}
+                                onChange={onChange}
+                                value={value}
+                              />
+                            )}
                           />
                         </div>
                       </form>
@@ -335,8 +394,8 @@ const ModalEditUser: FC<Props> = ({
                       onClick={handleExternalButtonClick}
                       typeButton="primary"
                       type="submit"
-                      disabled={false}
-                      loading={false}>
+                      disabled={isLoading}
+                      loading={isLoading}>
                       Save
                     </Button>
 

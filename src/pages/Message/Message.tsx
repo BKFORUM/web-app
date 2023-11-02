@@ -14,7 +14,7 @@ import { RiSendPlaneFill } from 'react-icons/ri'
 import SearchInput from '@components/SearchInput'
 import { Tooltip } from '@mui/material'
 import OptionGroup from './components/OptionGroup'
-import AddUserToGroup from './components/AddUserToGroup'
+import AddUserToGroup from '../../components/AddUserToGroup'
 
 interface Props {}
 

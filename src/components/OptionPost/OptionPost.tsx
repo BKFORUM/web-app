@@ -12,8 +12,8 @@ import {
 
 interface Props {
   item: IPostViewForum
-  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>
-  setOpenModalDelete: React.Dispatch<React.SetStateAction<boolean>>
+  setOpenModal?: React.Dispatch<React.SetStateAction<boolean>>
+  setOpenModalDelete?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const OptionPost: FC<Props> = ({
@@ -59,7 +59,7 @@ const OptionPost: FC<Props> = ({
             <li
               className="list-none flex items-center gap-4 hover:bg-gray-200 cursor-pointer py-2 px-4 transition-all duration-300"
               onClick={() => {
-                setOpenModal(true)
+                if (setOpenModal !== undefined) setOpenModal(true)
                 setPostSelected(item)
               }}>
               <HiOutlinePencilSquare className="h-6 w-6" />
@@ -70,7 +70,7 @@ const OptionPost: FC<Props> = ({
           <li
             className="list-none flex items-center gap-4 hover:bg-gray-200 cursor-pointer py-2 px-4 transition-all duration-300 text-red-500"
             onClick={() => {
-              setOpenModalDelete(true)
+              if (setOpenModalDelete !== undefined) setOpenModalDelete(true)
               setPostSelected(item)
             }}>
             <HiOutlineTrash className="h-5 w-5" />

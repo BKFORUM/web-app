@@ -18,6 +18,7 @@ export interface IPostViewForum {
     forum: {
         name: string
         fileUrl: string
+        modId: string
     }
     user: {
         id: string

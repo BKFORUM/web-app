@@ -13,20 +13,13 @@ import { GrUserSettings } from 'react-icons/gr'
 import { ICurrentUser } from '@interfaces/IUser'
 import { IPostViewForum } from '@interfaces/IPost'
 import PostItem from '@components/PostItem'
+import { pageMode } from '@interfaces/IClient'
 
 interface Props {
   user?: ICurrentUser
   dataPost: IPostViewForum[]
-  paginationModel: {
-    page: number
-    pageSize: number
-  }
-  setPaginationModel: React.Dispatch<
-    React.SetStateAction<{
-      page: number
-      pageSize: number
-    }>
-  >
+  setPaginationModel: React.Dispatch<React.SetStateAction<pageMode | null>>
+  paginationModel: pageMode | null
   totalRowCount: number
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>
   setOpenModalDelete: React.Dispatch<React.SetStateAction<boolean>>
@@ -85,7 +78,10 @@ const PostProfile: FC<Props> = ({
         <InfiniteScroll
           dataLength={dataPost.length}
           next={() =>
-            setPaginationModel({ page: paginationModel.page + 1, pageSize: 10 })
+            setPaginationModel((prevPaginationModel) => ({
+              page: prevPaginationModel ? prevPaginationModel.page + 1 : 0,
+              pageSize: 10,
+            }))
           }
           hasMore={dataPost.length !== totalRowCount}
           loader={<h4>Loading...</h4>}

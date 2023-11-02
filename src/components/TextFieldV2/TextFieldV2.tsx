@@ -1,11 +1,10 @@
 import { FC } from 'react'
-import { Controller } from 'react-hook-form'
-
 interface IProps {
-  name: string
-  control: any
+  error?: any
+  onChange?: any
   placeholder?: string
   disabled?: boolean
+  value?: string
 }
 
 const CustomTextInput = ({
@@ -33,24 +32,19 @@ const CustomTextInput = ({
 }
 
 const TextFieldV2: FC<IProps> = ({
-  name,
-  control,
   placeholder,
   disabled,
+  error,
+  onChange,
+  value,
 }: IProps): JSX.Element => {
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field: { onChange, value }, fieldState: { error } }) => (
-        <CustomTextInput
-          disabled={disabled}
-          error={error}
-          onChange={onChange}
-          value={value}
-          placeholder={placeholder}
-        />
-      )}
+    <CustomTextInput
+      disabled={disabled}
+      error={error}
+      onChange={onChange}
+      value={value}
+      placeholder={placeholder}
     />
   )
 }

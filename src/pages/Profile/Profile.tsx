@@ -20,6 +20,7 @@ import ModalCreatePost from '@components/ModalCreatePost/ModalCreatePost'
 import ModalConfirm from '@components/ModalConfirm'
 import ModalEditUser from './components/ModalEditUser'
 import PostProfile from './components/PostProfile'
+import { pageMode } from '@interfaces/IClient'
 
 interface Props {}
 
@@ -42,13 +43,10 @@ const Profile: FC<Props> = (): JSX.Element => {
   const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
   const [dataForum, setDataForum] = useState<IUserForumResponse[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10,
-  })
+  const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
 
   const getAllPostByUserData = async (): Promise<void> => {
-    if (id) {
+    if (id && paginationModel) {
       const res = await getAllPostByUser({
         id: id,
         params: {
@@ -74,21 +72,29 @@ const Profile: FC<Props> = (): JSX.Element => {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([getAllForumByUserData(), getAllPostByUserData()])
-    }
-    fetchData()
+    getAllPostByUserData()
   }, [paginationModel])
 
   const getProfile = async (): Promise<void> => {
     if (id) {
       const res = await getUserById(id)
       setUser(res)
+      if (id === currentUserSuccess?.id) {
+        setCurrentUserSuccess(res)
+      }
     }
   }
 
   useEffect(() => {
-    getProfile()
+    window.scrollTo(0, 0)
+    if (id) {
+      setDataPost([])
+      setPaginationModel({ page: 0, pageSize: 10 })
+      const fetchData = async () => {
+        await Promise.all([getProfile(), getAllForumByUserData()])
+      }
+      fetchData()
+    }
   }, [id])
 
   const handleAction = async (data: any): Promise<void> => {
@@ -182,18 +188,18 @@ const Profile: FC<Props> = (): JSX.Element => {
           status: 'success',
           message: 'Edit user successfully',
         })
+        console.log(res)
         getProfile()
         setOpenModalEditUser(false)
-        if (currentUserSuccess?.id === user?.id) {
-          setCurrentUserSuccess(res)
-        }
       }
     } else {
-      const resImage = await postImage(data?.avatarUrl)
+      const formData = new FormData()
+      formData.append(`documents`, data?.avatarUrl[0])
+      const resImage = await postImage(formData)
       if (resImage) {
         const res = await editEdit({
           ...data,
-          avatarUrl: resImage?.fileUrl,
+          avatarUrl: resImage[0]?.fileUrl,
         })
         if (res) {
           setNotifySetting({
@@ -203,9 +209,6 @@ const Profile: FC<Props> = (): JSX.Element => {
           })
           getProfile()
           setOpenModalEditUser(false)
-          if (currentUserSuccess?.id === user?.id) {
-            setCurrentUserSuccess(res)
-          }
         }
       }
     }
