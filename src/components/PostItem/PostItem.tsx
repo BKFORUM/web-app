@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import PostContent from '@components/PostContent'
-import test from '../../assets/images/test.jpg'
+import test from '../../assets/images/default_forum.png'
 import {
   HiOutlineHeart,
   HiMiniHeart,
@@ -85,7 +85,7 @@ const PostItem: FC<Props> = ({
               <div className="h-10 w-10 rounded-xl overflow-hidden border border-gray-700 bg-gray-700 ">
                 <img
                   className="h-full w-full object-cover"
-                  src={test}
+                  src={item.forum.avatarUrl || test}
                   alt="logo"
                 />
               </div>

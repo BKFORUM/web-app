@@ -260,10 +260,12 @@ const Profile: FC<Props> = (): JSX.Element => {
               onChange={handleChange}
               aria-label="basic tabs example">
               <Tab
+                sx={{ textTransform: 'none' }}
                 label="Posts"
                 {...a11yProps(0)}
               />
               <Tab
+                sx={{ textTransform: 'none' }}
                 label="Forums"
                 {...a11yProps(1)}
               />

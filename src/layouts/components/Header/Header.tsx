@@ -50,7 +50,8 @@ const Header: FC<Props> = (): JSX.Element => {
       formData.append(`documents`, data?.avatarUrl[0])
       const resImage = await postImage(formData)
       if (resImage) {
-        const res = await addForum({ ...data, avatarUrl: resImage.fileUrl })
+        const { id, ...others } = data
+        const res = await addForum({ ...others, avatarUrl: resImage[0].fileUrl })
         if (res) {
           setNotifySetting({
             show: true,

@@ -76,6 +76,7 @@ const Forum: FC<Props> = (): JSX.Element => {
   useEffect(() => {
     window.scrollTo(0, 0)
     if (id) {
+      setValue(0)
       getForumData()
       setDataPost([])
       setPaginationModel({ page: 0, pageSize: 10 })

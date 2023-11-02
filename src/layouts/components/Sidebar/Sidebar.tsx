@@ -43,7 +43,7 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
 
   useEffect(() => {
     getAllForumByUserData()
-  }, [currentUserSuccess])
+  }, [currentUserSuccess?.id])
 
   useEffect(() => {
     if (contentRef.current) {

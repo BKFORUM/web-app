@@ -76,7 +76,7 @@ const HomePage: FC<Props> = (): JSX.Element => {
 
   useEffect(() => {
     getAllForumByUserData()
-  }, [])
+  }, [currentUserSuccess?.id])
 
   const handleChange = (value: string): void => {
     setForumSelected(value)

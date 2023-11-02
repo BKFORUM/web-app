@@ -43,10 +43,8 @@ const AddUserToGroup: FC<Props> = ({
         checked: userSelected.some((user) => user.id === item.id),
       }))
       setData(data)
-      setIsLoading(false)
-    } else {
-      setIsLoading(false)
     }
+    setIsLoading(false)
   }
 
   const scrollToLast = () => {
@@ -85,10 +83,6 @@ const AddUserToGroup: FC<Props> = ({
   useEffect(() => {
     getAllUserNoForumCurrent()
   }, [debouncedInputValue])
-
-  useEffect(() => {
-    console.log(userSelected)
-  }, [data])
 
   useEffect(() => {
     scrollToLast()

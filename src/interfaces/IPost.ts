@@ -19,6 +19,7 @@ export interface IPostViewForum {
         name: string
         fileUrl: string
         modId: string
+        avatarUrl: string
     }
     user: {
         id: string

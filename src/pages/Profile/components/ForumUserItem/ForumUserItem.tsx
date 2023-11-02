@@ -2,9 +2,9 @@ import { IUserForumResponse } from '@interfaces/IForum'
 import TabPanel from '@layouts/components/TabPanel'
 import { Box, Tab, Tabs } from '@mui/material'
 import { GrUserSettings } from 'react-icons/gr'
+import { HiUser } from 'react-icons/hi2'
 import { FC, useState } from 'react'
 import test from '../../../../assets/images/avatartest.jpg'
-import { HiUser } from 'react-icons/hi2'
 import { useNavigate } from 'react-router-dom'
 
 interface Props {

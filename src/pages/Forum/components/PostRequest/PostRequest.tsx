@@ -1,5 +1,6 @@
 import Button from '@components/Button'
 import PostItem from '@components/PostItem'
+import { pageMode } from '@interfaces/IClient'
 import { IPostViewForum } from '@interfaces/IPost'
 import { postActionSelector } from '@store/index'
 import { useStoreActions } from 'easy-peasy'
@@ -16,13 +17,10 @@ const PostRequest: FC<Props> = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10,
-  })
+  const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
 
   const getAllPostByForumData = async (): Promise<void> => {
-    if (id) {
+    if (id && paginationModel) {
       const res = await getAllPostByForum({
         id: id,
         params: {
@@ -39,21 +37,16 @@ const PostRequest: FC<Props> = (): JSX.Element => {
   }
 
   useEffect(() => {
-    window.scrollTo(0, 0)
     if (id) {
+      console.log(11)
       setDataPost([])
-      setPaginationModel((prev) => ({ ...prev, page: 0 }))
+      setPaginationModel({ page: 0, pageSize: 10 })
     }
   }, [id])
 
-  const memoizedGetAllPostByForumData = useMemo(
-    () => getAllPostByForumData,
-    [paginationModel],
-  )
-
   useEffect(() => {
-    memoizedGetAllPostByForumData()
-  }, [])
+    getAllPostByForumData()
+  }, [paginationModel])
 
   return (
     <div>
@@ -61,10 +54,10 @@ const PostRequest: FC<Props> = (): JSX.Element => {
         <InfiniteScroll
           dataLength={dataPost.length}
           next={() =>
-            setPaginationModel({
-              page: paginationModel.page + 1,
+            setPaginationModel((prevPaginationModel) => ({
+              page: prevPaginationModel ? prevPaginationModel.page + 1 : 0,
               pageSize: 10,
-            })
+            }))
           }
           hasMore={dataPost.length !== totalRowCount}
           loader={<h4>Loading...</h4>}
@@ -84,6 +77,7 @@ const PostRequest: FC<Props> = (): JSX.Element => {
               <div className="px-4 pb-4 flex justify-end w-full gap-4 ">
                 <Button
                   typeButton="reject"
+                  className="px-4 py-2"
                   // onClick={() => setOpen(false)}
                 >
                   Reject
@@ -91,6 +85,7 @@ const PostRequest: FC<Props> = (): JSX.Element => {
                 <Button
                   // onClick={handleExternalButtonClick}
                   typeButton="approve"
+                  className="px-4 py-2"
                   disabled={isLoading}
                   loading={isLoading}>
                   Approve
