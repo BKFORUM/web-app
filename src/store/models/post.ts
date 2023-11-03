@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addPost, deletePost, editPost, getAllPost, getAllPostByForum, getAllPostByUser, postImage } from "../../services/post.service";
+import { addPost, deletePost, editPost, getAllPost, getAllPostByForum, getAllPostByUser, postImage, updateStatusPost } from "../../services/post.service";
 import { IParams } from "@interfaces/IClient";
 import { IPostViewForum } from "@interfaces/IPost";
 
@@ -46,6 +46,11 @@ export interface IPostModel {
     isPostImageSuccess: boolean;
     setIsPostImageSuccess: Action<IPostModel, boolean>;
     postImage: Thunk<IPostModel, any>;
+
+    //UpdateStatusPost
+    isUpdateStatusPostSuccess: boolean;
+    setIsUpdateStatusPostSuccess: Action<IPostModel, boolean>;
+    updateStatusPost: Thunk<IPostModel, any>;
 }
 
 export const postModel: IPostModel = persist({
@@ -177,6 +182,23 @@ export const postModel: IPostModel = persist({
             })
             .catch((error) => {
                 actions.setIsDeletePostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //DeletePost
+    isUpdateStatusPostSuccess: true,
+    setIsUpdateStatusPostSuccess: action((state, payload) => {
+        state.isUpdateStatusPostSuccess = payload;
+    }),
+    updateStatusPost: thunk(async (actions, payload,) => {
+        return updateStatusPost(payload)
+            .then(async (res) => {
+                actions.setIsUpdateStatusPostSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsUpdateStatusPostSuccess(false)
                 actions.setMessageError(error?.response?.data?.message)
             });
     }),

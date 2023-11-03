@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import {
   forumActionSelector,
+  forumStateSelector,
   notifyActionSelector,
   postActionSelector,
   postStateSelector,
@@ -34,7 +35,9 @@ const Forum: FC<Props> = (): JSX.Element => {
   const { addPost, postImage, getAllPostByForum, deletePost, editPost } =
     useStoreActions(postActionSelector)
   const { postSelected } = useStoreState(postStateSelector)
-  const { getForumById, editForum } = useStoreActions(forumActionSelector)
+  const { getForumById, editForum, setIsGetAllAgainForumById } =
+    useStoreActions(forumActionSelector)
+  const { isGetAllAgainForumById } = useStoreState(forumStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const { setIsGetAllAgain } = useStoreActions(userActionSelector)
 
@@ -82,6 +85,15 @@ const Forum: FC<Props> = (): JSX.Element => {
       setPaginationModel({ page: 0, pageSize: 10 })
     }
   }, [id])
+
+  useEffect(() => {
+    if (isGetAllAgainForumById) {
+      getForumData()
+      setDataPost([])
+      setPaginationModel({ page: 0, pageSize: 10 })
+      setIsGetAllAgainForumById(false)
+    }
+  }, [isGetAllAgainForumById])
 
   useEffect(() => {
     getAllPostByForumData()
@@ -149,7 +161,6 @@ const Forum: FC<Props> = (): JSX.Element => {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       if (data.files?.length > 0) {
         const resImage = await postImage(formData)
-
         if (resImage) {
           const res = await addPost({
             forumId: id,
@@ -157,13 +168,21 @@ const Forum: FC<Props> = (): JSX.Element => {
             documents: resImage,
           })
           if (res) {
-            setNotifySetting({
-              show: true,
-              status: 'success',
-              message: 'Add post successfully',
-            })
-            setDataPost([])
-            setPaginationModel({ page: 0, pageSize: 10 })
+            if (detailForum?.moderator.id === currentUserSuccess?.id) {
+              setNotifySetting({
+                show: true,
+                status: 'success',
+                message: 'Add post successfully',
+              })
+              setDataPost([])
+              setPaginationModel({ page: 0, pageSize: 10 })
+            } else {
+              setNotifySetting({
+                show: true,
+                status: 'success',
+                message: 'Request post successfully',
+              })
+            }
           }
         }
         setIsLoading(false)
@@ -174,13 +193,21 @@ const Forum: FC<Props> = (): JSX.Element => {
           content: data.content,
         })
         if (res) {
-          setNotifySetting({
-            show: true,
-            status: 'success',
-            message: 'Add post successfully',
-          })
-          setDataPost([])
-          setPaginationModel({ page: 0, pageSize: 10 })
+          if (detailForum?.moderator.id === currentUserSuccess?.id) {
+            setNotifySetting({
+              show: true,
+              status: 'success',
+              message: 'Add post successfully',
+            })
+            setDataPost([])
+            setPaginationModel({ page: 0, pageSize: 10 })
+          } else {
+            setNotifySetting({
+              show: true,
+              status: 'success',
+              message: 'Request post successfully',
+            })
+          }
         }
         setIsLoading(false)
         setOpenModal(false)

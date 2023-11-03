@@ -14,6 +14,8 @@ export interface IForumModel {
     // getAllForum: Thunk<IForumModel, any>;
 
     //GetForumById
+    isGetAllAgainForumById: boolean;
+    setIsGetAllAgainForumById: Action<IForumModel, boolean>
     isGetForumByIdSuccess: boolean;
     setIsGetForumByIdSuccess: Action<IForumModel, boolean>
     getForumById: Thunk<IForumModel, any>;
@@ -57,6 +59,10 @@ export const forumModel: IForumModel = persist({
         state.messageErrorForum = payload;
     }),
 
+    isGetAllAgainForumById: false,
+    setIsGetAllAgainForumById: action((state, payload) => {
+        state.isGetAllAgainForumById = payload;
+    }),
     isGetForumByIdSuccess: true,
     setIsGetForumByIdSuccess: action((state, payload) => {
         state.isGetForumByIdSuccess = payload;
@@ -108,7 +114,7 @@ export const forumModel: IForumModel = persist({
             });
     }),
 
-    //EditForum
+    //DeleteUserFromForum
     isDeleteUserFromForumSuccess: true,
     setIsDeleteUserFromForumSuccess: action((state, payload) => {
         state.isDeleteUserFromForumSuccess = payload;

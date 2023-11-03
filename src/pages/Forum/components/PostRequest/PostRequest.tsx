@@ -2,9 +2,14 @@ import Button from '@components/Button'
 import PostItem from '@components/PostItem'
 import { pageMode } from '@interfaces/IClient'
 import { IPostViewForum } from '@interfaces/IPost'
-import { postActionSelector } from '@store/index'
-import { useStoreActions } from 'easy-peasy'
-import { FC, useEffect, useMemo, useState } from 'react'
+import {
+  forumActionSelector,
+  notifyActionSelector,
+  postActionSelector,
+  postStateSelector,
+} from '@store/index'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import { FC, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useParams } from 'react-router-dom'
 
@@ -12,7 +17,11 @@ interface Props {}
 
 const PostRequest: FC<Props> = (): JSX.Element => {
   const { id } = useParams()
-  const { getAllPostByForum } = useStoreActions(postActionSelector)
+  const { getAllPostByForum, setIsUpdateStatusPostSuccess, updateStatusPost } =
+    useStoreActions(postActionSelector)
+  const { isUpdateStatusPostSuccess, messageError } = useStoreState(postStateSelector)
+  const { setIsGetAllAgainForumById } = useStoreActions(forumActionSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
@@ -35,6 +44,37 @@ const PostRequest: FC<Props> = (): JSX.Element => {
       }
     }
   }
+
+  const handelAction = async (status: string, id: string): Promise<void> => {
+    setIsLoading(true)
+    const res = await updateStatusPost({ id: id, status: status })
+    if (res) {
+      setNotifySetting({
+        show: true,
+        status: 'success',
+        message: `${status === 'ACTIVE' ? 'Approve' : 'Reject'} post successfully`,
+      })
+      if (status === 'ACTIVE') {
+        setIsGetAllAgainForumById(true)
+      }
+      const newData = dataPost.filter((item) => {
+        return item.id !== id
+      })
+      setDataPost(newData)
+    }
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    if (!isUpdateStatusPostSuccess) {
+      setNotifySetting({
+        show: true,
+        status: 'error',
+        message: messageError,
+      })
+      setIsUpdateStatusPostSuccess(true)
+    }
+  }, [isUpdateStatusPostSuccess])
 
   useEffect(() => {
     if (id) {
@@ -78,16 +118,15 @@ const PostRequest: FC<Props> = (): JSX.Element => {
                 <Button
                   typeButton="reject"
                   className="px-4 py-2"
-                  // onClick={() => setOpen(false)}
-                >
+                  disabled={isLoading}
+                  onClick={() => handelAction('DELETED', item.id)}>
                   Reject
                 </Button>
                 <Button
-                  // onClick={handleExternalButtonClick}
+                  onClick={() => handelAction('ACTIVE', item.id)}
                   typeButton="approve"
                   className="px-4 py-2"
-                  disabled={isLoading}
-                  loading={isLoading}>
+                  disabled={isLoading}>
                   Approve
                 </Button>
               </div>

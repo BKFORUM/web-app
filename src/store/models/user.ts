@@ -102,7 +102,7 @@ export const userModel: IUserModel = persist({
             });
     }),
 
-    //GetALLUserByForum
+    //GetALLForumByUser
     isGetAllForumByUserSuccess: true,
     setIsGetAllForumByUserSuccess: action((state, payload) => {
         state.isGetAllForumByUserSuccess = payload;

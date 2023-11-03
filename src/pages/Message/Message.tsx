@@ -15,6 +15,7 @@ import SearchInput from '@components/SearchInput'
 import { Tooltip } from '@mui/material'
 import OptionGroup from './components/OptionGroup'
 import AddUserToGroup from '../../components/AddUserToGroup'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 interface Props {}
 
@@ -130,6 +131,21 @@ const Message: FC<Props> = (): JSX.Element => {
   const handleAddUser = async (data: any): Promise<void> => {
     console.log(data)
   }
+
+  const [items, setItems] = useState(Array.from({ length: 20 }))
+
+  const fetchMoreData = () => {
+    setTimeout(() => {
+      setItems(items.concat(Array.from({ length: 20 })))
+    }, 1500)
+  }
+
+  const style = {
+    height: 30,
+    border: '1px solid green',
+    margin: 6,
+    padding: 8,
+  }
   return (
     <>
       <div className="flex h-full bg-white">
@@ -153,38 +169,30 @@ const Message: FC<Props> = (): JSX.Element => {
               </div>
 
               <div
-                className={`px-4 flex-1 overflow-y-auto shadow-sm`}
-                style={{ maxHeight: heightContent !== undefined ? heightContent : '0' }}>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
-                <div>hahaah</div>
+                id="scrollableDiv"
+                style={{
+                  maxHeight: heightContent !== undefined ? heightContent : '0',
+                  overflow: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column-reverse',
+                }}>
+                {/*Put the scroll bar always on the bottom*/}
+                <InfiniteScroll
+                  dataLength={items.length}
+                  next={fetchMoreData}
+                  style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
+                  inverse={true} //
+                  hasMore={true}
+                  loader={<h4>Loading...</h4>}
+                  scrollableTarget="scrollableDiv">
+                  {items.map((i, index) => (
+                    <div
+                      style={style}
+                      key={index}>
+                      div - #{index}
+                    </div>
+                  ))}
+                </InfiniteScroll>
               </div>
 
               <div

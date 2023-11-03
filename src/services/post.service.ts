@@ -57,4 +57,12 @@ const deletePost = (id: string) => {
     });
 };
 
-export { addPost, postImage, getAllPost, getAllPostByForum, getAllPostByUser, deletePost, editPost }    
+const updateStatusPost = (data: any) => {
+    return BaseURL({
+        url: `/posts/${data?.id}`,
+        method: "PATCH",
+        data,
+    });
+}
+
+export { addPost, postImage, getAllPost, getAllPostByForum, getAllPostByUser, deletePost, editPost, updateStatusPost }    
