@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addPost, deletePost, editPost, getAllPost, getAllPostByForum, getAllPostByUser, postImage, updateStatusPost } from "../../services/post.service";
+import { addPost, deletePost, editPost, getAllPost, getAllPostByForum, getAllPostByUser, likePost, postImage, unLikePost, updateStatusPost } from "../../services/post.service";
 import { IParams } from "@interfaces/IClient";
 import { IPostViewForum } from "@interfaces/IPost";
 
@@ -51,6 +51,16 @@ export interface IPostModel {
     isUpdateStatusPostSuccess: boolean;
     setIsUpdateStatusPostSuccess: Action<IPostModel, boolean>;
     updateStatusPost: Thunk<IPostModel, any>;
+
+    //LikePost
+    isLikePostSuccess: boolean;
+    setIsLikePostSuccess: Action<IPostModel, boolean>;
+    likePost: Thunk<IPostModel, string>;
+
+    //UnLikePost
+    isUnLikePostSuccess: boolean;
+    setIsUnLikePostSuccess: Action<IPostModel, boolean>;
+    unLikePost: Thunk<IPostModel, string>;
 }
 
 export const postModel: IPostModel = persist({
@@ -202,4 +212,39 @@ export const postModel: IPostModel = persist({
                 actions.setMessageError(error?.response?.data?.message)
             });
     }),
+
+    //LikePost
+    isLikePostSuccess: true,
+    setIsLikePostSuccess: action((state, payload) => {
+        state.isLikePostSuccess = payload;
+    }),
+    likePost: thunk(async (actions, payload,) => {
+        return likePost(payload)
+            .then(async (res) => {
+                actions.setIsLikePostSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsLikePostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //UnLikePost
+    isUnLikePostSuccess: true,
+    setIsUnLikePostSuccess: action((state, payload) => {
+        state.isUnLikePostSuccess = payload;
+    }),
+    unLikePost: thunk(async (actions, payload,) => {
+        return unLikePost(payload)
+            .then(async (res) => {
+                actions.setIsUnLikePostSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsUnLikePostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
 })

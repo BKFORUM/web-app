@@ -107,30 +107,32 @@ const PostRequest: FC<Props> = (): JSX.Element => {
             </p>
           }>
           {dataPost.map((item, index) => (
-            <div
-              key={index}
-              className="my-4 bg-white flex-flex-col gap-2 min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
-              <PostItem
-                item={item}
-                isRequest={true}
-              />
-              <div className="px-4 pb-4 flex justify-end w-full gap-4 ">
-                <Button
-                  typeButton="reject"
-                  className="px-4 py-2"
-                  disabled={isLoading}
-                  onClick={() => handelAction('DELETED', item.id)}>
-                  Reject
-                </Button>
-                <Button
-                  onClick={() => handelAction('ACTIVE', item.id)}
-                  typeButton="approve"
-                  className="px-4 py-2"
-                  disabled={isLoading}>
-                  Approve
-                </Button>
+            <>
+              <div
+                key={index}
+                className="my-4 bg-white flex-flex-col gap-2 min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
+                <PostItem
+                  item={item}
+                  isRequest={true}
+                />
+                <div className="px-4 pb-4 flex justify-center w-full gap-4 mt-4 ">
+                  <Button
+                    typeButton="reject"
+                    className="px-3 py-1.5"
+                    disabled={isLoading}
+                    onClick={() => handelAction('DELETED', item.id)}>
+                    Reject
+                  </Button>
+                  <Button
+                    onClick={() => handelAction('ACTIVE', item.id)}
+                    typeButton="approve"
+                    className="px-3 py-1.5"
+                    disabled={isLoading}>
+                    Approve
+                  </Button>
+                </div>
               </div>
-            </div>
+            </>
           ))}
         </InfiniteScroll>
       </div>

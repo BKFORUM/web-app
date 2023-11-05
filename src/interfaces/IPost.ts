@@ -15,6 +15,7 @@ export interface IPostViewForum {
     documents: IDocuments[]
     status: string
     updateAt: string
+    likedAt: Date | null
     forum: {
         name: string
         fileUrl: string
@@ -25,5 +26,9 @@ export interface IPostViewForum {
         id: string
         fullName: string
         avatarUrl: string
+    }
+    _count: {
+        likes: number
+        comments: number
     }
 }

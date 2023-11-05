@@ -65,9 +65,10 @@ const MembersForum: FC<Props> = ({ users, moderator }: Props): JSX.Element => {
   }
 
   const handleAddUser = async (data: any): Promise<void> => {
-    const userIds = data?.map((item: IUserData) => item.id)
+    const ListUserId = data?.map((item: IUserData) => item.id)
+    console.log({ id: id, userIds: ListUserId })
     if (id) {
-      const res = await addUserToForum({ id: id, userIds: userIds })
+      const res = await addUserToForum({ id: id, userIds: ListUserId })
       if (res) {
         setNotifySetting({
           show: true,
@@ -77,7 +78,6 @@ const MembersForum: FC<Props> = ({ users, moderator }: Props): JSX.Element => {
         setListUser([...listUser, ...data])
       }
     }
-    console.log(userIds)
   }
 
   const handleChangeSearch = (value: string): void => {

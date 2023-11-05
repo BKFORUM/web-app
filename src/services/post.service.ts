@@ -65,4 +65,18 @@ const updateStatusPost = (data: any) => {
     });
 }
 
-export { addPost, postImage, getAllPost, getAllPostByForum, getAllPostByUser, deletePost, editPost, updateStatusPost }    
+const likePost = (id: string) => {
+    return BaseURL({
+        url: `/posts/${id}/likes`,
+        method: "POST",
+    });
+}
+
+const unLikePost = (id: string) => {
+    return BaseURL({
+        url: `/posts/${id}/likes`,
+        method: "DELETE",
+    });
+}
+
+export { addPost, postImage, getAllPost, getAllPostByForum, getAllPostByUser, deletePost, editPost, updateStatusPost, likePost, unLikePost }    

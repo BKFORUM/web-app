@@ -45,7 +45,7 @@ const addUserToForum = (data: IListUserRequest) => {
     return BaseURL({
         url: `/forums/${data.id}/users`,
         method: "POST",
-        data: data.userIds,
+        data,
     });
 }
 

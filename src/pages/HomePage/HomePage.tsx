@@ -11,7 +11,7 @@ import {
 } from '@store/index'
 import AutocompleteCustom from '@components/Autocomplete/Autocomplete'
 import { IOption, IUserForumResponse } from '@interfaces/IForum'
-import UserActive from './components/UserActive'
+import UserActive from '../../components/UserActive'
 import ModalConfirm from '@components/ModalConfirm'
 import { IPostViewForum } from '@interfaces/IPost'
 import InfiniteScroll from 'react-infinite-scroll-component'

@@ -1,10 +1,20 @@
-import { FC } from 'react'
-import avatartest from '../../../../assets/images/avatartest.jpg'
+import { FC, useEffect } from 'react'
+import avatartest from '../../assets/images/avatartest.jpg'
 import { HiOutlineChatBubbleLeftRight } from 'react-icons/hi2'
+import socket from '@utils/socket/socketConfig'
 
 interface Props {}
 
 const UserActive: FC<Props> = (): JSX.Element => {
+  console.log(socket)
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('Connected to the server')
+    })
+    socket.on('connect_error', (err) => console.log(err))
+    socket.on('connect_failed', (err) => console.log(err))
+    socket.on('disconnect', (err) => console.log(err))
+  }, [])
   return (
     <div className="bg-white px-1  py-3 shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md">
       <div className="flex items-center gap-2 px-3 text-[#0001CB] mb-2">

@@ -45,7 +45,6 @@ const Forum: FC<Props> = (): JSX.Element => {
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [openModalDelete, setOpenModalDelete] = useState<boolean>(false)
   const [openModalEditForum, setOpenModalEditForum] = useState<boolean>(false)
-
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [detailForum, setDetailForum] = useState<IForumDetail | null>(null)
   const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
@@ -280,6 +279,7 @@ const Forum: FC<Props> = (): JSX.Element => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue)
   }
+
   return (
     <>
       <div className="flex-1 flex flex-col ">
@@ -308,7 +308,7 @@ const Forum: FC<Props> = (): JSX.Element => {
 
             <OptionForum />
           </div>
-          <Box sx={{ borderColor: 'divider' }}>
+          <Box sx={{ borderColor: 'divider', position: 'relative' }}>
             <Tabs
               value={value}
               onChange={handleChange}
@@ -343,10 +343,21 @@ const Forum: FC<Props> = (): JSX.Element => {
                 />
               )}
             </Tabs>
+            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 py-2 px-3 rounded-md cursor-pointer bg-gray-100 hover:bg-gray-200 transition-all duration-300">
+              <HiSearch className="h-5 w-5" />
+              <div className="absolute top-[120%] right-0 w-[300px] bg-red-300 z-[90] ">
+                <SearchInput
+                  value={inputSearch}
+                  setValue={handleChangeSearch}
+                  width="100%"
+                  size="small"
+                />
+              </div>
+            </div> */}
           </Box>
         </div>
 
-        <div className="mx-72">
+        <div className="sm:mx-20 xl:mx-72 z-10">
           <TabPanel
             value={value}
             index={0}>
