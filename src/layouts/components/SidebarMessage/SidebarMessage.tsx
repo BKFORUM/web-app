@@ -40,7 +40,7 @@ const fakeData = [
 
 const SidebarMessage: FC<Props> = (): JSX.Element => {
   useEffect(() => {
-    console.log('test')
+    // console.log('test')
   }, [])
   const navigate = useNavigate()
   const [inputSearch, setInputSearch] = useState<string>('')

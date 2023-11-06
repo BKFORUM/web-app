@@ -23,7 +23,7 @@ const SearchInput: FC<IProps> = ({
         alignItems: 'center',
         width: width ? width : 400,
         borderRadius: 12,
-        bgcolor: '#f7f7f7',
+        bgcolor: '#f0f0f0',
       }}>
       <IconButton
         type="button"

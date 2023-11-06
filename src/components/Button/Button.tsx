@@ -9,6 +9,7 @@ export enum TypesButton {
   'gradient',
   'approve',
   'blue',
+  'cancel',
 }
 
 interface IButton
@@ -61,6 +62,11 @@ const Button = ({ typeButton = 'primary', loading, ...props }: IButton) =>
         case TypesButton[7]: {
           result =
             'transition-all duration-500 bg-[#3367d6] hover:bg-[#1a55d1] text-white font-semibold py-2 px-4 border border-[#3367d6] rounded shadow'
+          break
+        }
+        case TypesButton[8]: {
+          result =
+            'transition-all duration-300 bg-[#efebeb] hover:bg-[#f4f4f4] text-black font-semibold py-1.5 px-4 border border-[#f4f4f4] rounded-2xl shadow focus:outline-none focus:ring-0'
           break
         }
         case TypesButton[0]:

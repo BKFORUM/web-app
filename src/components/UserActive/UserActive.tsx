@@ -6,7 +6,6 @@ import socket from '@utils/socket/socketConfig'
 interface Props {}
 
 const UserActive: FC<Props> = (): JSX.Element => {
-  console.log(socket)
   useEffect(() => {
     socket.on('connect', () => {
       console.log('Connected to the server')

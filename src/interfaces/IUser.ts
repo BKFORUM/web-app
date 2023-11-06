@@ -51,6 +51,7 @@ export interface IUserData {
     phoneNumber: string
     email: string
     address?: string
+    friendStatus?: string
 }
 
 export interface IListUserRequest {
