@@ -1,49 +1,52 @@
 import SearchInput from '@components/SearchInput'
 import { FC, useState, useEffect } from 'react'
-import avatartest from '../../../assets/images/test666.jpg'
-import { useNavigate } from 'react-router-dom'
+import defaultAvatar from '../../../assets/images/default_forum.png'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useStoreActions } from 'easy-peasy'
+import { conversationActionSelector } from '@store/index'
+import { pageMode } from '@interfaces/IClient'
+import { IConversation } from '@interfaces/IConversation'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { dayComparedToThePast } from '@utils/functions/formatDay'
 
 interface Props {}
-
-const fakeData = [
-  {
-    id: 1,
-    name: 'Trương Quang Khang',
-    image: avatartest,
-    isOnline: false,
-  },
-  {
-    id: 2,
-    name: 'Nguyễn Văn Thịnh',
-    image: avatartest,
-    isOnline: true,
-  },
-  {
-    id: 3,
-    name: '20TCLC_DT4',
-    image: avatartest,
-    isOnline: false,
-  },
-  {
-    id: 4,
-    name: 'Nguyễn Phạm Nam Anh',
-    image: avatartest,
-    isOnline: true,
-  },
-  {
-    id: 5,
-    name: 'Nguyễn Thành Đạt',
-    image: avatartest,
-    isOnline: true,
-  },
-]
-
 const SidebarMessage: FC<Props> = (): JSX.Element => {
-  useEffect(() => {
-    // console.log('test')
-  }, [])
+  const { id } = useParams()
   const navigate = useNavigate()
+  const { getAllConverSation, setCurrentConversation } = useStoreActions(
+    conversationActionSelector,
+  )
+
   const [inputSearch, setInputSearch] = useState<string>('')
+  const [data, setData] = useState<IConversation[]>([])
+  const [totalRowCount, setTotalRowCount] = useState<number>(0)
+  const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
+  const [loading, setIsLoading] = useState<boolean>(false)
+
+  const getAllConversationPage = async (): Promise<void> => {
+    setIsLoading(true)
+    if (paginationModel) {
+      const res = await getAllConverSation({
+        search: inputSearch,
+        skip: paginationModel.page * 10,
+        take: paginationModel.pageSize,
+      })
+      if (res) {
+        setTotalRowCount(res.totalRecords)
+        setData([...data, ...res.data])
+      }
+    }
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    setData([])
+    setPaginationModel({ page: 0, pageSize: 10 })
+  }, [])
+
+  useEffect(() => {
+    getAllConversationPage()
+  }, [paginationModel])
 
   const handleChangeSearch = (value: string): void => {
     setInputSearch(value)
@@ -59,30 +62,93 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
           size="small"
         />
       </div>
-      <ul className="flex flex-col mt-4 gap-1 ">
-        {fakeData.map((item, index) => (
-          <li
-            key={index}
-            onClick={() => navigate('/message/' + item.id)}
-            className="relative group list-none px-2 ">
-            <a className="relative block w-full py-1.5 px-2  text-left clear-both whitespace-nowrap rounded-md hover:bg-gray-200 hover:text-primary-400 cursor-pointer group-hover:opacity-80 transition-all duration-200 ">
-              <img
-                className="h-12 w-12 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 inline"
-                src={item.image}
-                alt="avatar"
-              />
-              {item.isOnline && (
-                <span
-                  title="online"
-                  className="flex justify-center absolute left-11 bottom-2  text-center bg-green-500 border border-white w-[10px] h-[10px] rounded-full"></span>
-              )}
-              <span className="font-semibold">{item.name}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
+
+      <div
+        id="scrollableDiv"
+        style={{
+          maxHeight: 'calc(100vh - 60px)',
+          overflow: 'auto',
+        }}>
+        <InfiniteScroll
+          dataLength={data.length}
+          next={() =>
+            setPaginationModel((prevPaginationModel) => ({
+              page: prevPaginationModel ? prevPaginationModel.page + 1 : 0,
+              pageSize: 10,
+            }))
+          }
+          hasMore={data.length !== totalRowCount}
+          loader={<div>{loading && <span>Loading...</span>}</div>}
+          scrollableTarget="scrollableDiv"
+          endMessage={
+            <div>
+              {/* {paginationModel && !loading && data.length === 0 && (
+              <div className="flex-1 flex flex-col items-center justify-center">
+                <div className="h-40 w-40">
+                  <img
+                    className="h-full w-full"
+                    src={notFoundSearch}
+                    alt="not found search"
+                  />
+                </div>
+                <span className="font-medium">
+                  We're sorry. We were not able to find a match
+                </span>
+              </div>
+            )} */}
+              {/* {data.length === totalRowCount && data.length > 0 && paginationModel && (
+              <p style={{ textAlign: 'center', marginTop: 12 }}>
+                <b>Đúng! Bạn đã nhìn thấy tất cả kết quả tìm kiếm</b>
+              </p>
+            )} */}
+            </div>
+          }>
+          <ul className="flex flex-col mt-4 gap-1 px-2 ">
+            {data.map((item, index) => (
+              <li
+                key={index}
+                onClick={() => {
+                  navigate('/message/' + item.id), setCurrentConversation(item)
+                }}
+                className={`flex px-2 py-1  transition-all duration-200 rounded-md cursor-pointer
+                ${id === item.id ? 'bg-sky-100' : 'hover:bg-gray-200'}
+                `}>
+                <a className="relative flex-shrink-0">
+                  <img
+                    className="h-12 w-12 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 "
+                    src={item.avatarUrl || defaultAvatar}
+                    alt="avatar"
+                  />
+                </a>
+                <div className="flex flex-col ">
+                  <span className="font-semibold whitespace-nowrap truncate ">
+                    {item.displayName}
+                  </span>
+                  <div className="flex  items-center  gap-2">
+                    <span className={`max-w-[50px] truncate line-clamp-1 text-sm `}>
+                      {item.lastMessage?.content}{' '}
+                    </span>
+                    <span className=" text-xs">
+                      {item.lastMessage &&
+                        dayComparedToThePast(item.lastMessage.createdAt)}
+                    </span>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </InfiniteScroll>
+      </div>
     </div>
   )
 }
+
+// {
+//   item.isOnline && (
+//     <span
+//       title="online"
+//       className="flex justify-center absolute left-11 bottom-2  text-center bg-green-500 border border-white w-[10px] h-[10px] rounded-full"></span>
+//   )
+// }
 
 export default SidebarMessage

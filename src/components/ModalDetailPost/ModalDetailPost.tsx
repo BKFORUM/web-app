@@ -1,11 +1,13 @@
+import Comment from '@components/ModalDetailPost/components/Comment'
 import PostContent from '@components/PostContent'
 import { Dialog, Transition } from '@headlessui/react'
-import { IPostViewForum } from '@interfaces/IPost'
+import { pageMode } from '@interfaces/IClient'
+import { IComment, IPostViewForum } from '@interfaces/IPost'
 import { Tooltip } from '@mui/material'
-import { userStateSelector } from '@store/index'
+import { postActionSelector, userStateSelector } from '@store/index'
 import { dayComparedToThePast } from '@utils/functions/formatDay'
-import { useStoreState } from 'easy-peasy'
-import { FC, Fragment } from 'react'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import { FC, Fragment, useEffect, useState } from 'react'
 import {
   HiOutlineHeart,
   HiMiniHeart,
@@ -29,6 +31,91 @@ const ModalDetailPost: FC<Props> = ({
   setIsFavourite,
 }: Props): JSX.Element => {
   const { currentUserSuccess } = useStoreState(userStateSelector)
+  const { addCommentPost, getAllCommentPost, editCommentPost, deleteCommentPost } =
+    useStoreActions(postActionSelector)
+  const [inputText, setInputText] = useState<string>('')
+  const [loading, setIsLoading] = useState<boolean>(false)
+  const [totalRowCount, setTotalRowCount] = useState<number>(0)
+  const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
+  const [data, setData] = useState<IComment[]>([])
+  const [rowSelected, setRowSelected] = useState<IComment | null>(null)
+
+  const getAllCommentPage = async (): Promise<void> => {
+    if (paginationModel) {
+      setIsLoading(true)
+      const res = await getAllCommentPost({
+        id: item.id,
+        params: {
+          skip: paginationModel.page * 10,
+          take: paginationModel.pageSize,
+        },
+      })
+      if (res) {
+        setTotalRowCount(res.totalRecords)
+        setData([...data, ...res.data])
+      }
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getAllCommentPage()
+  }, [paginationModel])
+
+  useEffect(() => {
+    if (item) {
+      setData([])
+      setPaginationModel({ page: 0, pageSize: 10 })
+    }
+  }, [item])
+
+  const handleAddMessage = async (): Promise<void> => {
+    if (rowSelected) {
+      const res = await editCommentPost({ id: rowSelected.id, content: inputText })
+      if (res) {
+        const updatedComment = data.map((item: IComment) =>
+          item.id === rowSelected.id ? { ...item, content: inputText } : item,
+        )
+        setInputText('')
+        setData(updatedComment)
+      }
+    } else {
+      const res = await addCommentPost({ id: item.id, content: inputText })
+      if (res) {
+        const newDataRow = {
+          id: res?.id,
+          content: res?.content,
+          postId: res?.postId,
+          createdAt: res?.createdAt,
+          updateAt: res?.updateAt,
+          userId: res?.userId,
+          user: res?.user,
+        }
+        setTotalRowCount(totalRowCount + 1)
+        const newData = [newDataRow, ...data.slice(0, 9), ...data.slice(10)] as IComment[]
+        console.log(newData)
+        setInputText('')
+        setData(newData)
+      }
+    }
+  }
+
+  const handleEditMessage = (item: IComment): void => {
+    setInputText(item.content)
+    setRowSelected(item)
+  }
+
+  const handleDeleteComment = async (id: string): Promise<void> => {
+    const res = await deleteCommentPost(id)
+    if (res) {
+      const updatedComment = data.filter((item) => item.id !== id)
+      setData(updatedComment)
+    }
+  }
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') handleAddMessage()
+  }
   return (
     <div>
       <Transition
@@ -66,7 +153,9 @@ const ModalDetailPost: FC<Props> = ({
                     className="text-lg font-medium leading-6 text-gray-900 text-center shadow py-3 ">
                     Nội dung bài viết
                   </Dialog.Title>
-                  <div className="mt-2 max-h-[500px] overflow-y-auto">
+                  <div
+                    id="scrollableDiv"
+                    className="mt-2 max-h-[500px] overflow-y-auto">
                     <div className="flex items-center justify-between px-3">
                       <div className="flex items-center cursor-pointer">
                         <div className="relative flex-shrink-0  mr-2 ">
@@ -109,7 +198,17 @@ const ModalDetailPost: FC<Props> = ({
                         <span>Bình luận</span>
                       </div>
                     </div>
-                    <div className="min-h-[200px]"></div>
+                    <div className="pb-4">
+                      <Comment
+                        data={data}
+                        loading={loading}
+                        paginationModel={paginationModel}
+                        setPaginationModel={setPaginationModel}
+                        totalRowCount={totalRowCount}
+                        onEditMessage={handleEditMessage}
+                        onDeleteMessage={handleDeleteComment}
+                      />
+                    </div>
                   </div>
                   <div
                     className="px-3 py-2 flex gap-2"
@@ -126,6 +225,9 @@ const ModalDetailPost: FC<Props> = ({
                     <div className="flex-1 m-auto relative">
                       <input
                         type="text"
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyPress={handleKeyPress}
                         className="w-full bg-gray-200 outline-none px-4 py-2 rounded-3xl text-sm"
                         placeholder="Viết bình luận của bạn"
                       />

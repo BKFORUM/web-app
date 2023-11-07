@@ -79,4 +79,49 @@ const unLikePost = (id: string) => {
     });
 }
 
-export { addPost, postImage, getAllPost, getAllPostByForum, getAllPostByUser, deletePost, editPost, updateStatusPost, likePost, unLikePost }    
+const addCommentPost = (data: any) => {
+    return BaseURL({
+        url: `/posts/${data?.id}/comments`,
+        method: "POST",
+        data,
+    });
+}
+
+const editCommentPost = (data: any) => {
+    return BaseURL({
+        url: `/comments/` + data.id,
+        method: "PUT",
+        data,
+    });
+}
+
+const deleteCommentPost = (id: string) => {
+    return BaseURL({
+        url: `/comments/` + id,
+        method: "DELETE",
+    });
+}
+
+const getAllCommentPost = ({ id, params }: IParams) => {
+    return BaseURL({
+        url: `/posts/${id}/comments`,
+        method: "GET",
+        params,
+    });
+}
+
+export {
+    addPost,
+    postImage,
+    getAllPost,
+    getAllPostByForum,
+    getAllPostByUser,
+    deletePost,
+    editPost,
+    updateStatusPost,
+    likePost, unLikePost,
+    addCommentPost,
+    getAllCommentPost,
+    editCommentPost,
+    deleteCommentPost
+}    

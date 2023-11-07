@@ -7,7 +7,17 @@ export default {
       'xs': '320px',
       ...defaultTheme.screens,
     },
-    extend: {},
+    extend: {
+      animation: {
+        wiggle: 'wiggle 1s ease-in-out infinite',
+      },
+      keyframes: {
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-4.5deg)' },
+          '50%': { transform: 'rotate(4.5deg)' },
+        },
+      },
+    },
   },
   plugins: [],
 }

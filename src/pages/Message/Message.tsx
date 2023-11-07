@@ -1,6 +1,6 @@
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import test from '../../assets/images/test666.jpg'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   IoChatbubblesOutline,
   IoAddCircleSharp,
@@ -14,8 +14,20 @@ import { RiSendPlaneFill } from 'react-icons/ri'
 import SearchInput from '@components/SearchInput'
 import { Tooltip } from '@mui/material'
 import OptionGroup from './components/OptionGroup'
-import AddUserToGroup from '../../components/AddUserToGroup'
+// import AddUserToGroup from '../../components/AddUserToGroup'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import {
+  conversationActionSelector,
+  conversationStateSelector,
+  userStateSelector,
+} from '@store/index'
+import { IMessage } from '@interfaces/IConversation'
+import { pageMode } from '@interfaces/IClient'
+import { useDebounce } from '@hooks/useDebounce'
+import socket from '@utils/socket/socketConfig'
+import { formatDateLocalV2 } from '@utils/functions/formatDay'
+import logoVT from '../../assets/images/ingVT.png'
 
 interface Props {}
 
@@ -40,87 +52,101 @@ const fakeData = [
     name: 'Nguyễn Thành Đạt',
     image: test,
   },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
-  // {
-  //   id: 5,
-  //   name: 'Nguyễn Thành Đạt',
-  //   image: test,
-  // },
 ]
 const Message: FC<Props> = (): JSX.Element => {
+  const navigate = useNavigate()
   const { id } = useParams()
-  const [inputSearch, setInputSearch] = useState<string>('')
-  const [heightContent, setHeightContent] = useState<number | undefined>()
-  const [isOpenAddUser, setIsOpenAddUser] = useState<boolean>(false)
+  const { getConverSationById, addMessageToConversation } = useStoreActions(
+    conversationActionSelector,
+  )
+  const { currentUserSuccess } = useStoreState(userStateSelector)
+  const { currentConversation } = useStoreState(conversationStateSelector)
+
   const searchRef = useRef<HTMLDivElement>(null)
   const seendingRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  const [inputSearch, setInputSearch] = useState<string>('')
+  const [inputText, setInputText] = useState<string>('')
+  const [heightContent, setHeightContent] = useState<number | undefined>()
+  const [loading, setIsLoading] = useState<boolean>(false)
+  const [totalRowCount, setTotalRowCount] = useState<number>(0)
+  const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
+  const [data, setData] = useState<IMessage[]>([])
+  const [checkNext, setCheckNext] = useState<boolean>(false)
+
+  // const [isOpenAddUser, setIsOpenAddUser] = useState<boolean>(false)
+
+  const handleNewMessage = useCallback(
+    (response: any) => {
+      if (response?.author.id !== currentUserSuccess?.id) {
+        setData((prevData) => [response, ...prevData])
+      }
+    },
+    [currentUserSuccess?.id],
+  )
 
   useEffect(() => {
-    if (searchRef.current && seendingRef.current) {
+    socket.on('connect', () => {
+      console.log('Connected to the server')
+    })
+
+    socket.on('connect_error', (err) => console.log(err))
+
+    socket.emit('onConversationJoin', { id: id })
+
+    socket.on('onMessage', handleNewMessage)
+
+    return () => {
+      socket.off('onMessage', handleNewMessage)
+    }
+  }, [id, currentUserSuccess?.id])
+
+  const getDetailConversation = async (): Promise<void> => {
+    if (id && paginationModel) {
+      setIsLoading(true)
+      const res = await getConverSationById({
+        id: id,
+        params: {
+          search: inputSearch,
+          skip: paginationModel.page * 15,
+          take: paginationModel.pageSize + 5,
+        },
+      })
+      if (res) {
+        setTotalRowCount(res.totalRecords)
+        setData([...data, ...res.data])
+        const check = res.data.length === 15
+        setCheckNext(check)
+      }
+      setIsLoading(false)
+    }
+  }
+
+  const debouncedInputValue = useDebounce(inputSearch, 500)
+
+  useEffect(() => {
+    setData([])
+    setPaginationModel({ page: 0, pageSize: 10 })
+  }, [debouncedInputValue])
+
+  useEffect(() => {
+    getDetailConversation()
+  }, [paginationModel])
+
+  useEffect(() => {
+    if (searchRef.current && seendingRef.current && contentRef.current) {
       const heightSearch = searchRef.current.scrollHeight
       const heightSeeding = seendingRef.current.scrollHeight
       const windowHeight = window.innerHeight
       const totalHeight = windowHeight - 61 - heightSearch - heightSeeding
       setHeightContent(totalHeight)
+      contentRef.current.scrollTo(0, 0)
+    }
+
+    if (id) {
+      setData([])
+      setPaginationModel({ page: 0, pageSize: 10 })
     }
   }, [id])
 
@@ -128,24 +154,36 @@ const Message: FC<Props> = (): JSX.Element => {
     setInputSearch(value)
   }
 
-  const handleAddUser = async (data: any): Promise<void> => {
-    console.log(data)
+  // const handleAddUser = async (data: any): Promise<void> => {
+  //   console.log(data)
+  // }
+
+  const handleAddMessage = async (): Promise<void> => {
+    if (id) {
+      const res = await addMessageToConversation({
+        id: id,
+        content: inputText,
+        type: 'TEXT',
+      })
+      if (res) {
+        const newDataRow = {
+          id: res?.id,
+          content: res?.content,
+          type: 'TEXT',
+          author: res?.author,
+        }
+        setTotalRowCount(totalRowCount + 1)
+        const newData = [newDataRow, ...data.slice(0, 9), ...data.slice(10)] as IMessage[]
+        setInputText('')
+        setData(newData)
+      }
+    }
   }
 
-  const [items, setItems] = useState(Array.from({ length: 20 }))
-
-  const fetchMoreData = () => {
-    setTimeout(() => {
-      setItems(items.concat(Array.from({ length: 20 })))
-    }, 1500)
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') handleAddMessage()
   }
 
-  const style = {
-    height: 30,
-    border: '1px solid green',
-    margin: 6,
-    padding: 8,
-  }
   return (
     <>
       <div className="flex h-full bg-white">
@@ -170,26 +208,113 @@ const Message: FC<Props> = (): JSX.Element => {
 
               <div
                 id="scrollableDiv"
+                ref={contentRef}
                 style={{
                   maxHeight: heightContent !== undefined ? heightContent : '0',
                   overflow: 'auto',
-                  display: 'flex',
                   flexDirection: 'column-reverse',
                 }}>
-                {/*Put the scroll bar always on the bottom*/}
                 <InfiniteScroll
-                  dataLength={items.length}
-                  next={fetchMoreData}
-                  style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
-                  inverse={true} //
-                  hasMore={true}
-                  loader={<h4>Loading...</h4>}
+                  dataLength={data.length}
+                  next={() => {
+                    if (checkNext) {
+                      setPaginationModel((prevPaginationModel) => ({
+                        page: prevPaginationModel ? prevPaginationModel.page + 1 : 0,
+                        pageSize: 10,
+                      }))
+                    }
+                  }}
+                  hasMore={data.length !== totalRowCount}
+                  height={heightContent !== undefined ? heightContent : '0'}
+                  loader={<div>{loading && <span>Loading...</span>}</div>}
+                  style={{ display: 'flex', flexDirection: 'column-reverse' }}
+                  inverse={true}
+                  endMessage={
+                    <div>
+                      {data.length === totalRowCount &&
+                        data.length === 0 &&
+                        paginationModel && (
+                          <div>
+                            <div className="flex justify-center ">
+                              <img
+                                className=" h-32 w-32 animate-[wiggle_1s_ease-in-out_infinite]"
+                                src={logoVT}
+                                alt="Vẫy tay"
+                              />
+                            </div>
+                            <p
+                              style={{
+                                textAlign: 'center',
+                                marginBottom: 16,
+                              }}>
+                              <b>Hãy là người bắt đầu cuộc trò chuyện</b>
+                            </p>
+                          </div>
+                        )}
+                      {/* {paginationModel && !loading && data.length === 0 && (
+                        <div className="flex-1 flex flex-col items-center justify-center">
+                          <div className="h-40 w-40">
+                            <img
+                              className="h-full w-full"
+                              src={notFoundSearch}
+                              alt="not found search"
+                            />
+                          </div>
+                          <span className="font-medium">
+                            We're sorry. We were not able to find a match
+                          </span>
+                        </div>
+                      )} */}
+                      {data.length === totalRowCount &&
+                        data.length > 0 &&
+                        paginationModel && (
+                          <p style={{ textAlign: 'center', marginTop: 12 }}>
+                            <b>Đúng! Bạn đã nhìn thấy tất cả tin nhắn</b>
+                          </p>
+                        )}
+                    </div>
+                  }
                   scrollableTarget="scrollableDiv">
-                  {items.map((i, index) => (
+                  {data.map((item, index) => (
                     <div
-                      style={style}
-                      key={index}>
-                      div - #{index}
+                      id={item.id}
+                      key={index}
+                      className="flex flex-col px-2">
+                      <div
+                        className={`flex gap-2 my-1.5 ${
+                          item.author.id === currentUserSuccess?.id
+                            ? 'justify-end'
+                            : 'justify-start'
+                        }`}>
+                        {item.author.id !== currentUserSuccess?.id && (
+                          <div className="mt-auto">
+                            <div className="h-8 w-8 overflow-hidden">
+                              <img
+                                className="h-full w-full rounded-3xl border border-gray-200"
+                                src={item.author.avatarUrl}
+                                alt={item.author.fullName}
+                              />
+                            </div>
+                          </div>
+                        )}
+                        <div className="flex flex-col gap-2 text-xs ">
+                          {item.author.id !== currentUserSuccess?.id && (
+                            <span>{item.author.fullName}</span>
+                          )}
+                          <div>
+                            <Tooltip title={formatDateLocalV2(item.createdAt)}>
+                              <span
+                                className={`text-base px-3 py-1 max-w-[300px] truncate leading-0 ${
+                                  item.author.id === currentUserSuccess?.id
+                                    ? 'bg-blue-400 text-white'
+                                    : 'bg-gray-100 text-black'
+                                } rounded-2xl`}>
+                                {item.content}
+                              </span>
+                            </Tooltip>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </InfiniteScroll>
@@ -216,10 +341,16 @@ const Message: FC<Props> = (): JSX.Element => {
                 <div className="relative flex-1">
                   <input
                     type="text"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyPress={handleKeyPress}
                     className="w-full outline-none border border-gray-300 px-3 py-1.5 rounded-3xl"
                     placeholder="Aa"
                   />
-                  <RiSendPlaneFill className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-[#0001CB] cursor-pointer" />
+                  <RiSendPlaneFill
+                    onClick={() => handleAddMessage()}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-[#0001CB] cursor-pointer"
+                  />
                 </div>
               </div>
             </div>
@@ -229,13 +360,18 @@ const Message: FC<Props> = (): JSX.Element => {
               <div className="h-20 w-20 overflow-hidden rounded-full">
                 <img
                   className="h-full w-full object-cover"
-                  src={test}
-                  alt=""
+                  src={currentConversation?.avatarUrl}
+                  alt={currentConversation?.displayName}
                 />
               </div>
-              <span className="font-semibold text-lg">Trương Quang Khang</span>
+              <span className="font-semibold text-lg">
+                {currentConversation?.displayName}
+              </span>
               {id !== '3' && (
-                <div className="flex flex-col items-center justify-center mt-4">
+                <div
+                  className="flex flex-col items-center justify-center mt-4"
+                  // onClick={() =>navigate('/profile/' + currentConversation?.lastMessage?.userId) }
+                >
                   <IoPersonCircleOutline className="h-8 w-8 p-1 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300" />
                   <span className="text-sm">Trang cá nhân</span>
                 </div>
@@ -243,7 +379,8 @@ const Message: FC<Props> = (): JSX.Element => {
               {id === '3' && (
                 <div
                   className="flex flex-col items-center justify-center mt-4"
-                  onClick={() => setIsOpenAddUser(true)}>
+                  // onClick={() => setIsOpenAddUser(true)}
+                >
                   <HiUserPlus className="h-8 w-8 p-1 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300" />
                   <span className="text-sm">Mời</span>
                 </div>
@@ -285,12 +422,13 @@ const Message: FC<Props> = (): JSX.Element => {
           </div>
         )}
       </div>
-      <AddUserToGroup
+
+      {/* <AddUserToGroup
         isOpen={isOpenAddUser}
         setIsOpen={setIsOpenAddUser}
         id={id}
         handleAction={handleAddUser}
-      />
+      /> */}
     </>
   )
 }

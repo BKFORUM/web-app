@@ -37,6 +37,8 @@ export const dayComparedToThePast = (dateTime: string): string => {
     } else if (diff > 60) {
         const diffInHours = Math.floor(diff / 60);
         output = `${diffInHours} giờ trước`;
+    } else if (diff < 2) {
+        output = `vừa xong`
     } else {
         output = `${diff} phút trước`;
     }

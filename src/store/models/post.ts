@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addPost, deletePost, editPost, getAllPost, getAllPostByForum, getAllPostByUser, likePost, postImage, unLikePost, updateStatusPost } from "../../services/post.service";
+import { addCommentPost, addPost, deleteCommentPost, deletePost, editCommentPost, editPost, getAllCommentPost, getAllPost, getAllPostByForum, getAllPostByUser, likePost, postImage, unLikePost, updateStatusPost } from "../../services/post.service";
 import { IParams } from "@interfaces/IClient";
 import { IPostViewForum } from "@interfaces/IPost";
 
@@ -61,6 +61,26 @@ export interface IPostModel {
     isUnLikePostSuccess: boolean;
     setIsUnLikePostSuccess: Action<IPostModel, boolean>;
     unLikePost: Thunk<IPostModel, string>;
+
+    //getAllCommentPost
+    isGetAllCommentPostSuccess: boolean;
+    setIsGetAllCommentPostSuccess: Action<IPostModel, boolean>;
+    getAllCommentPost: Thunk<IPostModel, IParams>;
+
+    //addCommentPost
+    isAddCommentPostSuccess: boolean;
+    setIsAddCommentPostSuccess: Action<IPostModel, boolean>;
+    addCommentPost: Thunk<IPostModel, any>;
+
+    //editCommentPost
+    isEditCommentPostSuccess: boolean;
+    setIsEditCommentPostSuccess: Action<IPostModel, boolean>;
+    editCommentPost: Thunk<IPostModel, any>;
+
+    //deleteCommentPost
+    isDeleteCommentPostSuccess: boolean;
+    setIsDeleteCommentPostSuccess: Action<IPostModel, boolean>;
+    deleteCommentPost: Thunk<IPostModel, string>;
 }
 
 export const postModel: IPostModel = persist({
@@ -243,6 +263,74 @@ export const postModel: IPostModel = persist({
             })
             .catch((error) => {
                 actions.setIsUnLikePostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //AddCommentPost
+    isAddCommentPostSuccess: true,
+    setIsAddCommentPostSuccess: action((state, payload) => {
+        state.isAddCommentPostSuccess = payload;
+    }),
+    addCommentPost: thunk(async (actions, payload,) => {
+        return addCommentPost(payload)
+            .then(async (res) => {
+                actions.setIsAddCommentPostSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsAddCommentPostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //DeleteCommentPost
+    isDeleteCommentPostSuccess: true,
+    setIsDeleteCommentPostSuccess: action((state, payload) => {
+        state.isDeleteCommentPostSuccess = payload;
+    }),
+    deleteCommentPost: thunk(async (actions, payload,) => {
+        return deleteCommentPost(payload)
+            .then(async (res) => {
+                actions.setIsDeleteCommentPostSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsDeleteCommentPostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //EditCommentPost
+    isEditCommentPostSuccess: true,
+    setIsEditCommentPostSuccess: action((state, payload) => {
+        state.isEditCommentPostSuccess = payload;
+    }),
+    editCommentPost: thunk(async (actions, payload,) => {
+        return editCommentPost(payload)
+            .then(async (res) => {
+                actions.setIsEditCommentPostSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsEditCommentPostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //GetAllCommentPost
+    isGetAllCommentPostSuccess: true,
+    setIsGetAllCommentPostSuccess: action((state, payload) => {
+        state.isGetAllCommentPostSuccess = payload;
+    }),
+    getAllCommentPost: thunk(async (actions, payload,) => {
+        return getAllCommentPost(payload)
+            .then(async (res) => {
+                actions.setIsGetAllCommentPostSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllCommentPostSuccess(false)
                 actions.setMessageError(error?.response?.data?.message)
             });
     }),

@@ -1,3 +1,5 @@
+import { IUserData } from "./IUser";
+
 export interface IDocuments {
     id: string;
     createAt: string;
@@ -31,4 +33,15 @@ export interface IPostViewForum {
         likes: number
         comments: number
     }
+}
+
+export interface IComment {
+    id: string
+    content: string
+    postId: string
+    createdAt: string
+    updateAt: string
+    userId: string
+    user: IUserData
+
 }

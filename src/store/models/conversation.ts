@@ -1,10 +1,16 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
 import { addMessageToConversation, getAllConverSation, getConversationById } from "../../services/conversation.service";
+import { IParams } from "@interfaces/IClient";
+import { IConversation } from "@interfaces/IConversation";
 
 export interface IConversationModel {
   //MessageError
   messageError: string;
   setMessageError: Action<IConversationModel, string>;
+
+  //setConversation
+  currentConversation: IConversation | null
+  setCurrentConversation: Action<IConversationModel, IConversation | null>;
 
   //GetAllConverSation
   isGetAllConverSationSuccess: boolean;
@@ -14,7 +20,7 @@ export interface IConversationModel {
   //GetConverSationById
   isGetConverSationByIdSuccess: boolean;
   setIsGetConverSationByIdSuccess: Action<IConversationModel, boolean>;
-  getConverSationById: Thunk<IConversationModel, string>;
+  getConverSationById: Thunk<IConversationModel, IParams>;
 
   //AddMessageToConversation
   isAddMessageToConversationSuccess: boolean;
@@ -27,6 +33,12 @@ export const conversationModel: IConversationModel = persist({
   messageError: "",
   setMessageError: action((state, payload) => {
     state.messageError = payload;
+  }),
+
+  //setConversation
+  currentConversation: null,
+  setCurrentConversation: action((state, payload) => {
+    state.currentConversation = payload;
   }),
 
   //GetAllConverSation

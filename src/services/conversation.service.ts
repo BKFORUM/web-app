@@ -1,3 +1,4 @@
+import { IParams } from "@interfaces/IClient";
 import BaseURL from "@utils/api/baseURL";
 
 const getAllConverSation = (params: any) => {
@@ -8,10 +9,11 @@ const getAllConverSation = (params: any) => {
     });
 }
 
-const getConversationById = (id: string) => {
+const getConversationById = ({ id, params }: IParams) => {
     return BaseURL({
         url: `/conversations/` + id,
         method: "GET",
+        params,
     });
 }
 
