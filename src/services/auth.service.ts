@@ -9,4 +9,20 @@ const login = (data: IUserLogin) => {
     });
 };
 
-export { login }    
+const forgotPassword = (data: { email: string }) => {
+    return BaseURL({
+        url: `/auth/forgot-password`,
+        method: "POST",
+        data,
+    });
+};
+
+const resetPassword = (data: any) => {
+    return BaseURL({
+        url: `/auth/reset-password`,
+        method: "POST",
+        data,
+    });
+};
+
+export { login, forgotPassword, resetPassword }    

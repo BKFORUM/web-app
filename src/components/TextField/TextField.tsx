@@ -6,11 +6,13 @@ export const TextFieldCustom = ({
   value,
   width,
   placeholder,
+  type,
 }: any) => {
   return (
     <TextField
+      type={type || 'text'}
       placeholder={placeholder || undefined}
-      helperText={error ? error.message : null}
+      helperText={error?.message || error || null}
       sx={{ width: width !== undefined ? '100%' : width }}
       size="small"
       error={!!error}

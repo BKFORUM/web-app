@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { login } from "../../services/auth.service";
+import { forgotPassword, login, resetPassword } from "../../services/auth.service";
 import { IUserLogin } from "@interfaces/IUser";
 
 export interface IAuthModel {
@@ -15,6 +15,16 @@ export interface IAuthModel {
     isLoginSuccess: boolean;
     setIsLoginSuccess: Action<IAuthModel, boolean>;
     login: Thunk<IAuthModel, IUserLogin>;
+
+    //ForgotPassword
+    isForgotPasswordSuccess: boolean;
+    setIsForgotPasswordSuccess: Action<IAuthModel, boolean>;
+    forgotPassword: Thunk<IAuthModel, { email: string }>;
+
+    //ResetPassword
+    isResetPasswordSuccess: boolean;
+    setIsResetPasswordSuccess: Action<IAuthModel, boolean>;
+    resetPassword: Thunk<IAuthModel, any>;
 }
 
 export const authModel: IAuthModel = persist({
@@ -44,6 +54,40 @@ export const authModel: IAuthModel = persist({
             })
             .catch((error) => {
                 actions.setIsLoginSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //ForgotPassword
+    isForgotPasswordSuccess: true,
+    setIsForgotPasswordSuccess: action((state, payload) => {
+        state.isForgotPasswordSuccess = payload;
+    }),
+    forgotPassword: thunk(async (actions, payload) => {
+        return forgotPassword(payload)
+            .then(async (res) => {
+                actions.setIsForgotPasswordSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsForgotPasswordSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //ResetPassword
+    isResetPasswordSuccess: true,
+    setIsResetPasswordSuccess: action((state, payload) => {
+        state.isResetPasswordSuccess = payload;
+    }),
+    resetPassword: thunk(async (actions, payload) => {
+        return resetPassword(payload)
+            .then(async (res) => {
+                actions.setIsResetPasswordSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsResetPasswordSuccess(false)
                 actions.setMessageError(error?.response?.data?.message)
             });
     }),

@@ -33,7 +33,7 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
   const _logout = (): void => {
     setCurrentUserSuccess(null)
     localStorage.removeItem('auth')
-    navigate('/login')
+    navigate('/auth/login')
   }
   return (
     <div className="relative">
