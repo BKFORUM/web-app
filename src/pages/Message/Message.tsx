@@ -75,6 +75,8 @@ const Message: FC<Props> = (): JSX.Element => {
   const [data, setData] = useState<IMessage[]>([])
   const [checkNext, setCheckNext] = useState<boolean>(false)
 
+  console.log(navigate)
+
   // const [isOpenAddUser, setIsOpenAddUser] = useState<boolean>(false)
 
   const handleNewMessage = useCallback(

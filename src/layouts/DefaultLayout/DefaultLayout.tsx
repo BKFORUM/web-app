@@ -1,7 +1,6 @@
 import Header from '@layouts/components/Header'
 import Sidebar from '@layouts/components/Sidebar'
 import { FC } from 'react'
-import { Outlet } from 'react-router-dom'
 
 interface Props {
   children: React.ReactNode

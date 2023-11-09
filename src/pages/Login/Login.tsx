@@ -18,12 +18,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import Button from '@components/Button/Button'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import {
-  authActionSelector,
-  authStateSelector,
-  notifyActionSelector,
-  userActionSelector,
-} from '@store/index'
+import { authActionSelector, authStateSelector, notifyActionSelector } from '@store/index'
 import { useNavigate } from 'react-router-dom'
 import { IUserLogin } from '@interfaces/IUser'
 
