@@ -221,7 +221,7 @@ const Profile: FC<Props> = (): JSX.Element => {
     }
   }
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue)
   }
   return (

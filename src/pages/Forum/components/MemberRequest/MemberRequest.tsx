@@ -35,7 +35,7 @@ const fakeData = [
 
 const MemberRequest: FC<Props> = (): JSX.Element => {
   const [inputSearch, setInputSearch] = useState<string>('')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, _setIsLoading] = useState<boolean>(false)
 
   const handleChangeSearch = (value: string): void => {
     setInputSearch(value)

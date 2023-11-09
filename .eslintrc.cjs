@@ -15,4 +15,11 @@ module.exports = {
     project: ['./tsconfig.json'],
   },
   plugins: ['react-refresh'],
+  rules: {
+    'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+    ],
+  }
 }

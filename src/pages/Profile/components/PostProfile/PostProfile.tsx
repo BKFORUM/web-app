@@ -29,7 +29,6 @@ const PostProfile: FC<Props> = ({
   user,
   dataPost,
   setPaginationModel,
-  paginationModel,
   totalRowCount,
   setOpenModal,
   setOpenModalDelete,
