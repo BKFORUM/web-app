@@ -78,6 +78,7 @@ const ModalDetailPost: FC<Props> = ({
         )
         setInputText('')
         setData(updatedComment)
+        setRowSelected(null)
       }
     } else {
       const res = await addCommentPost({ id: item.id, content: inputText })
@@ -92,10 +93,14 @@ const ModalDetailPost: FC<Props> = ({
           user: res?.user,
         }
         setTotalRowCount(totalRowCount + 1)
-        const newData = [newDataRow, ...data.slice(0, 9), ...data.slice(10)] as IComment[]
-        console.log(newData)
-        setInputText('')
+        let newData
+        if (data.length <= 10) {
+          newData = [newDataRow, ...data.slice(0, 9), ...data.slice(10)] as IComment[]
+        } else {
+          newData = [newDataRow, ...data] as IComment[]
+        }
         setData(newData)
+        setInputText('')
       }
     }
   }
@@ -231,7 +236,10 @@ const ModalDetailPost: FC<Props> = ({
                         className="w-full bg-gray-200 outline-none px-4 py-2 rounded-3xl text-sm"
                         placeholder="Viết bình luận của bạn"
                       />
-                      <RiSendPlaneFill className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-[#0001CB] cursor-pointer" />
+                      <RiSendPlaneFill
+                        onClick={() => handleAddMessage()}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-[#0001CB] cursor-pointer"
+                      />
                     </div>
                   </div>
                 </Dialog.Panel>

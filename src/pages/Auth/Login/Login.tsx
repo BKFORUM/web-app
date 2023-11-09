@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react'
-import logo from '../../assets/images/logobkforum.png'
-import bgImage from '../../assets/images/bg-login-default.jpg'
+import logo from '../../../assets/images/logobkforum.png'
+import bgImage from '../../../assets/images/bg-login-default.jpg'
 import {
   FormControl,
   IconButton,
@@ -18,12 +18,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import Button from '@components/Button/Button'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import {
-  authActionSelector,
-  authStateSelector,
-  notifyActionSelector,
-  userActionSelector,
-} from '@store/index'
+import { authActionSelector, authStateSelector, notifyActionSelector } from '@store/index'
 import { useNavigate } from 'react-router-dom'
 import { IUserLogin } from '@interfaces/IUser'
 
@@ -159,12 +154,14 @@ const Login: FC<Props> = (): JSX.Element => {
               )}
             />
             <div className="flex justify-end">
-              <span className="text-sm cursor-pointer hover:text-blue-500">
+              <span
+                onClick={() => navigate('/auth/forgot-password')}
+                className="text-sm cursor-pointer hover:text-blue-500">
                 Quên mật khẩu?
               </span>
             </div>
             <Button
-              typeButton="blue"
+              // typeButton="blue"
               className="mt-10"
               disabled={isLoading}
               loading={isLoading}>

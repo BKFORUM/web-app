@@ -1,6 +1,5 @@
 import { FC, useState } from 'react'
 import PostContent from '@components/PostContent'
-import test from '../../assets/images/default_forum.png'
 import {
   HiOutlineHeart,
   HiMiniHeart,
@@ -13,6 +12,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy'
 import { postActionSelector, userStateSelector } from '@store/index'
 import OptionPost from '@components/OptionPost'
 import ModalDetailPost from '@components/ModalDetailPost'
+import default_forum from '../../assets/images/default_forum.png'
 
 interface Props {
   moderatorId?: string
@@ -108,7 +108,7 @@ const PostItem: FC<Props> = ({
                 <div className="h-10 w-10 rounded-xl overflow-hidden border border-gray-700 bg-gray-700 ">
                   <img
                     className="h-full w-full object-cover"
-                    src={item.forum.avatarUrl || test}
+                    src={item.forum.avatarUrl || default_forum}
                     alt="logo"
                   />
                 </div>

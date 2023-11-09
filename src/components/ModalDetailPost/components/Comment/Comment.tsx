@@ -36,33 +36,33 @@ const Comment: FC<Props> = ({
           <div
             key={index}
             className="flex gap-2">
-            <Tooltip
-              title={item.user.fullName}
-              className="mt-auto ">
-              <div
-                className="h-8 w-8 overflow-hidden cursor-pointer"
-                onClick={() => navigate('/profile/' + item.user.id)}>
-                <img
-                  className="h-full w-full border border-gray-200 rounded-full"
-                  src={item.user.avatarUrl}
-                  alt={item.user.fullName}
-                />
-              </div>
-            </Tooltip>
-            <div className="flex flex-col gap-0 group">
+            <div className="flex-shrink mt-auto">
+              <Tooltip title={item.user.fullName}>
+                <div
+                  className="h-8 w-8 overflow-hidden cursor-pointer"
+                  onClick={() => navigate('/profile/' + item.user.id)}>
+                  <img
+                    className="h-full w-full border border-gray-200 rounded-full"
+                    src={item.user.avatarUrl}
+                    alt={item.user.fullName}
+                  />
+                </div>
+              </Tooltip>
+            </div>
+            <div className="flex flex-col gap-0 group flex-1">
               <div className="flex items-center">
                 <span className="text-[13px] font-medium">{item.user.fullName}</span>
                 <span className="text-xs ml-2.5 ">
                   {dayComparedToThePast(item.createdAt)}
                 </span>
               </div>
-              <div className="">
-                <span className="flex gap-4 items-center ">
-                  <span className="text-sm px-2 py-0.5 bg-gray-200 rounded-lg">
+              <div className="flex-1  ">
+                <div className="flex gap-4 items-center w-full">
+                  <span className="max-w-[450px] text-sm px-2 py-0.5 bg-gray-200 rounded-lg break-words">
                     {item.content}
                   </span>
                   {item.userId === currentUserSuccess?.id && (
-                    <div className="flex gap-1.5">
+                    <div className="flex gap-1.5 w-[20%]">
                       <HiPencilAlt
                         onClick={() => onEditMessage(item)}
                         className="text-gray-600 cursor-pointer"
@@ -73,7 +73,7 @@ const Comment: FC<Props> = ({
                       />
                     </div>
                   )}
-                </span>
+                </div>
               </div>
             </div>
           </div>

@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react'
-import logoBkForum from '../../../assets/images/logobkforum.png'
 import SmsIcon from '@mui/icons-material/Sms'
 import AvatarHeader from '../AvatarHeader/AvatarHeader'
 // import { HiOutlinePlusCircle } from 'react-icons/hi2'
@@ -9,6 +8,7 @@ import Notification from '../Notification'
 import { useNavigate } from 'react-router-dom'
 import ModalEditForum from '@pages/Forum/components/ModalEditForum'
 import { useStoreActions, useStoreState } from 'easy-peasy'
+import logoBk from '../../../assets/images/logobkforum.png'
 import {
   forumActionSelector,
   forumStateSelector,
@@ -79,7 +79,7 @@ const Header: FC<Props> = (): JSX.Element => {
           onClick={() => navigate('/')}>
           <img
             className="w-full h-full"
-            src={logoBkForum}
+            src={logoBk}
             alt="logoBk"
           />
         </div>

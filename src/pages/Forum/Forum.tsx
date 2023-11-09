@@ -21,11 +21,11 @@ import { IForumDetail } from '@interfaces/IForum'
 import ModalConfirm from '@components/ModalConfirm'
 import ModalEditForum from './components/ModalEditForum'
 import MembersForum from './components/MembersForum'
-import defaultAvatar from '../../assets/images/default_forum.png'
 import PostRequest from './components/PostRequest'
 import MemberRequest from './components/MemberRequest'
 import EventsForum from './components/EventsForum'
 import { pageMode } from '@interfaces/IClient'
+import default_forum from '../../assets/images/default_forum.png'
 
 interface Props {}
 
@@ -289,7 +289,7 @@ const Forum: FC<Props> = (): JSX.Element => {
               <a className="relative flex items-center w-full   text-left clear-both whitespace-nowrap rounded-md">
                 <img
                   className="h-32 w-32 rounded-full border border-gray-700 bg-gray-700 object-cover mr-4 inline"
-                  src={detailForum?.avatarUrl || defaultAvatar}
+                  src={detailForum?.avatarUrl || default_forum}
                   alt="avatar"
                 />
                 <div>
