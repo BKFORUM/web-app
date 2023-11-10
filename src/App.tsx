@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { routerUser } from '@routes/router'
-import Login from '@pages/Login'
+import Login from '@pages/Auth/Login'
 import NotFound from '@pages/NotFound'
 import ProtectedRoute from '@routes/ProtectedRoute'
 import RedirectForum from '@routes/RedirectForum'
@@ -15,6 +15,7 @@ import {
 } from './store'
 import Notify from '@components/Notify'
 import { useEffect } from 'react'
+import ForgotPassword from '@pages/Auth/ForgotPassword'
 
 function App() {
   const { notifySetting } = useStoreState(notifyStateSelector)
@@ -55,10 +56,18 @@ function App() {
           )
         })}
         <Route
-          path="/login"
+          path="/auth/login"
           element={
             <RedirectForum>
               <Login />
+            </RedirectForum>
+          }
+        />
+        <Route
+          path="/auth/forgot-password"
+          element={
+            <RedirectForum>
+              <ForgotPassword />
             </RedirectForum>
           }
         />

@@ -1,5 +1,6 @@
 export const ROUTER = Object.freeze({
-    LOGIN: '/login',
+    LOGIN: 'auth/login',
+    FORGOT_PASSWORD: 'auth/forgot-password',
     HOME: '/',
     FRIEND: '/friends',
     EVENT: '/event',

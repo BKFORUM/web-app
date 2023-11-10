@@ -224,7 +224,7 @@ const HomePage: FC<Props> = (): JSX.Element => {
             </div>
             <input
               onClick={() => handleCreatePost()}
-              className="bg-gray-200 cursor-pointer px-4 py-2.5 rounded-3xl w-[200px] text-left flex-auto mr-2 hover:bg-gray-300 transition-all duration-300"
+              className="bg-slate-100 cursor-pointer px-4 py-2.5 rounded-3xl w-[200px] text-left flex-auto mr-2 hover:bg-slate-300 transition-all duration-300"
               type="button"
               value="Viết bài tại đây...."
             />
@@ -233,7 +233,7 @@ const HomePage: FC<Props> = (): JSX.Element => {
               onChange={handleChange}
               placeholder="Select forum"
               options={dataForum}
-              width="300px"
+              width="250px"
             />
 
             {forumSelected === '' && (

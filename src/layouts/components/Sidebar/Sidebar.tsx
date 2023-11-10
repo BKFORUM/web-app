@@ -4,10 +4,10 @@ import { MdOutlineCalendarMonth } from 'react-icons/md'
 import { HiOutlineUserGroup, HiOutlineStar, HiOutlineHome } from 'react-icons/hi2'
 import { useLocation, useNavigate } from 'react-router-dom'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import defaultAvatar from '../../../assets/images/default_forum.png'
 import { IUserForumResponse } from '@interfaces/IForum'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { userActionSelector, userStateSelector } from '@store/index'
+import default_forum from '../../../assets/images/default_forum.png'
 
 interface IProps {
   // open: boolean
@@ -168,7 +168,7 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
                 <div className="flex-shrink-0 h-8 w-8 rounded-xl overflow-hidden mr-2 border border-gray-500 bg-gray-500">
                   <img
                     className="h-full w-full object-cover "
-                    src={item?.avatarUrl || defaultAvatar}
+                    src={item?.avatarUrl || default_forum}
                     alt="logo"
                   />
                 </div>

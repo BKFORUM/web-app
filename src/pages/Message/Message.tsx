@@ -1,5 +1,4 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
-import test from '../../assets/images/test666.jpg'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   IoChatbubblesOutline,
@@ -27,7 +26,6 @@ import { pageMode } from '@interfaces/IClient'
 import { useDebounce } from '@hooks/useDebounce'
 import socket from '@utils/socket/socketConfig'
 import { formatDateLocalV2 } from '@utils/functions/formatDay'
-import logoVT from '../../assets/images/ingVT.png'
 
 interface Props {}
 
@@ -35,22 +33,22 @@ const fakeData = [
   {
     id: 1,
     name: 'Trương Quang Khang',
-    image: test,
+    image: '../../assets/images/test666.jpg',
   },
   {
     id: 2,
     name: 'Nguyễn Văn Thịnh',
-    image: test,
+    image: '../../assets/images/test666.jpg',
   },
   {
     id: 4,
     name: 'Nguyễn Phạm Nam Anh',
-    image: test,
+    image: '../../assets/images/test666.jpg',
   },
   {
     id: 5,
     name: 'Nguyễn Thành Đạt',
-    image: test,
+    image: '../../assets/images/test666.jpg',
   },
 ]
 const Message: FC<Props> = (): JSX.Element => {
@@ -240,7 +238,7 @@ const Message: FC<Props> = (): JSX.Element => {
                             <div className="flex justify-center ">
                               <img
                                 className=" h-32 w-32 animate-[wiggle_1s_ease-in-out_infinite]"
-                                src={logoVT}
+                                src="../../assets/images/ingVT.png"
                                 alt="Vẫy tay"
                               />
                             </div>

@@ -1,8 +1,18 @@
 import TextField from '@mui/material/TextField'
-export const TextFieldCustom = ({ error, onChange, label, value, width }: any) => {
+export const TextFieldCustom = ({
+  error,
+  onChange,
+  label,
+  value,
+  width,
+  placeholder,
+  type,
+}: any) => {
   return (
     <TextField
-      helperText={error ? error.message : null}
+      type={type || 'text'}
+      placeholder={placeholder || undefined}
+      helperText={error?.message || error || null}
       sx={{ width: width !== undefined ? '100%' : width }}
       size="small"
       error={!!error}

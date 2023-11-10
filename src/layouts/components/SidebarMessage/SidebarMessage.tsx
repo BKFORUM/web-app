@@ -1,6 +1,5 @@
 import SearchInput from '@components/SearchInput'
 import { FC, useState, useEffect } from 'react'
-import defaultAvatar from '../../../assets/images/default_forum.png'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useStoreActions } from 'easy-peasy'
 import { conversationActionSelector } from '@store/index'
@@ -116,7 +115,7 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
                 <a className="relative flex-shrink-0">
                   <img
                     className="h-12 w-12 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 "
-                    src={item.avatarUrl || defaultAvatar}
+                    src={item.avatarUrl || '../../../assets/images/default_forum.png'}
                     alt="avatar"
                   />
                 </a>

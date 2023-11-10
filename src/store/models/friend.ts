@@ -108,7 +108,7 @@ export const friendModel: IFriendModel = persist({
         return updateStatusFriend(payload)
             .then(async (res) => {
                 actions.setIsUpdateStatusFriendSuccess(true)
-                return res;
+                return res.data;
             })
             .catch((error) => {
                 actions.setIsUpdateStatusFriendSuccess(false)

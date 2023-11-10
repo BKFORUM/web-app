@@ -6,7 +6,6 @@ import { friendActionSelector, userActionSelector, userStateSelector } from '@st
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { FC, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import notFoundSearch from '../../../../assets/images/notFoundSearch.jpg'
 import Button from '@components/Button'
 import { useNavigate } from 'react-router-dom'
 
@@ -115,7 +114,7 @@ const SearchFriend: FC<Props> = (): JSX.Element => {
                   <div className="h-40 w-40">
                     <img
                       className="h-full w-full"
-                      src={notFoundSearch}
+                      src="../../../../assets/images/notFoundSearch.jpg"
                       alt="not found search"
                     />
                   </div>

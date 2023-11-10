@@ -8,7 +8,7 @@ function RedirectForum(props: IProps): JSX.Element {
   const auth = localStorage.getItem('auth')
   const { pathname } = useLocation()
 
-  if (auth && pathname.split('/')[1] === 'login') {
+  if (auth && pathname.split('/')[2] === 'login') {
     return <Navigate to="/" />
   }
   return props.children
