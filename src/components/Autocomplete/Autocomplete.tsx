@@ -54,8 +54,8 @@ const AutocompleteCustom: FC<IProps> = ({
           '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall ': {
             paddingTop: '8px',
             paddingBottom: '8px',
-            borderRadius: '6px',
-            backgroundColor: '#E6F0F6',
+            borderRadius: '20px',
+            backgroundColor: '#eff6fa',
           },
           '& .MuiOutlinedInput-notchedOutline': {
             border: !!error ? '1px solid red' : 'none',
