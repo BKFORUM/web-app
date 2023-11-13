@@ -8,8 +8,8 @@ import 'swiper/css/pagination'
 import 'swiper/css/scrollbar'
 import { IDocuments } from '@interfaces/IPost'
 interface Props {
-  content: string
-  images: IDocuments[]
+  content?: string
+  images?: IDocuments[]
 }
 
 const PostContent: FC<Props> = ({ content, images }: Props): JSX.Element => {
@@ -18,10 +18,10 @@ const PostContent: FC<Props> = ({ content, images }: Props): JSX.Element => {
       <div
         className="px-3"
         dangerouslySetInnerHTML={{
-          __html: content,
+          __html: content || '',
         }}
       />
-      {images.length > 0 && (
+      {images && images.length > 0 && (
         <div className="border-y border-gray-200 mt-3">
           <Swiper
             modules={[Navigation, Pagination, Scrollbar, A11y]}

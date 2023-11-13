@@ -16,7 +16,7 @@ import {
 import { RiSendPlaneFill } from 'react-icons/ri'
 
 interface Props {
-  item: IPostViewForum
+  item: IPostViewForum | null
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   isFavourite: boolean
@@ -41,7 +41,7 @@ const ModalDetailPost: FC<Props> = ({
   const [rowSelected, setRowSelected] = useState<IComment | null>(null)
 
   const getAllCommentPage = async (): Promise<void> => {
-    if (paginationModel) {
+    if (paginationModel && item) {
       setIsLoading(true)
       const res = await getAllCommentPost({
         id: item.id,
@@ -70,41 +70,43 @@ const ModalDetailPost: FC<Props> = ({
   }, [item])
 
   const handleAddMessage = async (): Promise<void> => {
-    if (rowSelected) {
-      const res = await editCommentPost({ id: rowSelected.id, content: inputText })
-      if (res) {
-        const updatedComment = data.map((item: IComment) =>
-          item.id === rowSelected.id ? { ...item, content: inputText } : item,
-        )
-        setInputText('')
-        setData(updatedComment)
-        setRowSelected(null)
-      }
-    } else {
-      const res = await addCommentPost({ id: item.id, content: inputText })
-      if (res) {
-        const newDataRow = {
-          id: res?.id,
-          content: res?.content,
-          postId: res?.postId,
-          createdAt: res?.createdAt,
-          updateAt: res?.updateAt,
-          userId: res?.userId,
-          user: res?.user,
+    if (item) {
+      if (rowSelected) {
+        const res = await editCommentPost({ id: rowSelected.id, content: inputText })
+        if (res) {
+          const updatedComment = data.map((item: IComment) =>
+            item.id === rowSelected.id ? { ...item, content: inputText } : item,
+          )
+          setInputText('')
+          setData(updatedComment)
+          setRowSelected(null)
         }
-        let newData
-        if (data.length >= 10 && data.length < totalRowCount) {
-          newData = [
-            newDataRow,
-            ...data.slice(0, data.length - 1),
-            ...data.slice(data.length),
-          ] as IComment[]
-        } else {
-          newData = [newDataRow, ...data] as IComment[]
+      } else {
+        const res = await addCommentPost({ id: item.id, content: inputText })
+        if (res) {
+          const newDataRow = {
+            id: res?.id,
+            content: res?.content,
+            postId: res?.postId,
+            createdAt: res?.createdAt,
+            updateAt: res?.updateAt,
+            userId: res?.userId,
+            user: res?.user,
+          }
+          let newData
+          if (data.length >= 10 && data.length < totalRowCount) {
+            newData = [
+              newDataRow,
+              ...data.slice(0, data.length - 1),
+              ...data.slice(data.length),
+            ] as IComment[]
+          } else {
+            newData = [newDataRow, ...data] as IComment[]
+          }
+          setData(newData)
+          setTotalRowCount(totalRowCount + 1)
+          setInputText('')
         }
-        setData(newData)
-        setTotalRowCount(totalRowCount + 1)
-        setInputText('')
       }
     }
   }
@@ -119,6 +121,7 @@ const ModalDetailPost: FC<Props> = ({
     if (res) {
       const updatedComment = data.filter((item) => item.id !== id)
       setData(updatedComment)
+      setTotalRowCount(totalRowCount - 1)
     }
   }
 
@@ -170,24 +173,24 @@ const ModalDetailPost: FC<Props> = ({
                         <div className="relative flex-shrink-0  mr-2 ">
                           <img
                             className="h-10 w-10 object-cover rounded-full border border-gray-500 bg-gray-500 "
-                            src={item.user.avatarUrl}
+                            src={item?.user.avatarUrl}
                             alt="logo"
                           />
                         </div>
                         <div className="flex flex-col">
                           <span className="text-base font-medium">
-                            {item.user.fullName}
+                            {item?.user.fullName}
                           </span>
                           <span className="text-xs">
-                            {dayComparedToThePast(item.createdAt)}
+                            {dayComparedToThePast(item?.createdAt || '')}
                           </span>
                         </div>
                       </div>
                     </div>
                     <div className="mt-2">
                       <PostContent
-                        content={item.content}
-                        images={item.documents}
+                        content={item?.content}
+                        images={item?.documents}
                       />
                     </div>
                     <div className="mx-3 py-1 flex justify-around border-y border-gray-300 mt-3  ">
@@ -200,6 +203,7 @@ const ModalDetailPost: FC<Props> = ({
                         {!isFavourite && (
                           <HiOutlineHeart className="h-6 w-6 inline mr-2" />
                         )}
+                        {/* <span>{}</span> */}
                         <span>Yêu thích</span>
                       </div>
                       <div className="text-[#0001CB] cursor-pointer px-6 py-1.5 hover:bg-gray-200 rounded-md">

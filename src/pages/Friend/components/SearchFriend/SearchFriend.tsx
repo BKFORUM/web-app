@@ -8,6 +8,7 @@ import { FC, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Button from '@components/Button'
 import { useNavigate } from 'react-router-dom'
+import notfound_data from '../../../../assets/images/notFoundSearch.jpg'
 
 interface Props {}
 
@@ -114,7 +115,7 @@ const SearchFriend: FC<Props> = (): JSX.Element => {
                   <div className="h-40 w-40">
                     <img
                       className="h-full w-full"
-                      src="../../../../assets/images/notFoundSearch.jpg"
+                      src={notfound_data}
                       alt="not found search"
                     />
                   </div>

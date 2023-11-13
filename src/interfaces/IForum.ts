@@ -34,6 +34,13 @@ export interface IUserForumResponse {
     }
 }
 
+export interface IUserForumResponseUpdated extends Omit<IUserForumResponse, 'topics'> {
+    topics: ITopic[];
+    yourStatus: string;
+}
+
+
+
 export interface IForumDetail {
     name: string
     avatarUrl?: string

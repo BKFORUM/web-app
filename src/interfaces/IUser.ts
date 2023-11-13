@@ -60,12 +60,7 @@ export interface IListUserRequest {
 }
 
 export interface IUserRequestForum {
-    user: {
-        id: string
-        fullName: string
-        avatarUrl: string
-        email: string
-    }
+    user: IUserData
     userType: string
 
 }

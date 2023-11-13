@@ -10,7 +10,7 @@ import { useStoreActions, useStoreState } from 'easy-peasy'
 import {
   notificationActionSelector,
   notificationStateSelector,
-  // postActionSelector,
+  postActionSelector,
   userStateSelector,
 } from '@store/index'
 import { pageMode } from '@interfaces/IClient'
@@ -18,6 +18,8 @@ import { INotification } from '@interfaces/INotify'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { dayComparedToThePast } from '@utils/functions/formatDay'
 import notfoundData from '../../../assets/images/notFoundSearch.jpg'
+import { IPostViewForum } from '@interfaces/IPost'
+import ModalDetailPost from '@components/ModalDetailPost'
 
 interface Props {}
 
@@ -30,10 +32,14 @@ const Notification: FC<Props> = (): JSX.Element => {
   } = useStoreActions(notificationActionSelector)
   const { listNotification, totalRowCount } = useStoreState(notificationStateSelector)
   const { currentUserSuccess } = useStoreState(userStateSelector)
-  // const { getPostById } = useStoreActions(postActionSelector)
+  const { getPostById, likePost, unLikePost } = useStoreActions(postActionSelector)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
+  const [isFavourite, setIsFavourite] = useState<boolean>(true) //!item.likedAt ? false : true
+  // const [countLike, setCountLike] = useState<number>(0)
+  const [openModalPostDetail, setOpenModalPostDetail] = useState<boolean>(false)
+  const [postSelected, setPostSelected] = useState<IPostViewForum | null>(null)
 
   const [open, setOpen] = useState<boolean>(false)
   let elementRef: any = useClickOutside(() => {
@@ -41,6 +47,24 @@ const Notification: FC<Props> = (): JSX.Element => {
       setOpen(false)
     }
   })
+
+  const handleFavouritePost = async (): Promise<void> => {
+    if (postSelected) {
+      if (isFavourite) {
+        const res = await unLikePost(postSelected?.id)
+        if (res) {
+          // setCountLike((prev) => prev - 1)
+          setIsFavourite(false)
+        }
+      } else {
+        const res = await likePost(postSelected?.id)
+        if (res) {
+          // setCountLike((prev) => prev + 1)
+          setIsFavourite(true)
+        }
+      }
+    }
+  }
 
   const getAllNotificationModal = async (): Promise<void> => {
     if (paginationModel) {
@@ -65,6 +89,13 @@ const Notification: FC<Props> = (): JSX.Element => {
         notify.id === item.id ? { ...notify, readAt: now.toISOString() } : notify,
       )
       setListNotification(newData)
+    }
+    if (item.modelName === 'post') {
+      const res = await getPostById(item.modelId)
+      if (res) {
+        setPostSelected(res)
+        setOpenModalPostDetail(true)
+      }
     }
   }
 
@@ -220,6 +251,16 @@ const Notification: FC<Props> = (): JSX.Element => {
           </div>
         </div>
       </Transition>
+
+      {openModalPostDetail && (
+        <ModalDetailPost
+          item={postSelected}
+          open={openModalPostDetail}
+          setOpen={setOpenModalPostDetail}
+          isFavourite={isFavourite}
+          setIsFavourite={handleFavouritePost}
+        />
+      )}
     </div>
   )
 }

@@ -14,18 +14,34 @@ import {
   forumStateSelector,
   notifyActionSelector,
   postActionSelector,
+  searchActionSelector,
 } from '@store/index'
+import SearchInput from '@components/SearchInput'
 interface Props {}
 
 const Header: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
+  const { setTextSearch } = useStoreActions(searchActionSelector)
   const { addForum, setIsAddForumSuccess } = useStoreActions(forumActionSelector)
   const { isAddForumSuccess, messageErrorForum } = useStoreState(forumStateSelector)
   const { postImage } = useStoreActions(postActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
+  const searchParams = new URLSearchParams(window.location.search)
+  const search = searchParams.get('search')
+
   const [openModalEditForum, setOpenModalEditForum] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [inputSearch, setInputSearch] = useState<string>(search !== null ? search : '')
+
+  const addQueryParam = (valueSearch: string): void => {
+    if (valueSearch !== '') {
+      const queryParams = new URLSearchParams()
+      queryParams.set('search', valueSearch.trim())
+      const newURL = `/search?${queryParams.toString()}`
+      navigate(newURL)
+    }
+  }
 
   const handleAddForum = async (data: any): Promise<void> => {
     setIsLoading(true)
@@ -61,6 +77,24 @@ const Header: FC<Props> = (): JSX.Element => {
     }
   }
 
+  const handleChangeSearch = (value: string): void => {
+    setInputSearch(value)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      addQueryParam(inputSearch)
+      setTextSearch(inputSearch)
+    }
+  }
+
+  useEffect(() => {
+    if (search !== null) {
+      setTextSearch(search)
+      addQueryParam(search)
+    }
+  }, [])
+
   useEffect(() => {
     if (!isAddForumSuccess) {
       setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
@@ -77,6 +111,15 @@ const Header: FC<Props> = (): JSX.Element => {
             className="w-full h-full"
             src={logoBk}
             alt="logoBk"
+          />
+        </div>
+        <div>
+          <SearchInput
+            value={inputSearch}
+            setValue={handleChangeSearch}
+            width="320px"
+            size="small"
+            handleKeyDown={handleKeyDown}
           />
         </div>
         <div className="flex gap-6 items-center pr-8">

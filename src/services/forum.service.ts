@@ -2,6 +2,14 @@ import { IFormDataForum } from "@interfaces/IForum";
 import { IListUserRequest } from "@interfaces/IUser";
 import BaseURL from "@utils/api/baseURL";
 
+const getAllForum = (params: any) => {
+    return BaseURL({
+        url: `/forums`,
+        method: "GET",
+        params,
+    });
+}
+
 const getForumById = (id: string) => {
     return BaseURL({
         url: `/forums/` + id,
@@ -56,4 +64,11 @@ const getAllUserRequest = (id: string) => {
     });
 }
 
-export { getForumById, getAllTopic, addForum, editForum, updateStatusUserFromForum, addUserToForum, getAllUserRequest }
+const requestOnForum = (id: string) => {
+    return BaseURL({
+        url: `/forums/${id}/requests`,
+        method: "POST",
+    });
+}
+
+export { getForumById, getAllTopic, addForum, editForum, updateStatusUserFromForum, addUserToForum, getAllUserRequest, getAllForum, requestOnForum }

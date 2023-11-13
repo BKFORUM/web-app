@@ -1,22 +1,24 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addForum, addUserToForum, updateStatusUserFromForum, editForum, getAllTopic, getAllUserRequest, getForumById } from "../../services/forum.service";
+import { addForum, addUserToForum, updateStatusUserFromForum, editForum, getAllTopic, getAllUserRequest, getForumById, getAllForum, requestOnForum } from "../../services/forum.service";
 import { IFormDataForum } from "@interfaces/IForum";
-import { IListUserRequest } from "@interfaces/IUser";
+import { IListUserRequest, IUserData } from "@interfaces/IUser";
 
 export interface IForumModel {
     //MessageError
     messageErrorForum: string;
     setMessageErrorForum: Action<IForumModel, string>;
 
-    //GetALLForum
-    // isGetAllForumSuccess: boolean;
-    // setIsGetAllForumSuccess: Action<IForumModel, boolean>
-    // getAllForum: Thunk<IForumModel, any>;
+    // GetALLForum
+    isGetAllForumSuccess: boolean;
+    setIsGetAllForumSuccess: Action<IForumModel, boolean>
+    getAllForum: Thunk<IForumModel, any>;
 
     //GetForumById
     isGetAllAgainForumById: boolean;
     setIsGetAllAgainForumById: Action<IForumModel, boolean>
     isGetForumByIdSuccess: boolean;
+    listUserForum: IUserData[]
+    setListUserForum: Action<IForumModel, IUserData[]>
     setIsGetForumByIdSuccess: Action<IForumModel, boolean>
     getForumById: Thunk<IForumModel, any>;
 
@@ -55,6 +57,11 @@ export interface IForumModel {
     setIsGetAllUserRequestSuccess: Action<IForumModel, boolean>
     getAllUserRequest: Thunk<IForumModel, string>;
 
+    //RequestOnForum
+    isRequestOnForumSuccess: boolean
+    setIsRequestOnForumSuccess: Action<IForumModel, boolean>
+    requestOnForum: Thunk<IForumModel, string>;
+
 }
 
 export const forumModel: IForumModel = persist({
@@ -64,6 +71,24 @@ export const forumModel: IForumModel = persist({
         state.messageErrorForum = payload;
     }),
 
+    //GetAllForum
+    isGetAllForumSuccess: true,
+    setIsGetAllForumSuccess: action((state, payload) => {
+        state.isGetAllForumSuccess = payload;
+    }),
+    getAllForum: thunk(async (actions, payload) => {
+        return getAllForum(payload)
+            .then(async (res) => {
+                actions.setIsGetAllForumSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllForumSuccess(false)
+                actions.setMessageErrorForum(error?.response?.data?.message)
+            });
+    }),
+
+    //GetForumById
     isGetAllAgainForumById: false,
     setIsGetAllAgainForumById: action((state, payload) => {
         state.isGetAllAgainForumById = payload;
@@ -71,6 +96,10 @@ export const forumModel: IForumModel = persist({
     isGetForumByIdSuccess: true,
     setIsGetForumByIdSuccess: action((state, payload) => {
         state.isGetForumByIdSuccess = payload;
+    }),
+    listUserForum: [],
+    setListUserForum: action((state, payload) => {
+        state.listUserForum = payload;
     }),
     getForumById: thunk(async (actions, payload) => {
         return getForumById(payload)
@@ -221,6 +250,23 @@ export const forumModel: IForumModel = persist({
             })
             .catch((error) => {
                 actions.setIsGetAllUserRequestSuccess(false)
+                actions.setMessageErrorForum(error?.response?.data?.message)
+            });
+    }),
+
+    //RequestOnForum
+    isRequestOnForumSuccess: true,
+    setIsRequestOnForumSuccess: action((state, payload) => {
+        state.isRequestOnForumSuccess = payload;
+    }),
+    requestOnForum: thunk(async (actions, payload) => {
+        return requestOnForum(payload)
+            .then(async (res) => {
+                actions.setIsRequestOnForumSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsRequestOnForumSuccess(false)
                 actions.setMessageErrorForum(error?.response?.data?.message)
             });
     }),

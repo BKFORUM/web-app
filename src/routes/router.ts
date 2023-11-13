@@ -8,6 +8,7 @@ import Friend from "@pages/Friend";
 import HomePage from "@pages/HomePage";
 import Message from "@pages/Message";
 import Profile from "@pages/Profile";
+import Search from "@pages/Search";
 
 
 
@@ -19,5 +20,6 @@ export const routerUser = [
     { path: ROUTER.MESSAGE, element: Message, layout: MessageLayout, },
     { path: ROUTER.MESSAGE_GROUP, element: Message, layout: MessageLayout },
     { path: ROUTER.FORUM, element: Forum, layout: DefaultLayout },
+    { path: ROUTER.SEARCH, element: Search, layout: DefaultLayout },
 ];
 

@@ -13,6 +13,8 @@ import { forumModel as forum, IForumModel } from "./models/forum";
 import { friendModel as friend, IFriendModel } from "./models/friend";
 import { conversationModel as conversation, IConversationModel } from "./models/conversation";
 import { notificationModel as notification, INotificationModel } from "./models/notification";
+import { searchModel as search, ISearchModel } from "./models/search";
+
 
 
 export interface IStoreModel {
@@ -24,6 +26,7 @@ export interface IStoreModel {
     friend: IFriendModel;
     conversation: IConversationModel;
     notification: INotificationModel;
+    search: ISearchModel
 }
 
 const storeModel: IStoreModel = {
@@ -34,7 +37,8 @@ const storeModel: IStoreModel = {
     forum,
     friend,
     conversation,
-    notification
+    notification,
+    search
 }
 
 export const { useStoreActions, useStoreState, useStoreDispatch, useStore } =
@@ -74,6 +78,10 @@ export const conversationActionSelector = (state: IActionMapper) => state.conver
 //Notification
 export const notificationStateSelector = (state: IStateMapper) => state.notification;
 export const notificationActionSelector = (state: IActionMapper) => state.notification;
+
+//Search
+export const searchStateSelector = (state: IStateMapper) => state.search;
+export const searchActionSelector = (state: IActionMapper) => state.search;
 
 
 const store = createStore(storeModel, {

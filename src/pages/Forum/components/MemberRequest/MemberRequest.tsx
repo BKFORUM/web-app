@@ -1,17 +1,22 @@
 // import SearchInput from '@components/SearchInput'
 import { FC, useEffect, useState } from 'react'
 import Button from '@components/Button'
-import { useStoreActions } from 'easy-peasy'
-import { forumActionSelector, notifyActionSelector } from '@store/index'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import {
+  forumActionSelector,
+  forumStateSelector,
+  notifyActionSelector,
+} from '@store/index'
 import { useParams } from 'react-router-dom'
-import { IUserRequestForum } from '@interfaces/IUser'
+import { IUserData, IUserRequestForum } from '@interfaces/IUser'
 
 interface Props {}
 
 const MemberRequest: FC<Props> = (): JSX.Element => {
   const { id } = useParams()
-  const { getAllUserRequest, updateStatusUserFromForum } =
+  const { getAllUserRequest, updateStatusUserFromForum, setListUserForum } =
     useStoreActions(forumActionSelector)
+  const { listUserForum } = useStoreState(forumStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
   // const [inputSearch, setInputSearch] = useState<string>('')
@@ -27,10 +32,10 @@ const MemberRequest: FC<Props> = (): JSX.Element => {
     }
   }
 
-  const handelAction = async (status: string, userId: string): Promise<void> => {
+  const handelAction = async (status: string, user: IUserData): Promise<void> => {
     const res = await updateStatusUserFromForum({
       id: id,
-      userId: userId,
+      userId: user.id,
       status: status,
     })
     if (res) {
@@ -42,9 +47,13 @@ const MemberRequest: FC<Props> = (): JSX.Element => {
         } user forum forum successfully`,
       })
       const newData = data.filter((item) => {
-        return item.user.id !== userId
+        return item.user.id !== user.id
       })
       setData(newData)
+
+      if (status === 'ACTIVE') {
+        setListUserForum([...listUserForum, user])
+      }
     }
   }
 
@@ -89,11 +98,11 @@ const MemberRequest: FC<Props> = (): JSX.Element => {
               <Button
                 typeButton="reject"
                 className="px-3 py-1.5"
-                onClick={() => handelAction('DELETED', user.user.id)}>
+                onClick={() => handelAction('DELETED', user.user)}>
                 Reject
               </Button>
               <Button
-                onClick={() => handelAction('ACTIVE', user.user.id)}
+                onClick={() => handelAction('ACTIVE', user.user)}
                 typeButton="approve"
                 className="px-3 py-1.5"
                 disabled={isLoading}

@@ -5,6 +5,10 @@ export interface INotifyModel {
     //NotifySetting
     notifySetting: INotify;
     setNotifySetting: Action<INotifyModel, INotify>;
+
+    //DataHeader
+    isDataHeader: boolean;
+    setDataHeader: Action<INotifyModel, boolean>;
 }
 
 export const notifyModel: INotifyModel = persist({
@@ -13,4 +17,9 @@ export const notifyModel: INotifyModel = persist({
     setNotifySetting: action((state, payload) => {
         state.notifySetting = payload;
     }),
+
+    isDataHeader: false,
+    setDataHeader: action((state, payload) => {
+        state.isDataHeader = payload;
+    })
 })

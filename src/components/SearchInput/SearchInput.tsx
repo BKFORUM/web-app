@@ -7,6 +7,7 @@ interface IProps {
   value: string
   width?: string
   setValue: (value: string) => void
+  handleKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
 }
 
 const SearchInput: FC<IProps> = ({
@@ -14,6 +15,7 @@ const SearchInput: FC<IProps> = ({
   setValue,
   size,
   width,
+  handleKeyDown,
 }: IProps): JSX.Element => {
   return (
     <Paper
@@ -37,6 +39,7 @@ const SearchInput: FC<IProps> = ({
         placeholder="Tìm kiếm "
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
     </Paper>
   )

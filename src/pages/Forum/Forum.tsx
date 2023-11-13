@@ -26,6 +26,7 @@ import MemberRequest from './components/MemberRequest'
 import EventsForum from './components/EventsForum'
 import { pageMode } from '@interfaces/IClient'
 import default_forum from '../../assets/images/default_forum.png'
+import { IUserData } from '@interfaces/IUser'
 
 interface Props {}
 
@@ -35,7 +36,7 @@ const Forum: FC<Props> = (): JSX.Element => {
   const { addPost, postImage, getAllPostByForum, deletePost, editPost } =
     useStoreActions(postActionSelector)
   const { postSelected } = useStoreState(postStateSelector)
-  const { getForumById, editForum, setIsGetAllAgainForumById } =
+  const { getForumById, editForum, setIsGetAllAgainForumById, setListUserForum } =
     useStoreActions(forumActionSelector)
   const { isGetAllAgainForumById } = useStoreState(forumStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
@@ -55,6 +56,10 @@ const Forum: FC<Props> = (): JSX.Element => {
     if (id) {
       const res = await getForumById(id)
       setDetailForum(res)
+      const usersList = res?.users.map((userData: { user: IUserData }) => {
+        return userData.user
+      })
+      setListUserForum(usersList)
     }
   }
 
@@ -343,17 +348,6 @@ const Forum: FC<Props> = (): JSX.Element => {
                 />
               )}
             </Tabs>
-            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 py-2 px-3 rounded-md cursor-pointer bg-gray-100 hover:bg-gray-200 transition-all duration-300">
-              <HiSearch className="h-5 w-5" />
-              <div className="absolute top-[120%] right-0 w-[300px] bg-red-300 z-[90] ">
-                <SearchInput
-                  value={inputSearch}
-                  setValue={handleChangeSearch}
-                  width="100%"
-                  size="small"
-                />
-              </div>
-            </div> */}
           </Box>
         </div>
 
@@ -375,10 +369,7 @@ const Forum: FC<Props> = (): JSX.Element => {
           <TabPanel
             value={value}
             index={1}>
-            <MembersForum
-              users={detailForum?.users}
-              moderator={detailForum?.moderator}
-            />
+            <MembersForum moderator={detailForum?.moderator} />
           </TabPanel>
 
           <TabPanel

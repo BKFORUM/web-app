@@ -4,8 +4,8 @@ import { Box, Tab, Tabs } from '@mui/material'
 import { GrUserSettings } from 'react-icons/gr'
 import { HiUser } from 'react-icons/hi2'
 import { FC, useState } from 'react'
-import test from '../../../../assets/images/avatartest.jpg'
 import { useNavigate } from 'react-router-dom'
+import defaultImage from '../../../../assets/images/bg-login-default.jpg'
 
 interface Props {
   dataForum: IUserForumResponse[]
@@ -62,7 +62,7 @@ const ForumUserItem: FC<Props> = ({ dataForum, idUser }: Props): JSX.Element => 
                     <div className="h-20 w-20 rounded-lg overflow-hidden">
                       <img
                         className="h-full w-full object-cover"
-                        src={test}
+                        src={item.avatarUrl || defaultImage}
                         alt=""
                       />
                     </div>
@@ -109,7 +109,7 @@ const ForumUserItem: FC<Props> = ({ dataForum, idUser }: Props): JSX.Element => 
                     <div className="h-20 w-20 rounded-lg overflow-hidden">
                       <img
                         className="h-full w-full object-cover"
-                        src={test}
+                        src={item.avatarUrl || defaultImage}
                         alt=""
                       />
                     </div>
