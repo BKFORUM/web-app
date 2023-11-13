@@ -33,7 +33,7 @@ const editForum = (data: IFormDataForum) => {
     });
 }
 
-const deleteUserFromForum = (data: any) => {
+const updateStatusUserFromForum = (data: any) => {
     return BaseURL({
         url: `/forums/${data.id}/requests`,
         method: "PATCH",
@@ -49,4 +49,11 @@ const addUserToForum = (data: IListUserRequest) => {
     });
 }
 
-export { getForumById, getAllTopic, addForum, editForum, deleteUserFromForum, addUserToForum }
+const getAllUserRequest = (id: string) => {
+    return BaseURL({
+        url: `/forums/${id}/requests`,
+        method: "GET",
+    });
+}
+
+export { getForumById, getAllTopic, addForum, editForum, updateStatusUserFromForum, addUserToForum, getAllUserRequest }

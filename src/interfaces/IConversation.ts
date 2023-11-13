@@ -6,6 +6,8 @@ export interface IConversation {
     displayName: string
     lastMessage: IMessage | null
     users: IUserData[]
+    type: string
+    isRead?: boolean
 }
 
 export interface IMessage {
@@ -14,5 +16,7 @@ export interface IMessage {
     content: string,
     author: IUserData,
     createdAt: string,
+    updatedAt: string,
+    conversationId?: string,
     userId?: string
 }

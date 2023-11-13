@@ -58,3 +58,14 @@ export interface IListUserRequest {
     id: string
     userIds: string[]
 }
+
+export interface IUserRequestForum {
+    user: {
+        id: string
+        fullName: string
+        avatarUrl: string
+        email: string
+    }
+    userType: string
+
+}

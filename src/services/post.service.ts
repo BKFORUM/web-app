@@ -26,6 +26,14 @@ const getAllPost = (params: any) => {
     });
 };
 
+const getPostById = (id: string) => {
+    return BaseURL({
+        url: `/posts/` + id,
+        method: "GET",
+    });
+};
+
+
 const getAllPostByForum = ({ id, params }: IParams) => {
     return BaseURL({
         url: `/forums/${id}/posts`,
@@ -114,6 +122,7 @@ export {
     addPost,
     postImage,
     getAllPost,
+    getPostById,
     getAllPostByForum,
     getAllPostByUser,
     deletePost,

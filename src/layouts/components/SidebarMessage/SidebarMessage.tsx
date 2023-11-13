@@ -1,23 +1,27 @@
 import SearchInput from '@components/SearchInput'
 import { FC, useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useStoreActions } from 'easy-peasy'
-import { conversationActionSelector } from '@store/index'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import { conversationActionSelector, conversationStateSelector } from '@store/index'
 import { pageMode } from '@interfaces/IClient'
-import { IConversation } from '@interfaces/IConversation'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { dayComparedToThePast } from '@utils/functions/formatDay'
+import default_forum from '../../../assets/images/default_forum.png'
+import { IConversation } from '@interfaces/IConversation'
 
 interface Props {}
 const SidebarMessage: FC<Props> = (): JSX.Element => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { getAllConverSation, setCurrentConversation } = useStoreActions(
-    conversationActionSelector,
-  )
+  const {
+    getAllConverSation,
+    setCurrentConversation,
+    setListConversation,
+    setIsReadConversation,
+  } = useStoreActions(conversationActionSelector)
+  const { listConversation } = useStoreState(conversationStateSelector)
 
   const [inputSearch, setInputSearch] = useState<string>('')
-  const [data, setData] = useState<IConversation[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
   const [loading, setIsLoading] = useState<boolean>(false)
@@ -32,14 +36,20 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
       })
       if (res) {
         setTotalRowCount(res.totalRecords)
-        setData([...data, ...res.data])
+        const newData: IConversation[] = res?.data.map((item: IConversation) => {
+          return {
+            ...item,
+            isRead: true,
+          }
+        })
+        setListConversation([...listConversation, ...newData])
       }
     }
     setIsLoading(false)
   }
 
   useEffect(() => {
-    setData([])
+    setListConversation([])
     setPaginationModel({ page: 0, pageSize: 10 })
   }, [])
 
@@ -53,7 +63,7 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
   return (
     <div className="flex flex-col ">
       <h2 className="px-3 py-2 text-2xl font-bold">Chat</h2>
-      <div className="px-3">
+      <div className="px-3 pb-3 shadow">
         <SearchInput
           value={inputSearch}
           setValue={handleChangeSearch}
@@ -65,18 +75,18 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
       <div
         id="scrollableDiv"
         style={{
-          maxHeight: 'calc(100vh - 60px)',
+          maxHeight: 'calc(100vh - 160px)',
           overflow: 'auto',
         }}>
         <InfiniteScroll
-          dataLength={data.length}
+          dataLength={listConversation.length}
           next={() =>
             setPaginationModel((prevPaginationModel) => ({
               page: prevPaginationModel ? prevPaginationModel.page + 1 : 0,
               pageSize: 10,
             }))
           }
-          hasMore={data.length !== totalRowCount}
+          hasMore={listConversation.length !== totalRowCount}
           loader={<div>{loading && <span>Loading...</span>}</div>}
           scrollableTarget="scrollableDiv"
           endMessage={
@@ -102,39 +112,53 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
             )} */}
             </div>
           }>
-          <ul className="flex flex-col mt-4 gap-1 px-2 ">
-            {data.map((item, index) => (
-              <li
-                key={index}
-                onClick={() => {
-                  navigate('/message/' + item.id), setCurrentConversation(item)
-                }}
-                className={`flex px-2 py-1  transition-all duration-200 rounded-md cursor-pointer
-                ${id === item.id ? 'bg-sky-100' : 'hover:bg-gray-200'}
+          <ul className="flex flex-col mt-2 gap-1 px-2 ">
+            {listConversation.length > 0 &&
+              listConversation.map((item, index) => (
+                <li
+                  key={index}
+                  onClick={() => {
+                    navigate('/message/' + item.id), setCurrentConversation(item)
+                    if (!item.isRead) {
+                      console.log(11)
+                      setIsReadConversation(item.id)
+                    }
+                  }}
+                  className={`flex px-2 py-1  transition-all duration-200 rounded-md cursor-pointer
+                ${id === item?.id ? 'bg-sky-100' : 'hover:bg-gray-200'}
                 `}>
-                <a className="relative flex-shrink-0">
-                  <img
-                    className="h-12 w-12 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 "
-                    src={item.avatarUrl || '../../../assets/images/default_forum.png'}
-                    alt="avatar"
-                  />
-                </a>
-                <div className="flex flex-col ">
-                  <span className="font-semibold whitespace-nowrap truncate ">
-                    {item.displayName}
-                  </span>
-                  <div className="flex  items-center  gap-2">
-                    <span className={`max-w-[50px] truncate line-clamp-1 text-sm `}>
-                      {item.lastMessage?.content}{' '}
+                  <a className="relative flex-shrink-0">
+                    <img
+                      className="h-12 w-12 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 "
+                      src={item?.avatarUrl || default_forum}
+                      alt="avatar"
+                    />
+                  </a>
+                  <div className="flex flex-col ">
+                    <span className="font-semibold whitespace-nowrap truncate ">
+                      {item?.displayName}
                     </span>
-                    <span className=" text-xs">
-                      {item.lastMessage &&
-                        dayComparedToThePast(item.lastMessage.createdAt)}
-                    </span>
+                    <div
+                      className={`flex items-center gap-2 ${
+                        !item.isRead && 'font-semibold'
+                      }`}>
+                      <span className={`max-w-[50px] truncate line-clamp-1 text-sm `}>
+                        {item.lastMessage?.content}{' '}
+                      </span>
+                      <span className=" text-xs">
+                        {item?.lastMessage &&
+                          dayComparedToThePast(item.lastMessage.createdAt)}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
+
+                  {!item.isRead && (
+                    <span
+                      title="not read"
+                      className="flex ml-auto transform translate-y-[18px] bg-blue-500 border border-white w-[10px] h-[10px] rounded-full"></span>
+                  )}
+                </li>
+              ))}
           </ul>
         </InfiniteScroll>
       </div>

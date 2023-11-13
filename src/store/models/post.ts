@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addCommentPost, addPost, deleteCommentPost, deletePost, editCommentPost, editPost, getAllCommentPost, getAllPost, getAllPostByForum, getAllPostByUser, likePost, postImage, unLikePost, updateStatusPost } from "../../services/post.service";
+import * as PostService from "../../services/post.service";
 import { IParams } from "@interfaces/IClient";
 import { IPostViewForum } from "@interfaces/IPost";
 
@@ -31,6 +31,11 @@ export interface IPostModel {
     isGetAllPostSuccess: boolean;
     setIsGetAllPostSuccess: Action<IPostModel, boolean>;
     getAllPost: Thunk<IPostModel, any>;
+
+    //getAllPostById
+    isGetPostByIdSuccess: boolean;
+    setGetPostByIdSuccess: Action<IPostModel, boolean>;
+    getPostById: Thunk<IPostModel, string>;
 
     //getAllPostByForum
     isGetAllPostByForumSuccess: boolean;
@@ -102,7 +107,7 @@ export const postModel: IPostModel = persist({
         state.isGetAllPostSuccess = payload;
     }),
     getAllPost: thunk(async (actions, payload) => {
-        return getAllPost(payload)
+        return PostService.getAllPost(payload)
             .then(async (res) => {
                 actions.setIsGetAllPostSuccess(true)
                 return res.data;
@@ -113,13 +118,30 @@ export const postModel: IPostModel = persist({
             });
     }),
 
+    // getPostById
+    isGetPostByIdSuccess: true,
+    setGetPostByIdSuccess: action((state, payload) => {
+        state.isGetPostByIdSuccess = payload;
+    }),
+    getPostById: thunk(async (actions, payload) => {
+        return PostService.getPostById(payload)
+            .then(async (res) => {
+                actions.setGetPostByIdSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setGetPostByIdSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
     // getAllPostByForum
     isGetAllPostByForumSuccess: true,
     setIsGetAllPostByForumSuccess: action((state, payload) => {
         state.isGetAllPostByForumSuccess = payload;
     }),
     getAllPostByForum: thunk(async (actions, payload) => {
-        return getAllPostByForum(payload)
+        return PostService.getAllPostByForum(payload)
             .then(async (res) => {
                 actions.setIsGetAllPostByForumSuccess(true)
                 return res.data;
@@ -136,7 +158,7 @@ export const postModel: IPostModel = persist({
         state.isGetAllPostByUserSuccess = payload;
     }),
     getAllPostByUser: thunk(async (actions, payload) => {
-        return getAllPostByUser(payload)
+        return PostService.getAllPostByUser(payload)
             .then(async (res) => {
                 actions.setIsGetAllPostByUserSuccess(true)
                 return res.data;
@@ -153,7 +175,7 @@ export const postModel: IPostModel = persist({
         state.isAddPostSuccess = payload;
     }),
     addPost: thunk(async (actions, payload) => {
-        return addPost(payload)
+        return PostService.addPost(payload)
             .then(async (res) => {
                 actions.setIsAddPostSuccess(true)
                 return res;
@@ -170,7 +192,7 @@ export const postModel: IPostModel = persist({
         state.isEditPostSuccess = payload;
     }),
     editPost: thunk(async (actions, payload) => {
-        return editPost(payload)
+        return PostService.editPost(payload)
             .then(async (res) => {
                 actions.setIsAddPostSuccess(true)
                 return res;
@@ -187,7 +209,7 @@ export const postModel: IPostModel = persist({
         state.isPostImageSuccess = payload;
     }),
     postImage: thunk(async (actions, payload) => {
-        return postImage(payload)
+        return PostService.postImage(payload)
             .then(async (res) => {
                 actions.setIsPostImageSuccess(true)
                 return res.data;
@@ -205,7 +227,7 @@ export const postModel: IPostModel = persist({
         state.isDeletePostSuccess = payload;
     }),
     deletePost: thunk(async (actions, payload,) => {
-        return deletePost(payload)
+        return PostService.deletePost(payload)
             .then(async (res) => {
                 actions.setIsDeletePostSuccess(true)
                 return res;
@@ -222,7 +244,7 @@ export const postModel: IPostModel = persist({
         state.isUpdateStatusPostSuccess = payload;
     }),
     updateStatusPost: thunk(async (actions, payload,) => {
-        return updateStatusPost(payload)
+        return PostService.updateStatusPost(payload)
             .then(async (res) => {
                 actions.setIsUpdateStatusPostSuccess(true)
                 return res;
@@ -239,7 +261,7 @@ export const postModel: IPostModel = persist({
         state.isLikePostSuccess = payload;
     }),
     likePost: thunk(async (actions, payload,) => {
-        return likePost(payload)
+        return PostService.likePost(payload)
             .then(async (res) => {
                 actions.setIsLikePostSuccess(true)
                 return res;
@@ -256,7 +278,7 @@ export const postModel: IPostModel = persist({
         state.isUnLikePostSuccess = payload;
     }),
     unLikePost: thunk(async (actions, payload,) => {
-        return unLikePost(payload)
+        return PostService.unLikePost(payload)
             .then(async (res) => {
                 actions.setIsUnLikePostSuccess(true)
                 return res;
@@ -273,7 +295,7 @@ export const postModel: IPostModel = persist({
         state.isAddCommentPostSuccess = payload;
     }),
     addCommentPost: thunk(async (actions, payload,) => {
-        return addCommentPost(payload)
+        return PostService.addCommentPost(payload)
             .then(async (res) => {
                 actions.setIsAddCommentPostSuccess(true)
                 return res.data;
@@ -290,7 +312,7 @@ export const postModel: IPostModel = persist({
         state.isDeleteCommentPostSuccess = payload;
     }),
     deleteCommentPost: thunk(async (actions, payload,) => {
-        return deleteCommentPost(payload)
+        return PostService.deleteCommentPost(payload)
             .then(async (res) => {
                 actions.setIsDeleteCommentPostSuccess(true)
                 return res;
@@ -307,7 +329,7 @@ export const postModel: IPostModel = persist({
         state.isEditCommentPostSuccess = payload;
     }),
     editCommentPost: thunk(async (actions, payload,) => {
-        return editCommentPost(payload)
+        return PostService.editCommentPost(payload)
             .then(async (res) => {
                 actions.setIsEditCommentPostSuccess(true)
                 return res;
@@ -324,7 +346,7 @@ export const postModel: IPostModel = persist({
         state.isGetAllCommentPostSuccess = payload;
     }),
     getAllCommentPost: thunk(async (actions, payload,) => {
-        return getAllCommentPost(payload)
+        return PostService.getAllCommentPost(payload)
             .then(async (res) => {
                 actions.setIsGetAllCommentPostSuccess(true)
                 return res.data;

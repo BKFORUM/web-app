@@ -12,6 +12,8 @@ import { postModel as post, IPostModel } from "./models/post";
 import { forumModel as forum, IForumModel } from "./models/forum";
 import { friendModel as friend, IFriendModel } from "./models/friend";
 import { conversationModel as conversation, IConversationModel } from "./models/conversation";
+import { notificationModel as notification, INotificationModel } from "./models/notification";
+
 
 export interface IStoreModel {
     auth: IAuthModel;
@@ -21,6 +23,7 @@ export interface IStoreModel {
     forum: IForumModel;
     friend: IFriendModel;
     conversation: IConversationModel;
+    notification: INotificationModel;
 }
 
 const storeModel: IStoreModel = {
@@ -31,6 +34,7 @@ const storeModel: IStoreModel = {
     forum,
     friend,
     conversation,
+    notification
 }
 
 export const { useStoreActions, useStoreState, useStoreDispatch, useStore } =
@@ -66,6 +70,10 @@ export const friendActionSelector = (state: IActionMapper) => state.friend;
 //Conversation
 export const conversationStateSelector = (state: IStateMapper) => state.conversation;
 export const conversationActionSelector = (state: IActionMapper) => state.conversation;
+
+//Notification
+export const notificationStateSelector = (state: IStateMapper) => state.notification;
+export const notificationActionSelector = (state: IActionMapper) => state.notification;
 
 
 const store = createStore(storeModel, {

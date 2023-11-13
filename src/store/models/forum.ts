@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addForum, addUserToForum, deleteUserFromForum, editForum, getAllTopic, getForumById } from "../../services/forum.service";
+import { addForum, addUserToForum, updateStatusUserFromForum, editForum, getAllTopic, getAllUserRequest, getForumById } from "../../services/forum.service";
 import { IFormDataForum } from "@interfaces/IForum";
 import { IListUserRequest } from "@interfaces/IUser";
 
@@ -33,7 +33,7 @@ export interface IForumModel {
     //DeleteUserFromForum
     isDeleteUserFromForumSuccess: boolean;
     setIsDeleteUserFromForumSuccess: Action<IForumModel, boolean>
-    deleteUserFromForum: Thunk<IForumModel, any>;
+    updateStatusUserFromForum: Thunk<IForumModel, any>;
 
     // AddUserToForum
     isAddUserToForumSuccess: boolean;
@@ -49,6 +49,11 @@ export interface IForumModel {
     isGetAllTopicSuccess: boolean
     setIsGetAllTopicSuccess: Action<IForumModel, boolean>
     getAllTopic: Thunk<IForumModel, undefined>;
+
+    //GetAllUserRequest
+    isGetAllUserRequestSuccess: boolean
+    setIsGetAllUserRequestSuccess: Action<IForumModel, boolean>
+    getAllUserRequest: Thunk<IForumModel, string>;
 
 }
 
@@ -120,8 +125,8 @@ export const forumModel: IForumModel = persist({
         state.isDeleteUserFromForumSuccess = payload;
     }),
 
-    deleteUserFromForum: thunk(async (actions, payload) => {
-        return deleteUserFromForum(payload)
+    updateStatusUserFromForum: thunk(async (actions, payload) => {
+        return updateStatusUserFromForum(payload)
             .then(async (res) => {
                 actions.setIsDeleteUserFromForumSuccess(true)
                 return res;
@@ -199,6 +204,23 @@ export const forumModel: IForumModel = persist({
             })
             .catch((error) => {
                 actions.setIsGetAllTopicSuccess(false)
+                actions.setMessageErrorForum(error?.response?.data?.message)
+            });
+    }),
+
+    //GetAllUserRequest
+    isGetAllUserRequestSuccess: true,
+    setIsGetAllUserRequestSuccess: action((state, payload) => {
+        state.isGetAllUserRequestSuccess = payload;
+    }),
+    getAllUserRequest: thunk(async (actions, payload) => {
+        return getAllUserRequest(payload)
+            .then(async (res) => {
+                actions.setIsGetAllUserRequestSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllUserRequestSuccess(false)
                 actions.setMessageErrorForum(error?.response?.data?.message)
             });
     }),

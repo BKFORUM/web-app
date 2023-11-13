@@ -27,7 +27,8 @@ interface Props {
 const MembersForum: FC<Props> = ({ users, moderator }: Props): JSX.Element => {
   const { id } = useParams()
   const { currentUserSuccess } = useStoreState(userStateSelector)
-  const { deleteUserFromForum, addUserToForum } = useStoreActions(forumActionSelector)
+  const { updateStatusUserFromForum, addUserToForum } =
+    useStoreActions(forumActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const usersList = users?.map((userData: { user: IUserData }) => {
     return userData.user
@@ -44,7 +45,7 @@ const MembersForum: FC<Props> = ({ users, moderator }: Props): JSX.Element => {
 
   const handleDeleteUser = async (): Promise<void> => {
     if (id && userSelected) {
-      const res = await deleteUserFromForum({
+      const res = await updateStatusUserFromForum({
         id: id,
         userId: userSelected,
         status: 'DELETED',

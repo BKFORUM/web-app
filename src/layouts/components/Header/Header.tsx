@@ -14,18 +14,14 @@ import {
   forumStateSelector,
   notifyActionSelector,
   postActionSelector,
-  // userActionSelector,
 } from '@store/index'
-
 interface Props {}
 
 const Header: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
   const { addForum, setIsAddForumSuccess } = useStoreActions(forumActionSelector)
-  // const { setIsGetAllAgain } = useStoreActions(userActionSelector)
   const { isAddForumSuccess, messageErrorForum } = useStoreState(forumStateSelector)
   const { postImage } = useStoreActions(postActionSelector)
-
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
   const [openModalEditForum, setOpenModalEditForum] = useState<boolean>(false)

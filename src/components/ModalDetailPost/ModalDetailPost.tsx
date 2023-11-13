@@ -92,14 +92,18 @@ const ModalDetailPost: FC<Props> = ({
           userId: res?.userId,
           user: res?.user,
         }
-        setTotalRowCount(totalRowCount + 1)
         let newData
-        if (data.length <= 10) {
-          newData = [newDataRow, ...data.slice(0, 9), ...data.slice(10)] as IComment[]
+        if (data.length >= 10 && data.length < totalRowCount) {
+          newData = [
+            newDataRow,
+            ...data.slice(0, data.length - 1),
+            ...data.slice(data.length),
+          ] as IComment[]
         } else {
           newData = [newDataRow, ...data] as IComment[]
         }
         setData(newData)
+        setTotalRowCount(totalRowCount + 1)
         setInputText('')
       }
     }

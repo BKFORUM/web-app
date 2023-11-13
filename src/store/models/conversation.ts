@@ -12,6 +12,11 @@ export interface IConversationModel {
   currentConversation: IConversation | null
   setCurrentConversation: Action<IConversationModel, IConversation | null>;
 
+  //listConversation
+  listConversation: IConversation[]
+  setIsReadConversation: Action<IConversationModel, string>;
+  setListConversation: Action<IConversationModel, IConversation[]>;
+
   //GetAllConverSation
   isGetAllConverSationSuccess: boolean;
   setIsGetAllConverSationSuccess: Action<IConversationModel, boolean>;
@@ -39,6 +44,22 @@ export const conversationModel: IConversationModel = persist({
   currentConversation: null,
   setCurrentConversation: action((state, payload) => {
     state.currentConversation = payload;
+  }),
+
+
+  //listConversation
+  listConversation: [],
+  setListConversation: action((state, payload) => {
+    state.listConversation = payload;
+  }),
+
+  setIsReadConversation: action((state, payload) => {
+    state.listConversation = state.listConversation.map(item => {
+      if (item.id === payload) {
+        return { ...item, isRead: true };
+      }
+      return item;
+    })
   }),
 
   //GetAllConverSation
