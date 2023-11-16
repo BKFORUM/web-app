@@ -1,16 +1,16 @@
 import { Transition } from '@headlessui/react'
 import { FC, Fragment, useEffect, useState } from 'react'
-import test from '../../../assets/images/test.jpg'
 import { useClickOutside } from '@hooks/useClickOutside'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-// import { useNavigate } from 'react-router-dom'
 import { Tooltip } from '@mui/material'
 import socket from '@utils/socket/socketConfig'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import {
   notificationActionSelector,
   notificationStateSelector,
+  notifyActionSelector,
   postActionSelector,
+  postStateSelector,
   userStateSelector,
 } from '@store/index'
 import { pageMode } from '@interfaces/IClient'
@@ -20,10 +20,12 @@ import { dayComparedToThePast } from '@utils/functions/formatDay'
 import notfoundData from '../../../assets/images/notFoundSearch.jpg'
 import { IPostViewForum } from '@interfaces/IPost'
 import ModalDetailPost from '@components/ModalDetailPost'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {}
 
 const Notification: FC<Props> = (): JSX.Element => {
+  const navigate = useNavigate()
   const {
     getAllNotification,
     updateNotification,
@@ -32,14 +34,17 @@ const Notification: FC<Props> = (): JSX.Element => {
   } = useStoreActions(notificationActionSelector)
   const { listNotification, totalRowCount } = useStoreState(notificationStateSelector)
   const { currentUserSuccess } = useStoreState(userStateSelector)
-  const { getPostById, likePost, unLikePost } = useStoreActions(postActionSelector)
+  const { getPostById, likePost, unLikePost, setGetPostByIdSuccess } =
+    useStoreActions(postActionSelector)
+  const { isGetPostByIdSuccess, messageError } = useStoreState(postStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
-  const [isFavourite, setIsFavourite] = useState<boolean>(true) //!item.likedAt ? false : true
-  // const [countLike, setCountLike] = useState<number>(0)
+  const [countLike, setCountLike] = useState<number>(0)
   const [openModalPostDetail, setOpenModalPostDetail] = useState<boolean>(false)
   const [postSelected, setPostSelected] = useState<IPostViewForum | null>(null)
+  const [isFavourite, setIsFavourite] = useState<boolean>(false)
 
   const [open, setOpen] = useState<boolean>(false)
   let elementRef: any = useClickOutside(() => {
@@ -53,13 +58,13 @@ const Notification: FC<Props> = (): JSX.Element => {
       if (isFavourite) {
         const res = await unLikePost(postSelected?.id)
         if (res) {
-          // setCountLike((prev) => prev - 1)
+          setCountLike((prev) => prev - 1)
           setIsFavourite(false)
         }
       } else {
         const res = await likePost(postSelected?.id)
         if (res) {
-          // setCountLike((prev) => prev + 1)
+          setCountLike((prev) => prev + 1)
           setIsFavourite(true)
         }
       }
@@ -82,24 +87,38 @@ const Notification: FC<Props> = (): JSX.Element => {
   }
 
   const handleRead = async (item: INotification): Promise<void> => {
-    const res = await updateNotification(item.id)
-    if (res) {
-      var now = new Date()
-      const newData = listNotification.map((notify: INotification) =>
-        notify.id === item.id ? { ...notify, readAt: now.toISOString() } : notify,
-      )
-      setListNotification(newData)
+    if (!item.readAt) {
+      const res = await updateNotification(item.id)
+      if (res) {
+        var now = new Date()
+        const newData = listNotification.map((notify: INotification) =>
+          notify.id === item.id ? { ...notify, readAt: now.toISOString() } : notify,
+        )
+        setListNotification(newData)
+      }
     }
     if (item.modelName === 'post') {
       const res = await getPostById(item.modelId)
-      if (res) {
+      if (res && res.status !== 'DELETED') {
         setPostSelected(res)
         setOpenModalPostDetail(true)
       }
+      if (res.status === 'DELETED') {
+        setNotifySetting({
+          show: true,
+          status: 'error',
+          message: 'The post has been rejected ',
+        })
+      }
+    }
+
+    if (item.modelName === 'forum') {
+      navigate('/forums/' + item.modelId)
     }
   }
 
   const handleNewNotification = (response: INotification) => {
+    console.log(response)
     let newData
     if (listNotification.length >= 10 && listNotification.length < totalRowCount) {
       newData = [
@@ -113,6 +132,17 @@ const Notification: FC<Props> = (): JSX.Element => {
     setTotalRowCount(totalRowCount + 1)
     setListNotification(newData)
   }
+
+  useEffect(() => {
+    if (!isGetPostByIdSuccess) {
+      setNotifySetting({
+        show: true,
+        status: 'error',
+        message: messageError,
+      })
+      setGetPostByIdSuccess(true)
+    }
+  }, [isGetPostByIdSuccess])
 
   useEffect(() => {
     getAllNotificationModal()
@@ -131,7 +161,22 @@ const Notification: FC<Props> = (): JSX.Element => {
     socket.on('onLikeCreated', handleNewNotification)
 
     socket.on('onCommentCreated', handleNewNotification)
+
+    socket.on('onRequestForumCreated', handleNewNotification) // user request to forum
+
+    socket.on('onRequestForumApproved', handleNewNotification) // moderator approve request user
+
+    socket.on('onPostRequestCreated', handleNewNotification) // user request post to forum
+
+    socket.on('onPostRequestApproved', handleNewNotification) // moderator approve request post of user
   }, [listNotification])
+
+  useEffect(() => {
+    if (postSelected) {
+      setIsFavourite(!postSelected.likedAt ? false : true)
+      setCountLike(postSelected._count.likes)
+    }
+  }, [postSelected])
 
   return (
     <div className="relative">
@@ -193,7 +238,7 @@ const Notification: FC<Props> = (): JSX.Element => {
               endMessage={
                 <>
                   {!isLoading && listNotification.length === 0 && totalRowCount === 0 && (
-                    <p className="flex flex-col items-center pb-4 ">
+                    <div className="flex flex-col items-center pb-4 ">
                       <div className="h-32 w-32 m-auto">
                         <img
                           className="h-full w-full"
@@ -202,7 +247,7 @@ const Notification: FC<Props> = (): JSX.Element => {
                         />
                       </div>
                       <span className="font-medium">Bạn chưa có thông báo nào</span>
-                    </p>
+                    </div>
                   )}
                   {!isLoading &&
                     listNotification.length > 0 &&
@@ -222,17 +267,18 @@ const Notification: FC<Props> = (): JSX.Element => {
                     <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mr-2 border border-gray-700 bg-gray-700">
                       <img
                         className="h-full w-full object-cover "
-                        src={test}
+                        src={item.sender.avatarUrl}
                         alt="avatar"
                       />
                     </div>
-                    <p
-                      className={`flex flex-col text-sm mr-0.5 ${
-                        !item.readAt && 'font-bold'
-                      }`}>
-                      {/* <span className="font-medium">Trương Quang khang</span> đã nhắc đến bạn
-                  trong một bình luận */}
-                      <span>{item.content}</span>
+                    <p className={`flex flex-col text-sm mr-0.5`}>
+                      <span className="font-bold line-clamp-3">
+                        {item.sender.fullName}&nbsp;
+                        <span className={`${item.readAt && 'font-normal'}`}>
+                          {item.content}
+                        </span>
+                      </span>
+
                       <span
                         className={`text-xs ${
                           !item.readAt ? 'text-blue-500' : 'font-thin'
@@ -259,6 +305,7 @@ const Notification: FC<Props> = (): JSX.Element => {
           setOpen={setOpenModalPostDetail}
           isFavourite={isFavourite}
           setIsFavourite={handleFavouritePost}
+          countLike={countLike}
         />
       )}
     </div>

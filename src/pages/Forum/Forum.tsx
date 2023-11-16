@@ -311,7 +311,10 @@ const Forum: FC<Props> = (): JSX.Element => {
               </a>
             </div>
 
-            <OptionForum />
+            <OptionForum
+              yourStatus={detailForum?.yourStatus}
+              id={id}
+            />
           </div>
           <Box sx={{ borderColor: 'divider', position: 'relative' }}>
             <Tabs

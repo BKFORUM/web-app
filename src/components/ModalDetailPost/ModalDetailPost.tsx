@@ -1,10 +1,16 @@
+import Button from '@components/Button'
 import Comment from '@components/ModalDetailPost/components/Comment'
 import PostContent from '@components/PostContent'
 import { Dialog, Transition } from '@headlessui/react'
 import { pageMode } from '@interfaces/IClient'
 import { IComment, IPostViewForum } from '@interfaces/IPost'
 import { Tooltip } from '@mui/material'
-import { postActionSelector, userStateSelector } from '@store/index'
+import {
+  notifyActionSelector,
+  postActionSelector,
+  postStateSelector,
+  userStateSelector,
+} from '@store/index'
 import { dayComparedToThePast } from '@utils/functions/formatDay'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { FC, Fragment, useEffect, useState } from 'react'
@@ -21,6 +27,7 @@ interface Props {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   isFavourite: boolean
   setIsFavourite: () => Promise<void>
+  countLike: number
 }
 
 const ModalDetailPost: FC<Props> = ({
@@ -29,12 +36,19 @@ const ModalDetailPost: FC<Props> = ({
   item,
   isFavourite,
   setIsFavourite,
+  countLike,
 }: Props): JSX.Element => {
   const { currentUserSuccess } = useStoreState(userStateSelector)
   const { addCommentPost, getAllCommentPost, editCommentPost, deleteCommentPost } =
     useStoreActions(postActionSelector)
+  const { setIsUpdateStatusPostSuccess, updateStatusPost } =
+    useStoreActions(postActionSelector)
+  const { isUpdateStatusPostSuccess, messageError } = useStoreState(postStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+
   const [inputText, setInputText] = useState<string>('')
   const [loading, setIsLoading] = useState<boolean>(false)
+  const [isLoadingAction, setIsLoadingAction] = useState<boolean>(false)
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
   const [data, setData] = useState<IComment[]>([])
@@ -68,6 +82,31 @@ const ModalDetailPost: FC<Props> = ({
       setPaginationModel({ page: 0, pageSize: 10 })
     }
   }, [item])
+
+  useEffect(() => {
+    if (!isUpdateStatusPostSuccess) {
+      setNotifySetting({
+        show: true,
+        status: 'error',
+        message: messageError,
+      })
+      setIsUpdateStatusPostSuccess(true)
+    }
+  }, [isUpdateStatusPostSuccess])
+
+  const handelAction = async (status: string, id: string): Promise<void> => {
+    setIsLoadingAction(true)
+    const res = await updateStatusPost({ id: id, status: status })
+    if (res) {
+      setNotifySetting({
+        show: true,
+        status: 'success',
+        message: `${status === 'ACTIVE' ? 'Approve' : 'Reject'} post successfully`,
+      })
+    }
+    setOpen(false)
+    setIsLoadingAction(false)
+  }
 
   const handleAddMessage = async (): Promise<void> => {
     if (item) {
@@ -163,7 +202,9 @@ const ModalDetailPost: FC<Props> = ({
                   <Dialog.Title
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900 text-center shadow py-3 ">
-                    Nội dung bài viết
+                    {item?.status === 'ACTIVE'
+                      ? ' Nội dung bài viết'
+                      : `Bài viết của forum:  ${item?.forum.name} `}
                   </Dialog.Title>
                   <div
                     id="scrollableDiv"
@@ -193,63 +234,91 @@ const ModalDetailPost: FC<Props> = ({
                         images={item?.documents}
                       />
                     </div>
-                    <div className="mx-3 py-1 flex justify-around border-y border-gray-300 mt-3  ">
-                      <div
-                        onClick={() => setIsFavourite()}
-                        className={`${
-                          isFavourite ? 'text-red-600' : 'text-[#0001CB]'
-                        } cursor-pointer mr-12 transition-all duration-300 px-6 py-1.5 hover:bg-gray-200 rounded-md`}>
-                        {isFavourite && <HiMiniHeart className="h-6 w-6 inline mr-2" />}
-                        {!isFavourite && (
-                          <HiOutlineHeart className="h-6 w-6 inline mr-2" />
-                        )}
-                        {/* <span>{}</span> */}
-                        <span>Yêu thích</span>
-                      </div>
-                      <div className="text-[#0001CB] cursor-pointer px-6 py-1.5 hover:bg-gray-200 rounded-md">
-                        <HiOutlineChatBubbleLeftEllipsis className="h-6 w-6 inline mr-2" />
-                        <span>Bình luận</span>
-                      </div>
-                    </div>
-                    <div className="pb-4">
-                      <Comment
-                        data={data}
-                        loading={loading}
-                        paginationModel={paginationModel}
-                        setPaginationModel={setPaginationModel}
-                        totalRowCount={totalRowCount}
-                        onEditMessage={handleEditMessage}
-                        onDeleteMessage={handleDeleteComment}
-                      />
-                    </div>
+                    {item?.status === 'ACTIVE' && (
+                      <>
+                        <div className="mx-3 py-1 flex justify-around border-y border-gray-300 mt-3  ">
+                          <div
+                            onClick={() => setIsFavourite()}
+                            className={`${
+                              isFavourite ? 'text-red-600' : 'text-[#0001CB]'
+                            } cursor-pointer mr-12 transition-all duration-300 px-6 py-1.5 hover:bg-gray-200 rounded-md`}>
+                            {isFavourite && (
+                              <HiMiniHeart className="h-6 w-6 inline mr-2" />
+                            )}
+                            {!isFavourite && (
+                              <HiOutlineHeart className="h-6 w-6 inline mr-2" />
+                            )}
+                            <span className="text-sm mr-1">
+                              {countLike !== 0 && countLike}
+                            </span>
+                            <span>Yêu thích</span>
+                          </div>
+                          <div className="text-[#0001CB] cursor-pointer px-6 py-1.5 hover:bg-gray-200 rounded-md">
+                            <HiOutlineChatBubbleLeftEllipsis className="h-6 w-6 inline mr-2" />
+                            <span>Bình luận</span>
+                          </div>
+                        </div>
+                        <div className="pb-4">
+                          <Comment
+                            data={data}
+                            loading={loading}
+                            paginationModel={paginationModel}
+                            setPaginationModel={setPaginationModel}
+                            totalRowCount={totalRowCount}
+                            onEditMessage={handleEditMessage}
+                            onDeleteMessage={handleDeleteComment}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <div
-                    className="px-3 py-2 flex gap-2"
-                    style={{ boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)' }}>
-                    <Tooltip title={currentUserSuccess?.fullName}>
-                      <div className="h-10 w-10 overflow-hidden">
-                        <img
-                          className="h-full w-full rounded-full  border border-gray-200"
-                          src={currentUserSuccess?.avatarUrl}
-                          alt={currentUserSuccess?.fullName}
+                  {item?.status === 'ACTIVE' && (
+                    <div
+                      className="px-3 py-2 flex gap-2"
+                      style={{ boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)' }}>
+                      <Tooltip title={currentUserSuccess?.fullName}>
+                        <div className="h-10 w-10 overflow-hidden">
+                          <img
+                            className="h-full w-full rounded-full  border border-gray-200"
+                            src={currentUserSuccess?.avatarUrl}
+                            alt={currentUserSuccess?.fullName}
+                          />
+                        </div>
+                      </Tooltip>
+                      <div className="flex-1 m-auto relative">
+                        <input
+                          type="text"
+                          value={inputText}
+                          onChange={(e) => setInputText(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                          className="w-full bg-gray-200 outline-none px-4 py-2 rounded-3xl text-sm"
+                          placeholder="Viết bình luận của bạn"
+                        />
+                        <RiSendPlaneFill
+                          onClick={() => handleAddMessage()}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-[#0001CB] cursor-pointer"
                         />
                       </div>
-                    </Tooltip>
-                    <div className="flex-1 m-auto relative">
-                      <input
-                        type="text"
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        className="w-full bg-gray-200 outline-none px-4 py-2 rounded-3xl text-sm"
-                        placeholder="Viết bình luận của bạn"
-                      />
-                      <RiSendPlaneFill
-                        onClick={() => handleAddMessage()}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-[#0001CB] cursor-pointer"
-                      />
                     </div>
-                  </div>
+                  )}
+                  {item?.status === 'PENDING' && (
+                    <div className="px-4 pb-4 flex justify-center w-full gap-4 mt-4 ">
+                      <Button
+                        typeButton="reject"
+                        className="px-3 py-1.5"
+                        disabled={isLoadingAction}
+                        onClick={() => handelAction('DELETED', item.id)}>
+                        Reject
+                      </Button>
+                      <Button
+                        onClick={() => handelAction('ACTIVE', item.id)}
+                        typeButton="approve"
+                        className="px-3 py-1.5"
+                        disabled={isLoadingAction}>
+                        Approve
+                      </Button>
+                    </div>
+                  )}
                 </Dialog.Panel>
               </Transition.Child>
             </div>

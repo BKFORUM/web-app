@@ -189,6 +189,7 @@ const PostItem: FC<Props> = ({
           setOpen={setOpenModalPostDetail}
           isFavourite={isFavourite}
           setIsFavourite={handleFavouritePost}
+          countLike={countLike}
         />
       )}
     </>

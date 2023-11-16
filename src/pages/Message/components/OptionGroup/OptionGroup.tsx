@@ -7,10 +7,14 @@ import {
   HiOutlineUserCircle,
   HiOutlineUserMinus,
 } from 'react-icons/hi2'
+import { useNavigate } from 'react-router-dom'
 // import { useNavigate } from 'react-router-dom'
-interface Props {}
+interface Props {
+  id: string
+}
 
-const OptionGroup: FC<Props> = (): JSX.Element => {
+const OptionGroup: FC<Props> = ({ id }: Props): JSX.Element => {
+  const navigate = useNavigate()
   const [open, setOpen] = useState<boolean>(false)
   let elementRef: any = useClickOutside(() => {
     if (open) {
@@ -45,7 +49,11 @@ const OptionGroup: FC<Props> = (): JSX.Element => {
             <HiOutlineChatBubbleLeft className="w-5 h-5" />
             <span>Nhắn tin</span>
           </li>
-          <li className="list-none flex gap-2 items-center py-1.5 px-2 cursor-pointer hover:bg-gray-200 transition-all duration-200 ">
+          <li
+            onClick={() => {
+              navigate('/profile/' + id)
+            }}
+            className="list-none flex gap-2 items-center py-1.5 px-2 cursor-pointer hover:bg-gray-200 transition-all duration-200 ">
             <HiOutlineUserCircle className="w-5 h-5" />
             <span>Trang cá nhân</span>
           </li>

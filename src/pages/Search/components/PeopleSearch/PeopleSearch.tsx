@@ -46,12 +46,15 @@ const PeopleSearch: FC<Props> = ({
         setTotalRowCount(res.totalRecords)
         setData([...data, ...res.data])
 
-        if (res.data.length === 0) {
-          setCheckNoData((prev) => ({
-            ...prev,
-            isNoPeople: true,
-          }))
-        }
+        res.data.length === 0
+          ? setCheckNoData((prev) => ({
+              ...prev,
+              isNoPeople: true,
+            }))
+          : setCheckNoData((prev) => ({
+              ...prev,
+              isNoPeople: false,
+            }))
       }
       setIsLoading(false)
     }

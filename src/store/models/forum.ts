@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addForum, addUserToForum, updateStatusUserFromForum, editForum, getAllTopic, getAllUserRequest, getForumById, getAllForum, requestOnForum } from "../../services/forum.service";
+import { addForum, addUserToForum, updateStatusUserFromForum, editForum, getAllTopic, getAllUserRequest, getForumById, getAllForum, requestOnForum, exitForum } from "../../services/forum.service";
 import { IFormDataForum } from "@interfaces/IForum";
 import { IListUserRequest, IUserData } from "@interfaces/IUser";
 
@@ -61,6 +61,11 @@ export interface IForumModel {
     isRequestOnForumSuccess: boolean
     setIsRequestOnForumSuccess: Action<IForumModel, boolean>
     requestOnForum: Thunk<IForumModel, string>;
+
+    //ExitForum
+    isExitForumSuccess: boolean
+    setIsExitForumSuccess: Action<IForumModel, boolean>
+    exitForum: Thunk<IForumModel, string>;
 
 }
 
@@ -166,8 +171,6 @@ export const forumModel: IForumModel = persist({
             });
     }),
 
-
-
     // isUpdateStatusForumSuccess: true,
     // setIsUpdateStatusForum: action((state, payload) => {
     //     state.isUpdateStatusForumSuccess = payload;
@@ -267,6 +270,23 @@ export const forumModel: IForumModel = persist({
             })
             .catch((error) => {
                 actions.setIsRequestOnForumSuccess(false)
+                actions.setMessageErrorForum(error?.response?.data?.message)
+            });
+    }),
+
+    //ExitForum
+    isExitForumSuccess: true,
+    setIsExitForumSuccess: action((state, payload) => {
+        state.isExitForumSuccess = payload;
+    }),
+    exitForum: thunk(async (actions, payload) => {
+        return exitForum(payload)
+            .then(async (res) => {
+                actions.setIsExitForumSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsExitForumSuccess(false)
                 actions.setMessageErrorForum(error?.response?.data?.message)
             });
     }),

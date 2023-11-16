@@ -14,7 +14,7 @@ const RichTextEditTor = ({ editorState, onEditorStateChange, height }: IProp) =>
     <div>
       <Editor
         editorState={editorState}
-        wrapperClassName="demo-wrapper"
+        wrapperClassName="demo-wrapper  "
         editorClassName={`demo-editor ${
           height === '100px' ? 'height-content-image' : 'height-content'
         } overflow-auto`}

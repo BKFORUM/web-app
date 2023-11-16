@@ -14,6 +14,6 @@ export interface INotification {
     readAt: string
     updatedAt: string
     content: string
-    user?: IUserData
+    sender: IUserData
 }
 

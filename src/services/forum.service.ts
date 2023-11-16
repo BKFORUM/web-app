@@ -71,4 +71,22 @@ const requestOnForum = (id: string) => {
     });
 }
 
-export { getForumById, getAllTopic, addForum, editForum, updateStatusUserFromForum, addUserToForum, getAllUserRequest, getAllForum, requestOnForum }
+const exitForum = (id: string) => {
+    return BaseURL({
+        url: `/forums/${id}/exit`,
+        method: "PATCH",
+    });
+}
+
+export {
+    getForumById,
+    getAllTopic,
+    addForum,
+    editForum,
+    updateStatusUserFromForum,
+    addUserToForum,
+    getAllUserRequest,
+    getAllForum,
+    requestOnForum,
+    exitForum,
+}

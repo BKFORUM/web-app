@@ -20,7 +20,7 @@ interface Props {
   isLoading: boolean
 }
 
-interface Image {
+export interface Image {
   name: string
   fileUrl: string
 }

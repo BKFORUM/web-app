@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addMessageToConversation, getAllConverSation, getConversationById } from "../../services/conversation.service";
+import { addConversation, addMessageToConversation, getAllConverSation, getConversationById } from "../../services/conversation.service";
 import { IParams } from "@interfaces/IClient";
 import { IConversation } from "@interfaces/IConversation";
 
@@ -31,6 +31,11 @@ export interface IConversationModel {
   isAddMessageToConversationSuccess: boolean;
   setIsAddMessageToConversationSuccess: Action<IConversationModel, boolean>;
   addMessageToConversation: Thunk<IConversationModel, any>;
+
+  //AddConversation
+  isAddConversationSuccess: boolean;
+  setIsAddConversationSuccess: Action<IConversationModel, boolean>;
+  addConversation: Thunk<IConversationModel, any>;
 }
 
 export const conversationModel: IConversationModel = persist({
@@ -109,6 +114,23 @@ export const conversationModel: IConversationModel = persist({
       })
       .catch((error) => {
         actions.setIsAddMessageToConversationSuccess(false)
+        actions.setMessageError(error?.response?.data?.message)
+      });
+  }),
+
+  //AddConversation
+  isAddConversationSuccess: true,
+  setIsAddConversationSuccess: action((state, payload) => {
+    state.isAddConversationSuccess = payload;
+  }),
+  addConversation: thunk(async (actions, payload) => {
+    return addConversation(payload)
+      .then(async (res) => {
+        actions.setIsAddConversationSuccess(true)
+        return res.data
+      })
+      .catch((error) => {
+        actions.setIsAddConversationSuccess(false)
         actions.setMessageError(error?.response?.data?.message)
       });
   }),

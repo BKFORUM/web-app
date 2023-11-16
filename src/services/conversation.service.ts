@@ -25,4 +25,12 @@ const addMessageToConversation = (data: any) => {
     });
 }
 
-export { getAllConverSation, getConversationById, addMessageToConversation }
+const addConversation = (data: any) => {
+    return BaseURL({
+        url: `/conversations`,
+        method: "POST",
+        data,
+    });
+}
+
+export { getAllConverSation, getConversationById, addMessageToConversation, addConversation }
