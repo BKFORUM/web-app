@@ -3,9 +3,13 @@ import SearchInput from '@components/SearchInput'
 import { Dialog, Transition } from '@headlessui/react'
 import { Checkbox } from '@mui/material'
 import { FC, Fragment, useEffect, useRef, useState } from 'react'
-import { useStoreActions } from 'easy-peasy'
-import { IViewUserAddList } from '@interfaces/IUser'
-import { userActionSelector } from '@store/index'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import { IUserData } from '@interfaces/IUser'
+import {
+  conversationStateSelector,
+  userActionSelector,
+  userStateSelector,
+} from '@store/index'
 import { useDebounce } from '@hooks/useDebounce'
 import notFoundSearch from '../../assets/images/notFoundSearch.jpg'
 
@@ -23,9 +27,12 @@ const AddUserToGroup: FC<Props> = ({
   handleAction,
 }: Props): JSX.Element => {
   const { getAllUser } = useStoreActions(userActionSelector)
+  const { currentUserSuccess } = useStoreState(userStateSelector)
+  const { currentConversation } = useStoreState(conversationStateSelector)
+
   const [inputSearch, setInputSearch] = useState<string>('')
-  const [data, setData] = useState<IViewUserAddList[]>([])
-  const [userSelected, setUserSelected] = useState<IViewUserAddList[]>([])
+  const [data, setData] = useState<IUserData[]>([])
+  const [userSelected, setUserSelected] = useState<IUserData[]>([])
   const [isLoading, setIsLoading] = useState<boolean | null>(null)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -33,15 +40,35 @@ const AddUserToGroup: FC<Props> = ({
     setIsLoading(true)
     const res = await getAllUser({
       search: inputSearch,
-      take: 100000000,
+      take: 100000,
       forumId: id,
-      isInForum: false,
+      isInForum: id && false,
     })
     if (res) {
-      const data = res?.data?.map((item: any) => ({
-        ...item,
-        checked: userSelected.some((user) => user.id === item.id),
-      }))
+      let data
+      if (id) {
+        data = res?.data?.map((item: any) => ({
+          ...item,
+          checked: userSelected.some((user) => user.id === item.id),
+        }))
+      } else {
+        data = res?.data
+          ?.map((item: any) => {
+            if (
+              item.id !== currentUserSuccess?.id &&
+              !currentConversation?.users.some((userId) => userId.userId === item.id)
+            ) {
+              return {
+                ...item,
+                checked: userSelected.some((user) => user.id === item.id),
+              }
+            }
+          })
+          .filter((data: any) => {
+            return data !== undefined
+          })
+      }
+
       setData(data)
     }
     setIsLoading(false)
@@ -153,7 +180,7 @@ const AddUserToGroup: FC<Props> = ({
                                     alt="avatar"
                                   />
                                   <span
-                                    onClick={() => handleCheckboxChange(item.id)}
+                                    onClick={() => handleCheckboxChange(item.id || '')}
                                     className="absolute top-0.5 right-2.5 cursor-pointer text-gray-500 bg-white px-1.5 text-sm rounded-[50%] hover:bg-gray-200 transition-all duration-200 ">
                                     X
                                   </span>
@@ -216,7 +243,7 @@ const AddUserToGroup: FC<Props> = ({
                               className={`flex justify-between items-center cursor-pointer rounded-xl py-1.5 ${
                                 item.checked ? 'bg-slate-100' : 'hover:bg-slate-100'
                               } `}
-                              onClick={() => handleCheckboxChange(item.id)}>
+                              onClick={() => handleCheckboxChange(item.id || '')}>
                               <div className="flex gap-2 items-center">
                                 <div>
                                   <div className="h-12 w-12 flex-shrink rounded-full border border-gray-400 overflow-hidden ml-3">

@@ -30,9 +30,9 @@ const ModalCreatePost: FC<Props> = ({
   isLoading,
   postSelected,
 }: Props): JSX.Element => {
-  const ImageRef: any = useRef()
   const [step, setStep] = useState('post')
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
+  const ImageRef: any = useRef()
   const [Images, setImages] = useState<Image[]>([])
   const [FileImages, setFileImages] = useState<File[]>([])
   const [imageEdit, setImageEdit] = useState<IDocuments[]>([])

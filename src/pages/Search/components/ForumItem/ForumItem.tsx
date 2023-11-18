@@ -3,6 +3,7 @@ import { IUserForumResponseUpdated } from '@interfaces/IForum'
 import { FC } from 'react'
 import { HiUser } from 'react-icons/hi2'
 import default_forum from '../../../../assets/images/default_forum.png'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
   item: IUserForumResponseUpdated
@@ -10,10 +11,13 @@ interface Props {
 }
 
 const ForumItem: FC<Props> = ({ item, requestForumUser }: Props): JSX.Element => {
+  const navigate = useNavigate()
   return (
     <div className="flex justify-between items-center px-3 py-3.5 border border-gray-300 rounded-xl">
       <div className="flex gap-4">
-        <div className="h-20 w-20 rounded-lg overflow-hidden">
+        <div
+          onClick={() => navigate('/forums/' + item.id)}
+          className="h-20 w-20 rounded-lg overflow-hidden cursor-pointer">
           <img
             className="h-full w-full object-cover border border-gray-300"
             src={item.avatarUrl || default_forum}
@@ -21,7 +25,11 @@ const ForumItem: FC<Props> = ({ item, requestForumUser }: Props): JSX.Element =>
           />
         </div>
         <div className="flex flex-col flex-1 gap-1 mb-auto">
-          <h4 className="text-xl font-semibold pt-0">{item.name}</h4>
+          <h4
+            onClick={() => navigate('/forums/' + item.id)}
+            className="text-xl font-semibold pt-0 hover:underline cursor-pointer">
+            {item.name}
+          </h4>
           <div className="flex flex-wrap gap-2">
             {item.topics.map((item, index) => (
               <span

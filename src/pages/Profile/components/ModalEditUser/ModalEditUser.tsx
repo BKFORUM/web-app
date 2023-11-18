@@ -124,6 +124,7 @@ const ModalEditUser: FC<Props> = ({
         new Event('submit', { cancelable: true, bubbles: true }),
       )
     }
+
   }
 
   useEffect(() => {

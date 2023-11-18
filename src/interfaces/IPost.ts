@@ -6,7 +6,7 @@ export interface IDocuments {
     fileName: string;
     fileUrl: string;
     postId: string;
-    updateAt: string;
+    updatedAt: string;
     userId: string;
 }
 
@@ -16,7 +16,7 @@ export interface IPostViewForum {
     createdAt: string
     documents: IDocuments[]
     status: string
-    updateAt: string
+    updatedAt: string
     likedAt: Date | null
     forum: {
         name: string

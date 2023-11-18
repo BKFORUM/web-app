@@ -45,6 +45,7 @@ const Notification: FC<Props> = (): JSX.Element => {
   const [openModalPostDetail, setOpenModalPostDetail] = useState<boolean>(false)
   const [postSelected, setPostSelected] = useState<IPostViewForum | null>(null)
   const [isFavourite, setIsFavourite] = useState<boolean>(false)
+  const [numberNotRead, setNumberNotRead] = useState<number>(0)
 
   const [open, setOpen] = useState<boolean>(false)
   let elementRef: any = useClickOutside(() => {
@@ -81,6 +82,7 @@ const Notification: FC<Props> = (): JSX.Element => {
       if (res) {
         setTotalRowCount(res.totalRecords)
         setListNotification([...listNotification, ...res.data])
+        setNumberNotRead(res?.totalUnreadNotifications)
       }
       setIsLoading(false)
     }
@@ -90,6 +92,7 @@ const Notification: FC<Props> = (): JSX.Element => {
     if (!item.readAt) {
       const res = await updateNotification(item.id)
       if (res) {
+        setNumberNotRead(numberNotRead - 1)
         var now = new Date()
         const newData = listNotification.map((notify: INotification) =>
           notify.id === item.id ? { ...notify, readAt: now.toISOString() } : notify,
@@ -115,10 +118,14 @@ const Notification: FC<Props> = (): JSX.Element => {
     if (item.modelName === 'forum') {
       navigate('/forums/' + item.modelId)
     }
+
+    if (item.modelName === 'friendship') {
+      navigate('/profile/' + item.sender.id)
+    }
   }
 
   const handleNewNotification = (response: INotification) => {
-    console.log(response)
+    setNumberNotRead(numberNotRead + 1)
     let newData
     if (listNotification.length >= 10 && listNotification.length < totalRowCount) {
       newData = [
@@ -169,6 +176,10 @@ const Notification: FC<Props> = (): JSX.Element => {
     socket.on('onPostRequestCreated', handleNewNotification) // user request post to forum
 
     socket.on('onPostRequestApproved', handleNewNotification) // moderator approve request post of user
+
+    socket.on('onFriendRequestCreated', handleNewNotification)
+
+    socket.on('onFriendRequestApproved', handleNewNotification)
   }, [listNotification])
 
   useEffect(() => {
@@ -186,17 +197,31 @@ const Notification: FC<Props> = (): JSX.Element => {
         onClick={() => setOpen(!open)}>
         <div className="relative">
           {open && (
-            <NotificationsIcon
-              className=" text-[#FEFE00] cursor-pointer"
-              sx={{ fontSize: 28 }}
-            />
-          )}
-          {!open && (
-            <Tooltip title={<h1 className="text-sm">Notify</h1>}>
+            <div className="relative">
               <NotificationsIcon
                 className=" text-[#FEFE00] cursor-pointer"
                 sx={{ fontSize: 28 }}
               />
+              {numberNotRead > 0 && (
+                <span className="absolute top-[-20%] right-[-10%] flex justify-center items-center text-[12px] bg-red-500 h-5 w-5  text-white rounded-full">
+                  {numberNotRead}
+                </span>
+              )}
+            </div>
+          )}
+          {!open && (
+            <Tooltip title={<h1 className="text-sm">Notify</h1>}>
+              <div className="relative">
+                <NotificationsIcon
+                  className=" text-[#FEFE00] cursor-pointer"
+                  sx={{ fontSize: 28 }}
+                />
+                {numberNotRead > 0 && (
+                  <span className="absolute top-[-20%] right-[-10%] flex justify-center items-center text-[12px] bg-red-500 h-5 w-5  text-white rounded-full">
+                    {numberNotRead}
+                  </span>
+                )}
+              </div>
             </Tooltip>
           )}
         </div>

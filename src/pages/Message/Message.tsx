@@ -44,7 +44,6 @@ const Message: FC<Props> = (): JSX.Element => {
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
   const [data, setData] = useState<IMessage[]>([])
   const [checkNext, setCheckNext] = useState<boolean>(false)
-  // const [isOpenAddUser, setIsOpenAddUser] = useState<boolean>(false)
 
   const handleNewMessage = (response: IMessage) => {
     if (
@@ -130,10 +129,6 @@ const Message: FC<Props> = (): JSX.Element => {
   const handleChangeSearch = (value: string): void => {
     setInputSearch(value)
   }
-
-  // const handleAddUser = async (data: any): Promise<void> => {
-  //   console.log(data)
-  // }
 
   const handleAddMessage = async (): Promise<void> => {
     if (id) {
@@ -240,13 +235,6 @@ const Message: FC<Props> = (): JSX.Element => {
           </div>
         )}
       </div>
-
-      {/* <AddUserToGroup
-        isOpen={isOpenAddUser}
-        setIsOpen={setIsOpenAddUser}
-        id={id}
-        handleAction={handleAddUser}
-      /> */}
     </>
   )
 }

@@ -1,7 +1,7 @@
 import { pageMode } from '@interfaces/IClient'
 import { IUserForumResponseUpdated } from '@interfaces/IForum'
-import { forumActionSelector } from '@store/index'
-import { useStoreActions } from 'easy-peasy'
+import { forumActionSelector, userStateSelector } from '@store/index'
+import { useStoreActions, useStoreState } from 'easy-peasy'
 import { FC, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { HiChevronLeft } from 'react-icons/hi'
@@ -24,7 +24,9 @@ const ForumSearch: FC<Props> = ({
   setStatusShowPeople,
   setCheckNoData,
 }: Props): JSX.Element => {
-  const { getAllForum, requestOnForum } = useStoreActions(forumActionSelector)
+  const { getAllForum, requestOnForum, updateStatusUserFromForum } =
+    useStoreActions(forumActionSelector)
+  const { currentUserSuccess } = useStoreState(userStateSelector)
 
   const [loading, setIsLoading] = useState<boolean>(false)
 
@@ -71,13 +73,20 @@ const ForumSearch: FC<Props> = ({
         setData([...data])
       }
     } else {
-      // const res = await updateStatusFriend({ id: id, status: 'DELETED' })
-      // if (res) {
-      //   const index = data.findIndex((item) => item.id === id)
-      //   const newData: IUserData = { ...data[index], friendStatus: 'NOT FRIEND' }
-      //   data[index] = newData
-      //   setData([...data])
-      // }
+      const res = await updateStatusUserFromForum({
+        id: id,
+        userId: currentUserSuccess?.id,
+        status: 'DELETED',
+      })
+      if (res) {
+        const index = data.findIndex((item) => item.id === id)
+        const newData: IUserForumResponseUpdated = {
+          ...data[index],
+          yourStatus: 'NOT MEMBER',
+        }
+        data[index] = newData
+        setData([...data])
+      }
     }
   }
 

@@ -1,10 +1,4 @@
-export interface IViewUserAddList {
-    id: string
-    fullName: string
-    checked: boolean
-    avatarUrl: string
-    email: string
-}
+
 
 export interface IUserLogin {
     email: string;
@@ -52,6 +46,7 @@ export interface IUserData {
     email: string
     address?: string
     friendStatus?: string
+    checked?: boolean
 }
 
 export interface IListUserRequest {

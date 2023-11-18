@@ -226,7 +226,7 @@ const Profile: FC<Props> = (): JSX.Element => {
   }
   return (
     <>
-      <div className="bg-white sm:px-0 lg:px-60 pt-8 flex flex-col">
+      <div className="bg-white sm:px-0 xl:px-60 pt-8 flex flex-col">
         <div className="container mx-auto">
           <div className="flex items-center gap-8 border-b border-gray-300 pb-6 flex-1 ">
             <div className="h-40 w-40 overflow-hidden">
@@ -273,7 +273,7 @@ const Profile: FC<Props> = (): JSX.Element => {
           </Box>
         </div>
       </div>
-      <div className="container mx-auto sm:px-0 lg:px-60">
+      <div className="sm:container sm:mx-auto sm:px-0 xl:px-60 ">
         <TabPanel
           value={value}
           index={0}>
