@@ -86,6 +86,21 @@ export interface IPostModel {
     isDeleteCommentPostSuccess: boolean;
     setIsDeleteCommentPostSuccess: Action<IPostModel, boolean>;
     deleteCommentPost: Thunk<IPostModel, string>;
+
+    //replyCommentPost
+    isReplyCommentPostSuccess: boolean;
+    setReplyCommentPostSuccess: Action<IPostModel, boolean>;
+    replyCommentPost: Thunk<IPostModel, any>;
+
+    //editReplyCommentPost
+    isEditReplyCommentPostSuccess: boolean;
+    setIsEditReplyCommentPostSuccess: Action<IPostModel, boolean>;
+    editReplyCommentPost: Thunk<IPostModel, any>;
+
+    //deleteReplyCommentPost
+    isDeleteReplyCommentPostSuccess: boolean;
+    setIsDeleteReplyCommentPostSuccess: Action<IPostModel, boolean>;
+    deleteReplyCommentPost: Thunk<IPostModel, any>;
 }
 
 export const postModel: IPostModel = persist({
@@ -357,4 +372,54 @@ export const postModel: IPostModel = persist({
             });
     }),
 
+    //ReplyCommentPost
+    isReplyCommentPostSuccess: true,
+    setReplyCommentPostSuccess: action((state, payload) => {
+        state.isReplyCommentPostSuccess = payload;
+    }),
+    replyCommentPost: thunk(async (actions, payload,) => {
+        return PostService.replyCommentPost(payload)
+            .then(async (res) => {
+                actions.setReplyCommentPostSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setReplyCommentPostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //EditReplyCommentPost
+    isEditReplyCommentPostSuccess: true,
+    setIsEditReplyCommentPostSuccess: action((state, payload) => {
+        state.isEditReplyCommentPostSuccess = payload;
+    }),
+    editReplyCommentPost: thunk(async (actions, payload,) => {
+        return PostService.editReplyCommentPost(payload)
+            .then(async (res) => {
+                actions.setIsEditReplyCommentPostSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsEditReplyCommentPostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //DeleteReplyCommentPost
+    isDeleteReplyCommentPostSuccess: true,
+    setIsDeleteReplyCommentPostSuccess: action((state, payload) => {
+        state.isDeleteReplyCommentPostSuccess = payload;
+    }),
+    deleteReplyCommentPost: thunk(async (actions, payload,) => {
+        return PostService.deleteReplyCommentPost(payload)
+            .then(async (res) => {
+                actions.setIsDeleteReplyCommentPostSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsDeleteReplyCommentPostSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
 })

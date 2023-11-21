@@ -31,6 +31,7 @@ export interface ICurrentUser {
 
 export interface IUserData {
     id?: string
+    displayName?: string
     fullName: string
     gender: string
     dateOfBirth: string

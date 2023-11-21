@@ -43,5 +43,9 @@ export interface IComment {
     updateAt: string
     userId: string
     user: IUserData
+    replyComments: IComment[]
+    _count?: {
+        replyComments: number
+    }
 
 }

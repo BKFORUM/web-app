@@ -85,6 +85,8 @@ const ModalEditForum: FC<Props> = ({
     resolver: yupResolver(schema) as any,
   })
 
+  
+
   const [optionsTopic, setOptionsTopic] = useState<IOption[]>([])
 
   const getAllTopicForum = async (): Promise<void> => {

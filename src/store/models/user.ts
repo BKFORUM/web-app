@@ -16,6 +16,11 @@ export interface IUserModel {
     currentUserSuccess: null | ICurrentUser;
     setCurrentUserSuccess: Action<IUserModel, ICurrentUser | null>;
 
+    //ListFriendOnline
+    listFriendOnline: IUserData[],
+    setListFriendOnline: Action<IUserModel, IUserData[]>
+
+
     isGetCurrentUserSuccess: boolean;
     setIsGetCurrentUserSuccess: Action<IUserModel, boolean>;
     getCurrentUser: Thunk<IUserModel, undefined>;
@@ -66,6 +71,12 @@ export const userModel: IUserModel = persist({
                 actions.setCurrentUserSuccess(null)
                 actions.setMessageErrorUser(error?.response?.data?.message)
             });
+    }),
+
+    //ListFriendOnline
+    listFriendOnline: [],
+    setListFriendOnline: action((state, payload) => {
+        state.listFriendOnline = payload;
     }),
 
     //getUserById

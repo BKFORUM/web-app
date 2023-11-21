@@ -241,7 +241,7 @@ const AddUserToGroup: FC<Props> = ({
                             <div
                               key={index}
                               className={`flex justify-between items-center cursor-pointer rounded-xl py-1.5 ${
-                                item.checked ? 'bg-slate-100' : 'hover:bg-slate-100'
+                                item.checked ? 'bg-slate-100' : 'hove:bg-slate-100'
                               } `}
                               onClick={() => handleCheckboxChange(item.id || '')}>
                               <div className="flex gap-2 items-center">

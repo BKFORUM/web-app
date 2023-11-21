@@ -33,4 +33,37 @@ const addConversation = (data: any) => {
     });
 }
 
-export { getAllConverSation, getConversationById, addMessageToConversation, addConversation }
+const deleteMemberOfConversation = (data: any) => {
+    return BaseURL({
+        url: `/conversations/${data.conversationId}/users/${data.userId}`,
+        method: "DELETE",
+    });
+}
+
+const addUserToConversation = (data: any) => {
+    return BaseURL({
+        url: `/conversations/${data.id}/users`,
+        method: "POST",
+        data,
+    });
+}
+
+const editNickNameMember = (data: any) => {
+    return BaseURL({
+        url: `/conversations/${data.conversationId}/users/${data.userId}`,
+        method: "PUT",
+        data: { displayName: data.displayName },
+    });
+}
+
+
+
+export {
+    getAllConverSation,
+    getConversationById,
+    addMessageToConversation,
+    addConversation,
+    deleteMemberOfConversation,
+    addUserToConversation,
+    editNickNameMember,
+}

@@ -156,10 +156,6 @@ const Notification: FC<Props> = (): JSX.Element => {
   }, [paginationModel])
 
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log(socket.id)
-    })
-    socket.on('connect_error', (err) => console.log(err))
     setListNotification([])
     setPaginationModel({ page: 0, pageSize: 10 })
   }, [currentUserSuccess?.id])

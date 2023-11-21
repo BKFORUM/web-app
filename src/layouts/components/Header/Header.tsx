@@ -10,6 +10,7 @@ import ModalEditForum from '@pages/Forum/components/ModalEditForum'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import logoBk from '../../../assets/images/logobkforum.png'
 import {
+  authStateSelector,
   forumActionSelector,
   forumStateSelector,
   notifyActionSelector,
@@ -17,6 +18,8 @@ import {
   searchActionSelector,
 } from '@store/index'
 import SearchInput from '@components/SearchInput'
+import { connectSocket } from '@utils/functions/connectSocket'
+import socket from '@utils/socket/socketConfig'
 interface Props {}
 
 const Header: FC<Props> = (): JSX.Element => {
@@ -26,6 +29,7 @@ const Header: FC<Props> = (): JSX.Element => {
   const { isAddForumSuccess, messageErrorForum } = useStoreState(forumStateSelector)
   const { postImage } = useStoreActions(postActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { isLoginSuccess } = useStoreState(authStateSelector)
 
   const searchParams = new URLSearchParams(window.location.search)
   const search = searchParams.get('search')
@@ -87,6 +91,12 @@ const Header: FC<Props> = (): JSX.Element => {
       setTextSearch(inputSearch)
     }
   }
+
+  useEffect(() => {
+    if (isLoginSuccess) {
+      socket.connect()
+    }
+  }, [isLoginSuccess])
 
   useEffect(() => {
     if (search !== null) {

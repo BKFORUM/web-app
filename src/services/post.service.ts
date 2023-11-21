@@ -118,6 +118,29 @@ const getAllCommentPost = ({ id, params }: IParams) => {
     });
 }
 
+const replyCommentPost = (data: any) => {
+    return BaseURL({
+        url: `/comments/${data.id}/replies`,
+        method: "POST",
+        data,
+    });
+}
+
+const editReplyCommentPost = (data: any) => {
+    return BaseURL({
+        url: `/comments/${data.id}/replies/${data.replyId}`,
+        method: "PUT",
+        data: { content: data.content },
+    });
+}
+
+const deleteReplyCommentPost = (data: any) => {
+    return BaseURL({
+        url: `/comments/${data.id}/replies/${data.replyId}`,
+        method: "DELETE",
+    });
+}
+
 export {
     addPost,
     postImage,
@@ -132,5 +155,8 @@ export {
     addCommentPost,
     getAllCommentPost,
     editCommentPost,
-    deleteCommentPost
+    deleteCommentPost,
+    replyCommentPost,
+    editReplyCommentPost,
+    deleteReplyCommentPost,
 }    

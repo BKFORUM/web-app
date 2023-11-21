@@ -16,6 +16,10 @@ export interface IAuthModel {
     setIsLoginSuccess: Action<IAuthModel, boolean>;
     login: Thunk<IAuthModel, IUserLogin>;
 
+    //Logout
+    isLogoutSuccess: boolean;
+    setIsLogoutSuccess: Action<IAuthModel, boolean>;
+
     //ForgotPassword
     isForgotPasswordSuccess: boolean;
     setIsForgotPasswordSuccess: Action<IAuthModel, boolean>;
@@ -56,6 +60,12 @@ export const authModel: IAuthModel = persist({
                 actions.setIsLoginSuccess(false)
                 actions.setMessageError(error?.response?.data?.message)
             });
+    }),
+
+    //Logout
+    isLogoutSuccess: false,
+    setIsLogoutSuccess: action((state, payload) => {
+        state.isLogoutSuccess = payload;
     }),
 
     //ForgotPassword

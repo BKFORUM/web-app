@@ -9,7 +9,6 @@ import {
 import { RiSendPlaneFill } from 'react-icons/ri'
 import SearchInput from '@components/SearchInput'
 import { Tooltip } from '@mui/material'
-// import AddUserToGroup from '../../components/AddUserToGroup'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import {
   conversationActionSelector,
@@ -27,9 +26,15 @@ interface Props {}
 
 const Message: FC<Props> = (): JSX.Element => {
   const { id } = useParams()
-  const { getConverSationById, addMessageToConversation, setListConversation } =
-    useStoreActions(conversationActionSelector)
-  const { listConversation } = useStoreState(conversationStateSelector)
+  const {
+    getConverSationById,
+    addMessageToConversation,
+    setListConversation,
+    setIsGetAllMessagesAgain,
+  } = useStoreActions(conversationActionSelector)
+  const { listConversation, isGetAllMessagesAgain } = useStoreState(
+    conversationStateSelector,
+  )
   const { currentUserSuccess } = useStoreState(userStateSelector)
 
   const searchRef = useRef<HTMLDivElement>(null)
@@ -105,6 +110,14 @@ const Message: FC<Props> = (): JSX.Element => {
     setData([])
     setPaginationModel({ page: 0, pageSize: 10 })
   }, [debouncedInputValue])
+
+  useEffect(() => {
+    if (isGetAllMessagesAgain) {
+      setData([])
+      setPaginationModel({ page: 0, pageSize: 10 })
+      setIsGetAllMessagesAgain(false)
+    }
+  }, [isGetAllMessagesAgain])
 
   useEffect(() => {
     getDetailConversation()

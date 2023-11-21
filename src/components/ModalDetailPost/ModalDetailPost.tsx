@@ -4,13 +4,7 @@ import PostContent from '@components/PostContent'
 import { Dialog, Transition } from '@headlessui/react'
 import { pageMode } from '@interfaces/IClient'
 import { IComment, IPostViewForum } from '@interfaces/IPost'
-import { Tooltip } from '@mui/material'
-import {
-  notifyActionSelector,
-  postActionSelector,
-  postStateSelector,
-  userStateSelector,
-} from '@store/index'
+import { notifyActionSelector, postActionSelector, postStateSelector } from '@store/index'
 import { dayComparedToThePast } from '@utils/functions/formatDay'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { FC, Fragment, useEffect, useState } from 'react'
@@ -19,7 +13,7 @@ import {
   HiMiniHeart,
   HiOutlineChatBubbleLeftEllipsis,
 } from 'react-icons/hi2'
-import { RiSendPlaneFill } from 'react-icons/ri'
+import WritingTools from './components/WritingTools'
 
 interface Props {
   item: IPostViewForum | null
@@ -38,15 +32,12 @@ const ModalDetailPost: FC<Props> = ({
   setIsFavourite,
   countLike,
 }: Props): JSX.Element => {
-  const { currentUserSuccess } = useStoreState(userStateSelector)
-  const { addCommentPost, getAllCommentPost, editCommentPost, deleteCommentPost } =
-    useStoreActions(postActionSelector)
-  const { setIsUpdateStatusPostSuccess, updateStatusPost } =
+  const { getAllCommentPost } = useStoreActions(postActionSelector)
+  const { setIsUpdateStatusPostSuccess, updateStatusPost, deleteCommentPost } =
     useStoreActions(postActionSelector)
   const { isUpdateStatusPostSuccess, messageError } = useStoreState(postStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
-  const [inputText, setInputText] = useState<string>('')
   const [loading, setIsLoading] = useState<boolean>(false)
   const [isLoadingAction, setIsLoadingAction] = useState<boolean>(false)
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
@@ -60,8 +51,8 @@ const ModalDetailPost: FC<Props> = ({
       const res = await getAllCommentPost({
         id: item.id,
         params: {
-          skip: paginationModel.page * 10,
-          take: paginationModel.pageSize,
+          skipComment: paginationModel.page * 10,
+          takeComment: paginationModel.pageSize,
         },
       })
       if (res) {
@@ -108,53 +99,6 @@ const ModalDetailPost: FC<Props> = ({
     setIsLoadingAction(false)
   }
 
-  const handleAddMessage = async (): Promise<void> => {
-    if (item) {
-      if (rowSelected) {
-        const res = await editCommentPost({ id: rowSelected.id, content: inputText })
-        if (res) {
-          const updatedComment = data.map((item: IComment) =>
-            item.id === rowSelected.id ? { ...item, content: inputText } : item,
-          )
-          setInputText('')
-          setData(updatedComment)
-          setRowSelected(null)
-        }
-      } else {
-        const res = await addCommentPost({ id: item.id, content: inputText })
-        if (res) {
-          const newDataRow = {
-            id: res?.id,
-            content: res?.content,
-            postId: res?.postId,
-            createdAt: res?.createdAt,
-            updateAt: res?.updateAt,
-            userId: res?.userId,
-            user: res?.user,
-          }
-          let newData
-          if (data.length >= 10 && data.length < totalRowCount) {
-            newData = [
-              newDataRow,
-              ...data.slice(0, data.length - 1),
-              ...data.slice(data.length),
-            ] as IComment[]
-          } else {
-            newData = [newDataRow, ...data] as IComment[]
-          }
-          setData(newData)
-          setTotalRowCount(totalRowCount + 1)
-          setInputText('')
-        }
-      }
-    }
-  }
-
-  const handleEditMessage = (item: IComment): void => {
-    setInputText(item.content)
-    setRowSelected(item)
-  }
-
   const handleDeleteComment = async (id: string): Promise<void> => {
     const res = await deleteCommentPost(id)
     if (res) {
@@ -164,8 +108,8 @@ const ModalDetailPost: FC<Props> = ({
     }
   }
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') handleAddMessage()
+  const handleEditMessage = (item: IComment): void => {
+    setRowSelected(item)
   }
   return (
     <div>
@@ -211,7 +155,7 @@ const ModalDetailPost: FC<Props> = ({
                     className="mt-2 max-h-[500px] overflow-y-auto">
                     <div className="flex items-center justify-between px-3">
                       <div className="flex items-center cursor-pointer">
-                        <div className="relative flex-shrink-0  mr-2 ">
+                        <div className="relative flex-shrink-0  mr-2">
                           <img
                             className="h-10 w-10 object-cover rounded-full border border-gray-500 bg-gray-500 "
                             src={item?.user.avatarUrl}
@@ -236,7 +180,7 @@ const ModalDetailPost: FC<Props> = ({
                     </div>
                     {item?.status === 'ACTIVE' && (
                       <>
-                        <div className="mx-3 py-1 flex justify-around border-y border-gray-300 mt-3  ">
+                        <div className="mx-3 py-1 flex justify-around border-y border-gray-300 mt-3">
                           <div
                             onClick={() => setIsFavourite()}
                             className={`${
@@ -260,7 +204,9 @@ const ModalDetailPost: FC<Props> = ({
                         </div>
                         <div className="pb-4">
                           <Comment
+                            idPost={item.id}
                             data={data}
+                            setData={setData}
                             loading={loading}
                             paginationModel={paginationModel}
                             setPaginationModel={setPaginationModel}
@@ -273,33 +219,18 @@ const ModalDetailPost: FC<Props> = ({
                     )}
                   </div>
                   {item?.status === 'ACTIVE' && (
-                    <div
-                      className="px-3 py-2 flex gap-2"
-                      style={{ boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)' }}>
-                      <Tooltip title={currentUserSuccess?.fullName}>
-                        <div className="h-10 w-10 overflow-hidden">
-                          <img
-                            className="h-full w-full rounded-full  border border-gray-200"
-                            src={currentUserSuccess?.avatarUrl}
-                            alt={currentUserSuccess?.fullName}
-                          />
-                        </div>
-                      </Tooltip>
-                      <div className="flex-1 m-auto relative">
-                        <input
-                          type="text"
-                          value={inputText}
-                          onChange={(e) => setInputText(e.target.value)}
-                          onKeyPress={handleKeyPress}
-                          className="w-full bg-gray-200 outline-none px-4 py-2 rounded-3xl text-sm"
-                          placeholder="Viết bình luận của bạn"
-                        />
-                        <RiSendPlaneFill
-                          onClick={() => handleAddMessage()}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-[#0001CB] cursor-pointer"
-                        />
-                      </div>
-                    </div>
+                    <>
+                      <WritingTools
+                        data={data}
+                        setData={setData}
+                        totalRowCount={totalRowCount}
+                        setTotalRowCount={setTotalRowCount}
+                        rowSelected={rowSelected}
+                        setRowSelected={setRowSelected}
+                        idPost={item.id}
+                        type="comment"
+                      />
+                    </>
                   )}
                   {item?.status === 'PENDING' && (
                     <div className="px-4 pb-4 flex justify-center w-full gap-4 mt-4 ">

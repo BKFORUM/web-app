@@ -108,7 +108,7 @@ const ContentChat: FC<Props> = ({
             )}
             <div className="flex flex-col gap-2 text-xs ">
               {item.author.id !== currentUserSuccess?.id && (
-                <span>{item.author.fullName}</span>
+                <span>{item.author.displayName || item.author.fullName}</span>
               )}
               <div>
                 <Tooltip title={formatDateLocalV2(item.createdAt)}>

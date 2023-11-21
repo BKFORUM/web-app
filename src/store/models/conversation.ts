@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addConversation, addMessageToConversation, getAllConverSation, getConversationById } from "../../services/conversation.service";
+import { addConversation, addMessageToConversation, addUserToConversation, deleteMemberOfConversation, editNickNameMember, getAllConverSation, getConversationById } from "../../services/conversation.service";
 import { IParams } from "@interfaces/IClient";
 import { IConversation } from "@interfaces/IConversation";
 
@@ -25,6 +25,8 @@ export interface IConversationModel {
   //GetConverSationById
   isGetConverSationByIdSuccess: boolean;
   setIsGetConverSationByIdSuccess: Action<IConversationModel, boolean>;
+  isGetAllMessagesAgain: boolean;
+  setIsGetAllMessagesAgain: Action<IConversationModel, boolean>;
   getConverSationById: Thunk<IConversationModel, IParams>;
 
   //AddMessageToConversation
@@ -36,6 +38,21 @@ export interface IConversationModel {
   isAddConversationSuccess: boolean;
   setIsAddConversationSuccess: Action<IConversationModel, boolean>;
   addConversation: Thunk<IConversationModel, any>;
+
+  //DeleteMemberOfConversation
+  isDeleteMemberOfConversationSuccess: boolean;
+  setIsDeleteMemberOfConversationSuccess: Action<IConversationModel, boolean>;
+  deleteMemberOfConversation: Thunk<IConversationModel, any>;
+
+  //AddUserToConversation
+  isAddUserToConversationSuccess: boolean;
+  setIsAddUserToConversationSuccess: Action<IConversationModel, boolean>;
+  addUserToConversation: Thunk<IConversationModel, any>;
+
+  //EditNickNameMemberOfConversation
+  isEditNickNameMemberSuccess: boolean;
+  setIsEditNickNameMemberSuccess: Action<IConversationModel, boolean>;
+  editNickNameMember: Thunk<IConversationModel, any>;
 }
 
 export const conversationModel: IConversationModel = persist({
@@ -89,6 +106,10 @@ export const conversationModel: IConversationModel = persist({
   setIsGetConverSationByIdSuccess: action((state, payload) => {
     state.isGetConverSationByIdSuccess = payload;
   }),
+  isGetAllMessagesAgain: false,
+  setIsGetAllMessagesAgain: action((state, payload) => {
+    state.isGetAllMessagesAgain = payload;
+  }),
   getConverSationById: thunk(async (actions, payload) => {
     return getConversationById(payload)
       .then(async (res) => {
@@ -131,6 +152,57 @@ export const conversationModel: IConversationModel = persist({
       })
       .catch((error) => {
         actions.setIsAddConversationSuccess(false)
+        actions.setMessageError(error?.response?.data?.message)
+      });
+  }),
+
+  //DeleteMemberOfConversation
+  isDeleteMemberOfConversationSuccess: true,
+  setIsDeleteMemberOfConversationSuccess: action((state, payload) => {
+    state.isDeleteMemberOfConversationSuccess = payload;
+  }),
+  deleteMemberOfConversation: thunk(async (actions, payload) => {
+    return deleteMemberOfConversation(payload)
+      .then(async (res) => {
+        actions.setIsDeleteMemberOfConversationSuccess(true)
+        return res
+      })
+      .catch((error) => {
+        actions.setIsDeleteMemberOfConversationSuccess(false)
+        actions.setMessageError(error?.response?.data?.message)
+      });
+  }),
+
+  //AddUserToConversation
+  isAddUserToConversationSuccess: true,
+  setIsAddUserToConversationSuccess: action((state, payload) => {
+    state.isAddUserToConversationSuccess = payload;
+  }),
+  addUserToConversation: thunk(async (actions, payload) => {
+    return addUserToConversation(payload)
+      .then(async (res) => {
+        actions.setIsAddUserToConversationSuccess(true)
+        return res
+      })
+      .catch((error) => {
+        actions.setIsAddUserToConversationSuccess(false)
+        actions.setMessageError(error?.response?.data?.message)
+      });
+  }),
+
+  //EditNickNameMember
+  isEditNickNameMemberSuccess: true,
+  setIsEditNickNameMemberSuccess: action((state, payload) => {
+    state.isEditNickNameMemberSuccess = payload;
+  }),
+  editNickNameMember: thunk(async (actions, payload) => {
+    return editNickNameMember(payload)
+      .then(async (res) => {
+        actions.setIsEditNickNameMemberSuccess(true)
+        return res
+      })
+      .catch((error) => {
+        actions.setIsEditNickNameMemberSuccess(false)
         actions.setMessageError(error?.response?.data?.message)
       });
   }),
