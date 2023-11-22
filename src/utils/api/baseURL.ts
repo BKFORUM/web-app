@@ -32,23 +32,35 @@ BaseURL.interceptors.response.use(
             // Access Token was expired
             if (err.response.status === 401 && !originalConfig._retry) {
                 originalConfig._retry = true;
-                const auth: any = JSON.parse(String(localStorage.getItem("auth")));
-                try {
-                    const res = await axios.get('http://52.139.152.154/api/v1/auth/refresh', {
-                        headers: {
-                            Authorization: `Bearer ${auth?.refreshToken}`
-                        }
-                    })
-                    if (res) {
-                        localStorage.setItem('auth', JSON.stringify(res.data))
-                    }
-                } catch (error: any) {
-                    console.log('error', error?.response?.data?.message)
+                const res = await refreshToken();
+                if (res) {
+                    const access_token = res?.accessToken;
+                    BaseURL.defaults.headers.common[
+                        "Authorization"
+                    ] = `Bearer ${access_token}`;
+                    return BaseURL(originalConfig);
                 }
             }
         }
         return Promise.reject(err);
     }
 );
+
+const refreshToken = async () => {
+    const auth: any = JSON.parse(String(localStorage.getItem("auth")));
+    try {
+        const res = await BaseURL.get("/auth/refresh", {
+            headers: {
+                Authorization: `Bearer ${auth?.refreshToken}`
+            }
+        });
+        if (res) {
+            localStorage.setItem('auth', JSON.stringify(res.data))
+            return res.data;
+        }
+    } catch (e) {
+        console.log("Error", e);
+    }
+};
 
 export default BaseURL;
