@@ -33,9 +33,14 @@ const ModalDetailPost: FC<Props> = ({
   countLike,
 }: Props): JSX.Element => {
   const { getAllCommentPost } = useStoreActions(postActionSelector)
-  const { setIsUpdateStatusPostSuccess, updateStatusPost, deleteCommentPost } =
-    useStoreActions(postActionSelector)
-  const { isUpdateStatusPostSuccess, messageError } = useStoreState(postStateSelector)
+  const {
+    setIsUpdateStatusPostSuccess,
+    updateStatusPost,
+    deleteCommentPost,
+    setCountReplyByCommentId,
+  } = useStoreActions(postActionSelector)
+  const { isUpdateStatusPostSuccess, messageError, countReplyByCommentId } =
+    useStoreState(postStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
   const [loading, setIsLoading] = useState<boolean>(false)
@@ -51,13 +56,18 @@ const ModalDetailPost: FC<Props> = ({
       const res = await getAllCommentPost({
         id: item.id,
         params: {
-          skipComment: paginationModel.page * 10,
-          takeComment: paginationModel.pageSize,
+          skip: paginationModel.page * 10,
+          take: paginationModel.pageSize,
         },
       })
       if (res) {
         setTotalRowCount(res.totalRecords)
         setData([...data, ...res.data])
+
+        const countsReply = res.data.map((item: IComment) => {
+          return { id: item.id, _count: item._count?.replyComments }
+        })
+        setCountReplyByCommentId([...countReplyByCommentId, ...countsReply])
       }
       setIsLoading(false)
     }
@@ -84,6 +94,12 @@ const ModalDetailPost: FC<Props> = ({
       setIsUpdateStatusPostSuccess(true)
     }
   }, [isUpdateStatusPostSuccess])
+
+  useEffect(() => {
+    return () => {
+      setCountReplyByCommentId([])
+    }
+  }, [])
 
   const handelAction = async (status: string, id: string): Promise<void> => {
     setIsLoadingAction(true)

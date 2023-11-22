@@ -47,5 +47,26 @@ export interface IComment {
     _count?: {
         replyComments: number
     }
+    commentId?: string
 
+}
+
+export interface IEditChild {
+    id: string
+    item: IComment
+}
+
+export interface IDataChild {
+    id: string
+    data: IComment[]
+}
+
+export interface IChildLoading {
+    id: string
+    isLoading: boolean
+}
+
+export interface ICountReply {
+    id: string
+    _count: number
 }

@@ -141,6 +141,14 @@ const deleteReplyCommentPost = (data: any) => {
     });
 }
 
+const getAllReplyByCommentId = ({ id, params }: IParams) => {
+    return BaseURL({
+        url: `/comments/${id}/replies`,
+        method: "GET",
+        params,
+    });
+}
+
 export {
     addPost,
     postImage,
@@ -159,4 +167,5 @@ export {
     replyCommentPost,
     editReplyCommentPost,
     deleteReplyCommentPost,
+    getAllReplyByCommentId,
 }    

@@ -1,15 +1,16 @@
-import { IComment } from '@interfaces/IPost'
+import { IComment, IDataChild } from '@interfaces/IPost'
 import { Tooltip } from '@mui/material'
 import { dayComparedToThePast } from '@utils/functions/formatDay'
 import { FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { HiPencilAlt, HiOutlineTrash } from 'react-icons/hi'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import { postActionSelector, userStateSelector } from '@store/index'
+import { postActionSelector, postStateSelector, userStateSelector } from '@store/index'
 
 interface Props {
   idParent: string
   data: IComment[]
+  setDataChild: React.Dispatch<React.SetStateAction<IDataChild[]>>
   onEditMessage: (item: IComment, idParent: string) => void
 }
 
@@ -17,15 +18,35 @@ const FirstChildComment: FC<Props> = ({
   data,
   onEditMessage,
   idParent,
+  setDataChild,
 }: Props): JSX.Element => {
   const navigate = useNavigate()
   const { currentUserSuccess } = useStoreState(userStateSelector)
-  const { deleteReplyCommentPost } = useStoreActions(postActionSelector)
+  const { deleteReplyCommentPost, setCountReplyByCommentId } =
+    useStoreActions(postActionSelector)
+  const { countReplyByCommentId } = useStoreState(postStateSelector)
 
   const handleDeleteComment = async (id: string, idParent: string) => {
     const res = await deleteReplyCommentPost({ id: idParent, replyId: id })
     if (res) {
-      console.log(res)
+      const newDataChild = data.filter((item) => {
+        return item.id !== id
+      })
+      setDataChild((prevData) => {
+        const updatedData = prevData.map((item) => {
+          if (item.id === idParent) {
+            return { ...item, data: newDataChild }
+          }
+          return item
+        })
+        return updatedData
+      })
+
+      const newCountReply = countReplyByCommentId.map((data) =>
+        data.id === idParent ? { ...data, _count: data._count - 1 } : data,
+      )
+
+      setCountReplyByCommentId(newCountReply)
     }
   }
 

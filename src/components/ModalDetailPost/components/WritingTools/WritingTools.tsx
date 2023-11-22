@@ -1,10 +1,9 @@
-import { IComment } from '@interfaces/IPost'
+import { IComment, IDataChild, IEditChild } from '@interfaces/IPost'
 import { Tooltip } from '@mui/material'
 import { postActionSelector, userStateSelector } from '@store/index'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { FC, useEffect, useState } from 'react'
 import { RiSendPlaneFill } from 'react-icons/ri'
-import { IEditChild } from '../Comment/Comment'
 
 interface Props {
   rowSelected: IComment | null
@@ -12,6 +11,7 @@ interface Props {
   setRowSelected?: React.Dispatch<React.SetStateAction<IComment | null>>
   data: IComment[]
   setData: React.Dispatch<React.SetStateAction<IComment[]>>
+  setDataChild?: React.Dispatch<React.SetStateAction<IDataChild[]>>
   totalRowCount?: number
   setTotalRowCount?: React.Dispatch<React.SetStateAction<number>>
   idPost?: string
@@ -28,6 +28,7 @@ const WritingTools: FC<Props> = ({
   idPost,
   type,
   childSelected,
+  setDataChild,
 }: Props): JSX.Element => {
   const { currentUserSuccess } = useStoreState(userStateSelector)
   const { addCommentPost, editCommentPost, replyCommentPost, editReplyCommentPost } =
@@ -80,18 +81,43 @@ const WritingTools: FC<Props> = ({
 
     if (type === 'reply_comment') {
       if (childSelected) {
-        const res = editReplyCommentPost({
+        const res = await editReplyCommentPost({
           id: rowSelected?.id,
           replyId: childSelected.item.id,
           content: inputText,
         })
         if (res) {
-          console.log(res)
+          setInputText('')
+          setDataChild &&
+            setDataChild((prevData) => {
+              const updatedData = prevData.map((item) => {
+                if (item.id === rowSelected?.id) {
+                  const newData = item.data.map((reply) =>
+                    reply.id === childSelected.item.id
+                      ? { ...reply, content: inputText }
+                      : reply,
+                  )
+                  return { ...item, data: newData }
+                }
+                return item
+              })
+              return updatedData
+            })
         }
       } else {
-        const res = replyCommentPost({ id: rowSelected?.id, content: inputText })
+        const res = await replyCommentPost({ id: rowSelected?.id, content: inputText })
         if (res) {
-          console.log(res)
+          setInputText('')
+          setDataChild &&
+            setDataChild((prevData) => {
+              const updatedData = prevData.map((item) => {
+                if (item.id === res?.commentId) {
+                  return { ...item, data: [...item.data, res] }
+                }
+                return item
+              })
+              return updatedData
+            })
         }
       }
     }

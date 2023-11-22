@@ -1,7 +1,7 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
 import * as PostService from "../../services/post.service";
 import { IParams } from "@interfaces/IClient";
-import { IPostViewForum } from "@interfaces/IPost";
+import { ICountReply, IPostViewForum } from "@interfaces/IPost";
 
 export interface IPostModel {
     //MessageError
@@ -101,6 +101,13 @@ export interface IPostModel {
     isDeleteReplyCommentPostSuccess: boolean;
     setIsDeleteReplyCommentPostSuccess: Action<IPostModel, boolean>;
     deleteReplyCommentPost: Thunk<IPostModel, any>;
+
+    //getAllReplyByCommentId
+    isGetAllReplyByCommentIdSuccess: boolean;
+    setIsGetAllReplyByCommentIdSuccess: Action<IPostModel, boolean>;
+    countReplyByCommentId: ICountReply[];
+    setCountReplyByCommentId: Action<IPostModel, ICountReply[]>;
+    getAllReplyByCommentId: Thunk<IPostModel, IParams>;
 }
 
 export const postModel: IPostModel = persist({
@@ -372,6 +379,27 @@ export const postModel: IPostModel = persist({
             });
     }),
 
+    //GetAllReplyByCommentId
+    isGetAllReplyByCommentIdSuccess: true,
+    setIsGetAllReplyByCommentIdSuccess: action((state, payload) => {
+        state.isGetAllReplyByCommentIdSuccess = payload;
+    }),
+    countReplyByCommentId: [],
+    setCountReplyByCommentId: action((state, payload) => {
+        state.countReplyByCommentId = payload;
+    }),
+    getAllReplyByCommentId: thunk(async (actions, payload,) => {
+        return PostService.getAllReplyByCommentId(payload)
+            .then(async (res) => {
+                actions.setIsGetAllReplyByCommentIdSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllReplyByCommentIdSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
     //ReplyCommentPost
     isReplyCommentPostSuccess: true,
     setReplyCommentPostSuccess: action((state, payload) => {
@@ -381,7 +409,7 @@ export const postModel: IPostModel = persist({
         return PostService.replyCommentPost(payload)
             .then(async (res) => {
                 actions.setReplyCommentPostSuccess(true)
-                return res;
+                return res.data;
             })
             .catch((error) => {
                 actions.setReplyCommentPostSuccess(false)
