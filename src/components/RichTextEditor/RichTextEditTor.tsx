@@ -7,9 +7,17 @@ interface IProp {
   editorState: EditorState
   onEditorStateChange: (editorState: EditorState) => void
   height?: string
+  error?: any
+  type?: string
 }
 
-const RichTextEditTor = ({ editorState, onEditorStateChange, height }: IProp) => {
+const RichTextEditTor = ({
+  editorState,
+  onEditorStateChange,
+  height,
+  error,
+  type,
+}: IProp) => {
   return (
     <div>
       <Editor
@@ -17,7 +25,9 @@ const RichTextEditTor = ({ editorState, onEditorStateChange, height }: IProp) =>
         wrapperClassName="demo-wrapper  "
         editorClassName={`demo-editor ${
           height === '100px' ? 'height-content-image' : 'height-content'
-        } overflow-auto`}
+        } overflow-auto ${type === 'events' && 'px-2 bg-[#E6F0F6] rounded-md'} ${
+          !!error && 'border border-red-500'
+        }`}
         onEditorStateChange={onEditorStateChange}
         placeholder="Viết bài tại đây ..."
         toolbar={{
@@ -45,6 +55,7 @@ const RichTextEditTor = ({ editorState, onEditorStateChange, height }: IProp) =>
         }}
         hashtag={{}}
       />
+      {!!error && <span className="text-sm text-red-600">{error?.message}</span>}
     </div>
   )
 }

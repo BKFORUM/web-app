@@ -162,7 +162,6 @@ const Forum: FC<Props> = (): JSX.Element => {
         setOpenModal(false)
       }
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
       if (data.files?.length > 0) {
         const resImage = await postImage(formData)
         if (resImage) {

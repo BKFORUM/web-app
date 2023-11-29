@@ -220,7 +220,6 @@ const ModalDetailPost: FC<Props> = ({
                         </div>
                         <div className="pb-4">
                           <Comment
-                            idPost={item.id}
                             data={data}
                             setData={setData}
                             loading={loading}

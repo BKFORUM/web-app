@@ -12,7 +12,6 @@ import FirstChildComment from '../FirstChildComment'
 import { FaArrowTurnUp } from 'react-icons/fa6'
 
 interface Props {
-  idPost: string
   data: IComment[]
   loading: boolean
   setData: React.Dispatch<React.SetStateAction<IComment[]>>
@@ -39,6 +38,7 @@ const Comment: FC<Props> = ({
 
   const [reply, setReply] = useState<number[] | null>(null)
   const [showAllChild, setShowAllChild] = useState<number[] | null>(null)
+
   const [listItemEdit, setListItemEdit] = useState<IEditChild[]>([])
   const [dataChild, setDataChild] = useState<IDataChild[]>([])
   const [isLoading, setIsLoading] = useState<IChildLoading | null>(null)

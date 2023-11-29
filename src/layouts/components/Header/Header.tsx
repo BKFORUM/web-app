@@ -18,7 +18,7 @@ import {
   searchActionSelector,
 } from '@store/index'
 import SearchInput from '@components/SearchInput'
-import { connectSocket } from '@utils/functions/connectSocket'
+// import { connectSocket } from '@utils/functions/connectSocket'
 import socket from '@utils/socket/socketConfig'
 interface Props {}
 

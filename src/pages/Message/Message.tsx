@@ -51,6 +51,7 @@ const Message: FC<Props> = (): JSX.Element => {
   const [checkNext, setCheckNext] = useState<boolean>(false)
 
   const handleNewMessage = (response: IMessage) => {
+    console.log(response)
     if (
       response?.author.id !== currentUserSuccess?.id &&
       response?.conversationId === id

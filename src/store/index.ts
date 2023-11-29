@@ -14,8 +14,7 @@ import { friendModel as friend, IFriendModel } from "./models/friend";
 import { conversationModel as conversation, IConversationModel } from "./models/conversation";
 import { notificationModel as notification, INotificationModel } from "./models/notification";
 import { searchModel as search, ISearchModel } from "./models/search";
-
-
+import { eventModel as event, IEventModel } from "./models/event";
 
 export interface IStoreModel {
     auth: IAuthModel;
@@ -26,7 +25,9 @@ export interface IStoreModel {
     friend: IFriendModel;
     conversation: IConversationModel;
     notification: INotificationModel;
-    search: ISearchModel
+    search: ISearchModel;
+    event: IEventModel
+
 }
 
 const storeModel: IStoreModel = {
@@ -38,7 +39,8 @@ const storeModel: IStoreModel = {
     friend,
     conversation,
     notification,
-    search
+    search,
+    event,
 }
 
 export const { useStoreActions, useStoreState, useStoreDispatch, useStore } =
@@ -82,6 +84,10 @@ export const notificationActionSelector = (state: IActionMapper) => state.notifi
 //Search
 export const searchStateSelector = (state: IStateMapper) => state.search;
 export const searchActionSelector = (state: IActionMapper) => state.search;
+
+//Event
+export const eventStateSelector = (state: IStateMapper) => state.event;
+export const eventActionSelector = (state: IActionMapper) => state.event;
 
 
 const store = createStore(storeModel, {

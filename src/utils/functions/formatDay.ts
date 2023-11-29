@@ -20,8 +20,13 @@ export const formatDateLocal = (dateTime: string): string => {
 
 export const formatDateLocalV2 = (dateTime: string): string => {
     const dateObject = dayjs(dateTime);
-    const formattedDate = dateObject.format('DD-MM-YYYY HH:mm');
+    const formattedDate = dateObject.utc().format('DD-MM-YYYY HH:mm');
     return formattedDate;
+}
+
+export const formatDateTimeLocal = (dateTime: string): string => {
+    const formattedTime = dayjs(dateTime).utc().format();
+    return formattedTime;
 }
 
 export const dayComparedToThePast = (dateTime: string): string => {

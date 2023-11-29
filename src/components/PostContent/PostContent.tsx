@@ -10,13 +10,14 @@ import { IDocuments } from '@interfaces/IPost'
 interface Props {
   content?: string
   images?: IDocuments[]
+  type?: string
 }
 
-const PostContent: FC<Props> = ({ content, images }: Props): JSX.Element => {
+const PostContent: FC<Props> = ({ content, images, type }: Props): JSX.Element => {
   return (
     <div>
       <div
-        className="px-3"
+        className={`${type === 'events' ? '' : 'px-3'}`}
         dangerouslySetInnerHTML={{
           __html: content || '',
         }}

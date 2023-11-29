@@ -3,7 +3,7 @@ import PostContent from '@components/PostContent'
 import {
   HiOutlineHeart,
   HiMiniHeart,
-  HiOutlineChatBubbleLeftEllipsis,
+HiOutlineChatBubbleLeftEllipsis,
 } from 'react-icons/hi2'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { IPostViewForum } from '@interfaces/IPost'
