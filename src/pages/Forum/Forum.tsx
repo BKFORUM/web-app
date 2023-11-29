@@ -379,7 +379,7 @@ const Forum: FC<Props> = (): JSX.Element => {
           <TabPanel
             value={value}
             index={2}>
-            <EventsForum />
+            <EventsForum moderator={detailForum?.moderator} />
           </TabPanel>
 
           <TabPanel

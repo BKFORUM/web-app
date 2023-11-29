@@ -11,9 +11,7 @@ const BaseURL = axios.create({
 BaseURL.interceptors.request.use(
 	async (config) => {
 		const auth: any = JSON.parse(String(localStorage.getItem("auth")));
-		console.log(config);
 		if (auth?.accessToken !== null && config.url !== '/auth/refresh') {
-			console.log(config.url)
 			config.headers.Authorization = `Bearer ${auth?.accessToken}`;
 		}
 		return config;

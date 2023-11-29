@@ -92,8 +92,8 @@ const ContentChat: FC<Props> = ({
           key={index}
           className="flex flex-col px-2">
           <div
-            className={`flex gap-2 my-1.5 ${
-              item.author.id === currentUserSuccess?.id ? 'justify-end' : 'justify-start'
+            className={`flex gap-2 my-1.5  ${
+              item.author.id === currentUserSuccess?.id ? ' ml-auto' : 'mr-auto'
             }`}>
             {item.author.id !== currentUserSuccess?.id && (
               <div className="mt-auto">
@@ -106,22 +106,22 @@ const ContentChat: FC<Props> = ({
                 </div>
               </div>
             )}
-            <div className="flex flex-col gap-2 text-xs ">
+            <div className="flex flex-col gap-1 text-xs">
               {item.author.id !== currentUserSuccess?.id && (
                 <span>{item.author.displayName || item.author.fullName}</span>
               )}
-              <div>
-                <Tooltip title={formatDateLocalV2(item.createdAt)}>
+              <Tooltip title={formatDateLocalV2(item.createdAt)}>
+                <div className="flex max-w-[700px] ">
                   <span
-                    className={`text-base px-3 py-1 max-w-[300px] truncate leading-0 ${
+                    className={`text-base px-2.5 py-0.5 break-words ${
                       item.author.id === currentUserSuccess?.id
                         ? 'bg-blue-400 text-white'
                         : 'bg-gray-100 text-black'
                     } rounded-2xl`}>
                     {item.content}
                   </span>
-                </Tooltip>
-              </div>
+                </div>
+              </Tooltip>
             </div>
           </div>
         </div>

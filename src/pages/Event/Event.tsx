@@ -64,7 +64,7 @@ const Event: FC<Props> = (_props): JSX.Element => {
           </div>
         </div>
 
-        <div className="col-span-3 px-4 ">
+        <div className="col-span-3 px-4 relative">
           <UserActive />
         </div>
       </div>

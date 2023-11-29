@@ -91,6 +91,7 @@ const ModalEditNickName: FC<Props> = ({ open, setOpen }: Props): JSX.Element => 
                   <div className="flex flex-col gap-4 mt-4 max-h-[400px] overflow-y-auto">
                     {currentConversation?.users.map((user, index) => (
                       <div
+                        key={index}
                         onClick={() => {
                           setItemSelected(index)
                           setValue(user.displayName || '')

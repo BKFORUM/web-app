@@ -14,7 +14,7 @@ dayjs.extend(utc)
 const DateTimePickerV2: FC<Props> = ({ error, onChange, value }: Props): JSX.Element => {
   const defaultValue = value === '' ? 'DD/MM/YYYY HH:mm' : value
   return (
-    <div className='flex flex-col gap-1'>
+    <div className="flex flex-col gap-1">
       <DateTimePicker
         sx={{
           '& .MuiInputBase-input': {
@@ -27,11 +27,11 @@ const DateTimePickerV2: FC<Props> = ({ error, onChange, value }: Props): JSX.Ele
           backgroundColor: '#E6F0F6',
           borderRadius: '8px',
         }}
-        format='DD/MM/YYYY HH:mm'
-        value={dayjs.utc(defaultValue)}
+        format="DD/MM/YYYY HH:mm"
+        value={dayjs(defaultValue)}
         onChange={onChange}
       />
-      {!!error && <span className='text-red-600 text-sm'>{error?.message}</span>}
+      {!!error && <span className="text-red-600 text-sm">{error?.message}</span>}
     </div>
   )
 }

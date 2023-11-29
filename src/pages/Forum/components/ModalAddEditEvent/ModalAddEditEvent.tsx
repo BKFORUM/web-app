@@ -7,17 +7,19 @@ import { IEvent } from '@interfaces/IEvent'
 import TextFieldV2 from '@components/TextFieldV2'
 import DateTimePickerV2 from '@components/DateTimePickerV2'
 import RichTextEditTor from '@components/RichTextEditor'
-import { EditorState, convertToRaw } from 'draft-js'
+import { ContentState, EditorState, convertToRaw } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
 import MultiImageV2 from '@components/MultiImageV2'
 import Button from '@components/Button'
+import { IDocuments } from '@interfaces/IPost'
+import htmlToDraft from 'html-to-draftjs'
 
 interface Props {
   loading: boolean
   item?: IEvent
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  handleAction: (data: any) => Promise<void>
+  handleAction?: (data: any) => Promise<void>
 }
 
 interface Image {
@@ -73,7 +75,7 @@ const ModalAddEditEvent: FC<Props> = ({
   const ImageRef: any = useRef()
   const [Images, setImages] = useState<Image[]>([])
   const [FileImages, setFileImages] = useState<File[]>([])
-  // const [imageEdit, setImageEdit] = useState<IDocuments[]>([])
+  const [imageEdit, setImageEdit] = useState<IDocuments[]>([])
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
   const defaultValues: IEvent = {
@@ -91,7 +93,8 @@ const ModalAddEditEvent: FC<Props> = ({
   })
 
   const onSubmit = async (data: IEvent) => {
-    handleAction({ ...data, FileImages })
+    handleAction &&
+      handleAction({ ...data, FileImages: FileImages, imageEdit: imageEdit })
   }
 
   const onEditorStateChange = (editorState: EditorState) => {
@@ -111,10 +114,10 @@ const ModalAddEditEvent: FC<Props> = ({
       (file: any) => file.name.split('.')[0] !== image.name,
     )
     setFileImages(newFileImages)
-    // if (item) {
-    //   const newImageEdit = imageEdit.filter((file: any) => file.fileName !== image.name)
-    //   setImageEdit(newImageEdit)
-    // }
+    if (item) {
+      const newImageEdit = imageEdit.filter((file: any) => file.fileName !== image.name)
+      setImageEdit(newImageEdit)
+    }
   }
 
   const handleFileChange = (file: any) => {
@@ -135,12 +138,35 @@ const ModalAddEditEvent: FC<Props> = ({
   }
 
   const descriptionValue = watch('content')
+  console.log(descriptionValue)
 
   useEffect(() => {
     if (descriptionValue !== '') {
       clearErrors('content')
     }
   }, [editorState])
+
+  useEffect(() => {
+    if (item) {
+      const contentBlock = htmlToDraft(item.content)
+      const { contentBlocks, entityMap } = contentBlock
+      const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap)
+      const newEditorState = EditorState.createWithContent(contentState)
+      setTimeout(() => {
+        setEditorState(newEditorState)
+        setValue('content', item.content)
+      }, 50)
+      if (item.documents !== undefined) {
+        const image = item.documents.map((data) => {
+          return { fileUrl: data.fileUrl, name: data.fileName }
+        })
+        setImageEdit(item.documents)
+        if (image.length > 0) {
+          setImages(image)
+        }
+      }
+    }
+  }, [item])
   return (
     <div>
       <Transition
@@ -172,7 +198,7 @@ const ModalAddEditEvent: FC<Props> = ({
                 leave="ease-in duration-200"
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95">
-                <Dialog.Panel className="relative min-w-[500px] flex flex-col rounded-xl bg-white text-left  shadow-xl transition-all">
+                <Dialog.Panel className="relative max-w-[600px] flex flex-col rounded-xl bg-white text-left  shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900 text-center shadow py-3 ">

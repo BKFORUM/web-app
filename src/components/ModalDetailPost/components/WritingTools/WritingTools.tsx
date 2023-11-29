@@ -63,7 +63,7 @@ const WritingTools: FC<Props> = ({
             user: res?.user,
             replyCommentPost: [],
           }
-          if (totalRowCount && setTotalRowCount) {
+          if (totalRowCount !== undefined && setTotalRowCount) {
             let newData
             if (data.length >= 10 && data.length < totalRowCount) {
               newData = [
@@ -153,7 +153,7 @@ const WritingTools: FC<Props> = ({
             user: res?.user,
             replyCommentPost: [],
           }
-          if (totalRowCount && setTotalRowCount) {
+          if (totalRowCount !== undefined && setTotalRowCount) {
             let newData
             if (data.length >= 10 && data.length < totalRowCount) {
               newData = [

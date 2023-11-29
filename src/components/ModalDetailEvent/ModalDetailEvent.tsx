@@ -5,7 +5,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { pageMode } from '@interfaces/IClient'
 import { IEvent } from '@interfaces/IEvent'
 import { IComment } from '@interfaces/IPost'
-import { eventActionSelector, notifyActionSelector } from '@store/index'
+import { eventActionSelector } from '@store/index'
 import { formatDateLocalV2 } from '@utils/functions/formatDay'
 import { useStoreActions } from 'easy-peasy'
 import { FC, Fragment, useEffect, useState } from 'react'
@@ -21,8 +21,6 @@ interface Props {
 const ModalDetailEvent: FC<Props> = ({ item, open, setOpen }: Props): JSX.Element => {
   const { getAllCommentEventById, deleteCommentEvent } =
     useStoreActions(eventActionSelector)
-  const { setNotifySetting } = useStoreActions(notifyActionSelector)
-
   const [loading, setIsLoading] = useState<boolean>(false)
   // const [isLoadingAction, setIsLoadingAction] = useState<boolean>(false)
   const [totalRowCount, setTotalRowCount] = useState<number>(0)

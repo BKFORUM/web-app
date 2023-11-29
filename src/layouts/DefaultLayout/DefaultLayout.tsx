@@ -14,7 +14,7 @@ const DefaultLayout: FC<Props> = ({ children }): JSX.Element => {
         <nav className="col-span-2 bg-slate-100 ">
           <Sidebar />
         </nav>
-        <main className="mt-[60px] col-span-8  flex flex-col ">{children}</main>
+        <main className="mt-[60px] col-span-8  flex flex-col relative">{children}</main>
       </div>
     </div>
   )

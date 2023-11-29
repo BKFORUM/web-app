@@ -38,7 +38,7 @@ const UserActive: FC<Props> = (): JSX.Element => {
     socket.on('onFriendOffline', deleteFriendOffline)
   }, [listFriendOnline])
   return (
-    <div className="bg-white px-1  py-3 shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md">
+    <div className="bg-white px-1 w-72 fixed top-[82px] right-10 py-3 shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md">
       <div className="flex items-center gap-2 px-3 text-[#0001CB] mb-2">
         <HiOutlineChatBubbleLeftRight className="w-8 h-8  " />
         <span className="font-medium">Đang hoạt động</span>
