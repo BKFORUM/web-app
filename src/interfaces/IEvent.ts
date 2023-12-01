@@ -10,4 +10,5 @@ export interface IEvent {
     status?: string
     content: string
     documents?: IDocuments[]
+    isSubscriber?: boolean
 }

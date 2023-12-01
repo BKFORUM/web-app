@@ -1,7 +1,7 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
 import { addConversation, addMessageToConversation, addUserToConversation, deleteMemberOfConversation, editNickNameMember, getAllConverSation, getConversationById } from "../../services/conversation.service";
 import { IParams } from "@interfaces/IClient";
-import { IConversation } from "@interfaces/IConversation";
+import { IConversation, IMessage } from "@interfaces/IConversation";
 
 export interface IConversationModel {
   //MessageError
@@ -25,6 +25,10 @@ export interface IConversationModel {
   //GetConverSationById
   isGetConverSationByIdSuccess: boolean;
   setIsGetConverSationByIdSuccess: Action<IConversationModel, boolean>;
+  currentConverSationMessage: IMessage[];
+  setCurrentConverSationMessage: Action<IConversationModel, IMessage[]>;
+  totalRowMessages: number;
+  setTotalRowMessages: Action<IConversationModel, number>
   isGetAllMessagesAgain: boolean;
   setIsGetAllMessagesAgain: Action<IConversationModel, boolean>;
   getConverSationById: Thunk<IConversationModel, IParams>;
@@ -105,6 +109,14 @@ export const conversationModel: IConversationModel = persist({
   isGetConverSationByIdSuccess: true,
   setIsGetConverSationByIdSuccess: action((state, payload) => {
     state.isGetConverSationByIdSuccess = payload;
+  }),
+  currentConverSationMessage: [],
+  setCurrentConverSationMessage: action((state, payload) => {
+    state.currentConverSationMessage = payload;
+  }),
+  totalRowMessages: 0,
+  setTotalRowMessages: action((state, payload) => {
+    state.totalRowMessages = payload
   }),
   isGetAllMessagesAgain: false,
   setIsGetAllMessagesAgain: action((state, payload) => {

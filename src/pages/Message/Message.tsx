@@ -10,15 +10,10 @@ import { RiSendPlaneFill } from 'react-icons/ri'
 import SearchInput from '@components/SearchInput'
 import { Tooltip } from '@mui/material'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import {
-  conversationActionSelector,
-  conversationStateSelector,
-  userStateSelector,
-} from '@store/index'
+import { conversationActionSelector, conversationStateSelector } from '@store/index'
 import { IMessage } from '@interfaces/IConversation'
 import { pageMode } from '@interfaces/IClient'
 import { useDebounce } from '@hooks/useDebounce'
-import socket from '@utils/socket/socketConfig'
 import ContentChat from './components/ContentChat'
 import DetailConversation from './components/DetailConversation'
 
@@ -29,13 +24,12 @@ const Message: FC<Props> = (): JSX.Element => {
   const {
     getConverSationById,
     addMessageToConversation,
-    setListConversation,
     setIsGetAllMessagesAgain,
+    setCurrentConverSationMessage,
+    setTotalRowMessages,
   } = useStoreActions(conversationActionSelector)
-  const { listConversation, isGetAllMessagesAgain } = useStoreState(
-    conversationStateSelector,
-  )
-  const { currentUserSuccess } = useStoreState(userStateSelector)
+  const { isGetAllMessagesAgain, currentConverSationMessage, totalRowMessages } =
+    useStoreState(conversationStateSelector)
 
   const searchRef = useRef<HTMLDivElement>(null)
   const seendingRef = useRef<HTMLDivElement>(null)
@@ -45,44 +39,8 @@ const Message: FC<Props> = (): JSX.Element => {
   const [inputText, setInputText] = useState<string>('')
   const [heightContent, setHeightContent] = useState<number | undefined>()
   const [loading, setIsLoading] = useState<boolean>(false)
-  const [totalRowCount, setTotalRowCount] = useState<number>(0)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
-  const [data, setData] = useState<IMessage[]>([])
   const [checkNext, setCheckNext] = useState<boolean>(false)
-
-  const handleNewMessage = (response: IMessage) => {
-    console.log(response)
-    if (
-      response?.author.id !== currentUserSuccess?.id &&
-      response?.conversationId === id
-    ) {
-      setData((prevData) => [response, ...prevData])
-    }
-    const getConversationAdd = listConversation.find((item) => {
-      return item.id === response.conversationId
-    })
-
-    if (getConversationAdd) {
-      const newConversation = {
-        ...getConversationAdd,
-        isRead: id === response.conversationId,
-        lastMessage: response,
-      }
-      const newList = listConversation.filter((item) => {
-        return item.id !== response.conversationId
-      })
-      setListConversation([newConversation, ...newList])
-    }
-  }
-
-  useEffect(() => {
-    socket.emit('onConversationJoin', { id: id })
-    socket.on('onMessage', handleNewMessage)
-
-    return () => {
-      socket.off('onMessage', handleNewMessage)
-    }
-  }, [id, currentUserSuccess?.id])
 
   const getDetailConversation = async (): Promise<void> => {
     if (id && paginationModel) {
@@ -96,8 +54,8 @@ const Message: FC<Props> = (): JSX.Element => {
         },
       })
       if (res) {
-        setTotalRowCount(res.totalRecords)
-        setData([...data, ...res.data])
+        setTotalRowMessages(res.totalRecords)
+        setCurrentConverSationMessage([...currentConverSationMessage, ...res.data])
         const check = res.data.length === 15
         setCheckNext(check)
       }
@@ -108,13 +66,13 @@ const Message: FC<Props> = (): JSX.Element => {
   const debouncedInputValue = useDebounce(inputSearch, 500)
 
   useEffect(() => {
-    setData([])
+    setCurrentConverSationMessage([])
     setPaginationModel({ page: 0, pageSize: 10 })
   }, [debouncedInputValue])
 
   useEffect(() => {
     if (isGetAllMessagesAgain) {
-      setData([])
+      setCurrentConverSationMessage([])
       setPaginationModel({ page: 0, pageSize: 10 })
       setIsGetAllMessagesAgain(false)
     }
@@ -135,7 +93,7 @@ const Message: FC<Props> = (): JSX.Element => {
     }
 
     if (id) {
-      setData([])
+      setCurrentConverSationMessage([])
       setPaginationModel({ page: 0, pageSize: 10 })
     }
   }, [id])
@@ -158,10 +116,14 @@ const Message: FC<Props> = (): JSX.Element => {
           type: 'TEXT',
           author: res?.author,
         }
-        setTotalRowCount(totalRowCount + 1)
-        const newData = [newDataRow, ...data.slice(0, 9), ...data.slice(10)] as IMessage[]
+        setTotalRowMessages(totalRowMessages + 1)
+        const newData = [
+          newDataRow,
+          ...currentConverSationMessage.slice(0, currentConverSationMessage.length - 1),
+          ...currentConverSationMessage.slice(currentConverSationMessage.length),
+        ] as IMessage[]
         setInputText('')
-        setData(newData)
+        setCurrentConverSationMessage(newData)
       }
     }
   }
@@ -202,12 +164,12 @@ const Message: FC<Props> = (): JSX.Element => {
                 }}>
                 <ContentChat
                   checkNext={checkNext}
-                  data={data}
+                  data={currentConverSationMessage}
                   heightContent={heightContent}
                   loading={loading}
                   paginationModel={paginationModel}
                   setPaginationModel={setPaginationModel}
-                  totalRowCount={totalRowCount}
+                  totalRowCount={totalRowMessages}
                 />
               </div>
 

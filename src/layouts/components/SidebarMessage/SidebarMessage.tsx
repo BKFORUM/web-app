@@ -2,15 +2,20 @@ import SearchInput from '@components/SearchInput'
 import { FC, useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import { conversationActionSelector, conversationStateSelector } from '@store/index'
+import {
+  conversationActionSelector,
+  conversationStateSelector,
+  userStateSelector,
+} from '@store/index'
 import { pageMode } from '@interfaces/IClient'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { dayComparedToThePast } from '@utils/functions/formatDay'
 import default_forum from '../../../assets/images/default_forum.png'
-import { IConversation } from '@interfaces/IConversation'
+import { IConversation, IMessage } from '@interfaces/IConversation'
 import { BiMessageAdd } from 'react-icons/bi'
 import { Tooltip } from '@mui/material'
 import ModalAddGroupChat from '@components/ModalAddGroupChat'
+import socket from '@utils/socket/socketConfig'
 
 interface Props {}
 const SidebarMessage: FC<Props> = (): JSX.Element => {
@@ -21,8 +26,12 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
     setCurrentConversation,
     setListConversation,
     setIsReadConversation,
+    setCurrentConverSationMessage,
   } = useStoreActions(conversationActionSelector)
-  const { listConversation } = useStoreState(conversationStateSelector)
+  const { listConversation, currentConverSationMessage } = useStoreState(
+    conversationStateSelector,
+  )
+  const { currentUserSuccess } = useStoreState(userStateSelector)
 
   const [inputSearch, setInputSearch] = useState<string>('')
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
@@ -52,6 +61,38 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
     setIsLoading(false)
   }
 
+  const handleNewMessage = (response: IMessage) => {
+    console.log(response)
+    if (
+      response?.author.id !== currentUserSuccess?.id &&
+      response?.conversationId === id
+    ) {
+      setCurrentConverSationMessage([response, ...currentConverSationMessage])
+    }
+    const getConversationAdd = listConversation.find((item) => {
+      return item.id === response.conversationId
+    })
+
+    if (getConversationAdd) {
+      const newConversation = {
+        ...getConversationAdd,
+        isRead: id === response.conversationId,
+        lastMessage: response,
+      }
+      const newList = listConversation.filter((item) => {
+        return item.id !== response.conversationId
+      })
+      setListConversation([newConversation, ...newList])
+    }
+  }
+
+  useEffect(() => {
+    socket.on('onMessage', handleNewMessage)
+    return () => {
+      socket.off('onMessage', handleNewMessage)
+    }
+  }, [id, currentUserSuccess?.id, listConversation])
+
   useEffect(() => {
     setListConversation([])
     setPaginationModel({ page: 0, pageSize: 10 })
@@ -66,7 +107,7 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
   }
   return (
     <>
-      <div className="flex flex-col ">
+      <div className="flex flex-col">
         <div className="flex justify-between items-center">
           <h2 className="px-3 py-2 text-2xl font-bold">Chat</h2>
           <Tooltip title="Tạo đoạn chat">
@@ -91,9 +132,10 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
           id="scrollableDiv"
           style={{
             maxHeight: 'calc(100vh - 160px)',
-            overflow: 'auto',
+            overflowY: 'auto',
           }}>
           <InfiniteScroll
+            // style={{ overflowX: 'hidden' }}
             dataLength={listConversation.length}
             next={() =>
               setPaginationModel((prevPaginationModel) => ({
@@ -127,7 +169,7 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
             )} */}
               </div>
             }>
-            <ul className="flex flex-col mt-2 gap-1 px-2 ">
+            <ul className="flex flex-col mt-2 gap-1 pl-2 pt-1 ">
               {listConversation.length > 0 &&
                 listConversation.map((item, index) => (
                   <li
@@ -148,7 +190,7 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
                         alt="avatar"
                       />
                     </a>
-                    <div className="flex flex-col ">
+                    <div className="flex flex-col w-full ">
                       <span className="font-semibold whitespace-nowrap truncate ">
                         {item?.displayName}
                       </span>
@@ -156,8 +198,8 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
                         className={`flex items-center gap-2 ${
                           !item.isRead && 'font-semibold'
                         }`}>
-                        <span className={`max-w-[50px] truncate line-clamp-1 text-sm `}>
-                          {item.lastMessage?.content}{' '}
+                        <span className={` text-sm max-w-[125px] break-words truncate `}>
+                          {item.lastMessage?.content}
                         </span>
                         <span className=" text-xs">
                           {item?.lastMessage &&
@@ -169,7 +211,7 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
                     {!item.isRead && (
                       <span
                         title="not read"
-                        className="flex ml-auto transform translate-y-[18px] bg-blue-500 border border-white w-[10px] h-[10px] rounded-full"></span>
+                        className="flex ml-auto flex-shrink-0  transform translate-y-[18px] bg-blue-500 border border-white w-[10px] h-[10px] rounded-full"></span>
                     )}
                   </li>
                 ))}

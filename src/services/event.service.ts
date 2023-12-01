@@ -65,4 +65,26 @@ const deleteCommentToEvent = (data: any) => {
     });
 }
 
-export { getAllEvent, addEvent, editEvent, deleteEvent, getAllCommentEventById, addCommentToEvent, editCommentToEvent, deleteCommentToEvent }
+const subscribeToEvent = (id: string) => {
+    return BaseURL({
+        url: `/events/${id}/subscribe`,
+        method: "PATCH",
+    });
+}
+
+const unSubscribeToEvent = (id: string) => {
+    return BaseURL({
+        url: `/events/${id}/unsubscribe`,
+        method: "PATCH",
+    });
+}
+
+const getAllUserSub = ({ id, params }: IParams) => {
+    return BaseURL({
+        url: `/events/${id}/subscribers`,
+        method: "GET",
+        params,
+    });
+}
+
+export { getAllEvent, addEvent, editEvent, deleteEvent, getAllCommentEventById, addCommentToEvent, editCommentToEvent, deleteCommentToEvent, subscribeToEvent, unSubscribeToEvent, getAllUserSub }

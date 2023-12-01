@@ -1,12 +1,17 @@
 import PostContent from '@components/PostContent'
 import { IEvent } from '@interfaces/IEvent'
 import { formatDateLocalV2 } from '@utils/functions/formatDay'
-import { HiOutlineStar } from 'react-icons/hi'
+import { HiOutlineStar, HiStar } from 'react-icons/hi'
 import { HiOutlineChatBubbleLeftEllipsis } from 'react-icons/hi2'
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import ModalDetailEvent from '@components/ModalDetailEvent'
-import { useStoreState } from 'easy-peasy'
-import { userStateSelector } from '@store/index'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import {
+  eventActionSelector,
+  eventStateSelector,
+  notifyActionSelector,
+  userStateSelector,
+} from '@store/index'
 import OptionEventItem from './components'
 
 interface Props {
@@ -26,7 +31,74 @@ const EventItem: FC<Props> = ({
   setOpenModalDeleteEvent,
 }: Props): JSX.Element => {
   const { currentUserSuccess } = useStoreState(userStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const {
+    subscribeToEvent,
+    unSubscribeToEvent,
+    setIsSubscribedToEventSuccess,
+    setIsUnSubscribedToEventSuccess,
+    // getAllUserSub,
+  } = useStoreActions(eventActionSelector)
+  const { messageError, isSubscribedToEventSuccess, isUnSubscribedToEventSuccess } =
+    useStoreState(eventStateSelector)
   const [openModalDetailEvent, setOpenModalDetailEvent] = useState<boolean>(false)
+
+  const [isUnsubscribed, setIsUnsubscribed] = useState<boolean>(
+    item.isSubscriber ? true : false,
+  )
+
+  const handleAction = async (): Promise<void> => {
+    if (isUnsubscribed) {
+      const res = await unSubscribeToEvent(String(item.id))
+      if (res) {
+        setIsUnsubscribed(false)
+      }
+    } else {
+      const res = await subscribeToEvent(String(item.id))
+      if (res) {
+        setIsUnsubscribed(true)
+      }
+    }
+  }
+
+  // const getAllUserSubEvent = async (): Promise<void> => {
+  //   const res = await getAllUserSub({
+  //     id: item.id,
+  //     params: {
+  //       take: 10000000,
+  //     },
+  //   })
+
+  //   if (res) {
+  //     console.log(res)
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   getAllUserSubEvent()
+  // }, [item])
+
+  useEffect(() => {
+    if (!isSubscribedToEventSuccess) {
+      setNotifySetting({
+        show: true,
+        status: 'error',
+        message: messageError,
+      })
+      setIsSubscribedToEventSuccess(true)
+    }
+  }, [isSubscribedToEventSuccess])
+
+  useEffect(() => {
+    if (!isUnSubscribedToEventSuccess) {
+      setNotifySetting({
+        show: true,
+        status: 'error',
+        message: messageError,
+      })
+      setIsUnSubscribedToEventSuccess(true)
+    }
+  }, [isUnSubscribedToEventSuccess])
 
   return (
     <>
@@ -51,10 +123,28 @@ const EventItem: FC<Props> = ({
         </div>
 
         <div className="bg-gray-300 pl-2 rounded-md mt-3 flex gap-8 items-center">
-          <button className="outline-none flex gap-1.5 py-1 items-center border-none hover:opacity-75">
-            <HiOutlineStar className="text-blue-700 h-4 w-4" />
-            <span className="text-blue-700 ">Tham gia</span>
-          </button>
+          <div className="relative group">
+            <button
+              onClick={() => handleAction()}
+              className=" outline-none flex gap-1.5 py-1 items-center border-none hover:opacity-75">
+              {!isUnsubscribed && (
+                <>
+                  <HiOutlineStar className="text-blue-700 h-4 w-4" />
+                  <span className="text-blue-700 ">Tham gia</span>
+                </>
+              )}
+
+              {isUnsubscribed && (
+                <>
+                  <HiStar className="text-blue-700 h-4 w-4" />
+                  <span className="text-blue-700 ">Đã tham gia</span>
+                </>
+              )}
+            </button>
+            <div className="absolute h-12 bg-black/70 top-full left-0 px-2 py-1 rounded-md text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              hahahahahaha
+            </div>
+          </div>
 
           <button
             onClick={() => setOpenModalDetailEvent(true)}
@@ -80,6 +170,8 @@ const EventItem: FC<Props> = ({
           open={openModalDetailEvent}
           setOpen={setOpenModalDetailEvent}
           item={item}
+          isUnsubscribed={isUnsubscribed}
+          handleAction={handleAction}
         />
       )}
     </>

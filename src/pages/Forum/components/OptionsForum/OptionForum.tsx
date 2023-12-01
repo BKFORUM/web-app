@@ -33,6 +33,10 @@ const OptionForum: FC<Props> = ({ id, yourStatus }: Props): JSX.Element => {
     }
   })
 
+  useEffect(() => {
+    setStatus(yourStatus)
+  }, [yourStatus])
+
   const handleExitForum = async (): Promise<void> => {
     if (id) {
       const res = await exitForum(id)

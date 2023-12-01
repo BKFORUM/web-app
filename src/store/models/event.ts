@@ -1,6 +1,6 @@
 import { IEvent } from "@interfaces/IEvent";
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addCommentToEvent, addEvent, deleteCommentToEvent, deleteEvent, editCommentToEvent, editEvent, getAllCommentEventById, getAllEvent } from "../../services/event.service";
+import { addCommentToEvent, addEvent, deleteCommentToEvent, deleteEvent, editCommentToEvent, editEvent, getAllCommentEventById, getAllEvent, getAllUserSub, subscribeToEvent, unSubscribeToEvent } from "../../services/event.service";
 import { IParams } from "@interfaces/IClient";
 
 export interface IEventModel {
@@ -47,6 +47,21 @@ export interface IEventModel {
     isDeleteCommentEventSuccess: boolean;
     setIsDeleteCommentEventSuccess: Action<IEventModel, boolean>;
     deleteCommentEvent: Thunk<IEventModel, any>;
+
+    //subscribeToEvent
+    isSubscribedToEventSuccess: boolean;
+    setIsSubscribedToEventSuccess: Action<IEventModel, boolean>
+    subscribeToEvent: Thunk<IEventModel, string>;
+
+    //unSubscribeToEvent
+    isUnSubscribedToEventSuccess: boolean;
+    setIsUnSubscribedToEventSuccess: Action<IEventModel, boolean>
+    unSubscribeToEvent: Thunk<IEventModel, string>;
+
+    //getAllUserSub
+    isGetAllUserSubSuccess: boolean;
+    setIsGetAllUserSubSuccess: Action<IEventModel, boolean>
+    getAllUserSub: Thunk<IEventModel, IParams>;
 }
 
 export const eventModel: IEventModel = persist({
@@ -124,7 +139,7 @@ export const eventModel: IEventModel = persist({
             });
     }),
 
-    //GetAllEvent
+    //GetAllCommentEvent
     isGetAllCommentEventSuccess: true,
     setIsGetAllCommentEventSuccess: action((state, payload) => {
         state.isGetAllCommentEventSuccess = payload;
@@ -188,6 +203,57 @@ export const eventModel: IEventModel = persist({
             })
             .catch((error) => {
                 actions.setIsDeleteCommentEventSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //subscribedToEvent
+    isSubscribedToEventSuccess: true,
+    setIsSubscribedToEventSuccess: action((state, payload) => {
+        state.isSubscribedToEventSuccess = payload;
+    }),
+    subscribeToEvent: thunk(async (actions, payload) => {
+        return subscribeToEvent(payload)
+            .then(async (res) => {
+                actions.setIsSubscribedToEventSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsSubscribedToEventSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //unSubscribedToEvent
+    isUnSubscribedToEventSuccess: true,
+    setIsUnSubscribedToEventSuccess: action((state, payload) => {
+        state.isUnSubscribedToEventSuccess = payload;
+    }),
+    unSubscribeToEvent: thunk(async (actions, payload) => {
+        return unSubscribeToEvent(payload)
+            .then(async (res) => {
+                actions.setIsUnSubscribedToEventSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsUnSubscribedToEventSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //getAllUserSub
+    isGetAllUserSubSuccess: true,
+    setIsGetAllUserSubSuccess: action((state, payload) => {
+        state.isGetAllUserSubSuccess = payload;
+    }),
+    getAllUserSub: thunk(async (actions, payload) => {
+        return getAllUserSub(payload)
+            .then(async (res) => {
+                actions.setIsGetAllUserSubSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsGetAllUserSubSuccess(false)
                 actions.setMessageError(error?.response?.data?.message)
             });
     }),

@@ -56,6 +56,7 @@ const refreshToken = async () => {
 		return resp;
 	} catch (e) {
 		console.log("Error", e);
+		localStorage.removeItem('auth')
 	}
 };
 

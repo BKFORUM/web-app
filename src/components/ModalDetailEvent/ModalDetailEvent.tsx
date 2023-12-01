@@ -9,16 +9,24 @@ import { eventActionSelector } from '@store/index'
 import { formatDateLocalV2 } from '@utils/functions/formatDay'
 import { useStoreActions } from 'easy-peasy'
 import { FC, Fragment, useEffect, useState } from 'react'
-import { HiOutlineStar } from 'react-icons/hi'
+import { HiOutlineStar, HiStar } from 'react-icons/hi'
 import { HiOutlineChatBubbleLeftEllipsis } from 'react-icons/hi2'
 
 interface Props {
   item: IEvent
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  isUnsubscribed?: boolean
+  handleAction?: () => Promise<void>
 }
 
-const ModalDetailEvent: FC<Props> = ({ item, open, setOpen }: Props): JSX.Element => {
+const ModalDetailEvent: FC<Props> = ({
+  item,
+  open,
+  setOpen,
+  isUnsubscribed,
+  handleAction,
+}: Props): JSX.Element => {
   const { getAllCommentEventById, deleteCommentEvent } =
     useStoreActions(eventActionSelector)
   const [loading, setIsLoading] = useState<boolean>(false)
@@ -135,9 +143,22 @@ const ModalDetailEvent: FC<Props> = ({ item, open, setOpen }: Props): JSX.Elemen
 
                     <>
                       <div className="bg-gray-300 px-2 rounded-md mt-3 flex gap-8">
-                        <button className="outline-none flex gap-1.5 py-1 items-center border-none hover:opacity-75">
-                          <HiOutlineStar className="text-blue-700 h-4 w-4" />
-                          <span className="text-blue-700 ">Tham gia</span>
+                        <button
+                          onClick={() => handleAction && handleAction()}
+                          className="outline-none flex gap-1.5 py-1 items-center border-none hover:opacity-75">
+                          {!isUnsubscribed && (
+                            <>
+                              <HiOutlineStar className="text-blue-700 h-4 w-4" />
+                              <span className="text-blue-700 ">Tham gia</span>
+                            </>
+                          )}
+
+                          {isUnsubscribed && (
+                            <>
+                              <HiStar className="text-blue-700 h-4 w-4" />
+                              <span className="text-blue-700 ">Đã tham gia</span>
+                            </>
+                          )}
                         </button>
 
                         <button className="outline-none flex gap-1.5 py-1 items-center border-none">

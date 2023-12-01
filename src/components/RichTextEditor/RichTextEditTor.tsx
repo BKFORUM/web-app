@@ -22,6 +22,7 @@ const RichTextEditTor = ({
     <div>
       <Editor
         editorState={editorState}
+        toolbarClassName="border border-gray-200 shadow"
         wrapperClassName="demo-wrapper  "
         editorClassName={`demo-editor ${
           height === '100px' ? 'height-content-image' : 'height-content'
@@ -31,7 +32,16 @@ const RichTextEditTor = ({
         onEditorStateChange={onEditorStateChange}
         placeholder="Viết bài tại đây ..."
         toolbar={{
-          options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign'],
+          options: [
+            'inline',
+            'blockType',
+            'fontSize',
+            'fontFamily',
+            'list',
+            'textAlign',
+            'link',
+            'emoji',
+          ],
           inline: { options: ['bold', 'italic', 'underline'], inDropdown: true },
           list: {
             options: ['unordered', 'indent', 'outdent'],
