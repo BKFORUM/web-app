@@ -103,7 +103,7 @@ const Message: FC<Props> = (): JSX.Element => {
   }
 
   const handleAddMessage = async (): Promise<void> => {
-    if (id) {
+    if (id && inputText.trim().length > 0) {
       const res = await addMessageToConversation({
         id: id,
         content: inputText,

@@ -13,6 +13,8 @@ import {
   userStateSelector,
 } from '@store/index'
 import OptionEventItem from './components'
+import './style.css'
+import { IUserData } from '@interfaces/IUser'
 
 interface Props {
   item: IEvent
@@ -21,6 +23,11 @@ interface Props {
   setIsOpenModalAddEdit?: React.Dispatch<React.SetStateAction<boolean>>
   setOpenModalDeleteEvent?: React.Dispatch<React.SetStateAction<boolean>>
   setItemSelected?: React.Dispatch<React.SetStateAction<IEvent | undefined>>
+}
+
+interface IUserSubscribe {
+  userId: string
+  user: IUserData
 }
 
 const EventItem: FC<Props> = ({
@@ -46,37 +53,32 @@ const EventItem: FC<Props> = ({
   const [isUnsubscribed, setIsUnsubscribed] = useState<boolean>(
     item.isSubscriber ? true : false,
   )
+  const [listUserSubscribed, setListUserSubscribed] = useState<IUserSubscribe[]>(
+    item.users,
+  )
 
   const handleAction = async (): Promise<void> => {
     if (isUnsubscribed) {
       const res = await unSubscribeToEvent(String(item.id))
       if (res) {
         setIsUnsubscribed(false)
+        const newData = listUserSubscribed.filter((user) => {
+          return user.userId !== currentUserSuccess?.id
+        })
+        setListUserSubscribed(newData)
       }
     } else {
       const res = await subscribeToEvent(String(item.id))
       if (res) {
         setIsUnsubscribed(true)
+        const newData = {
+          userId: currentUserSuccess?.id || '',
+          user: currentUserSuccess as IUserData,
+        }
+        setListUserSubscribed([newData, ...listUserSubscribed])
       }
     }
   }
-
-  // const getAllUserSubEvent = async (): Promise<void> => {
-  //   const res = await getAllUserSub({
-  //     id: item.id,
-  //     params: {
-  //       take: 10000000,
-  //     },
-  //   })
-
-  //   if (res) {
-  //     console.log(res)
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   getAllUserSubEvent()
-  // }, [item])
 
   useEffect(() => {
     if (!isSubscribedToEventSuccess) {
@@ -110,9 +112,24 @@ const EventItem: FC<Props> = ({
           <h4 className="text-lg font-medium">{item.displayName}</h4>
           <p className="text-sm font-thin ">{item.location}</p>
         </div>
-        <span className="absolute right-4 top-4 border border-gray-400 text-gray-700 px-4 py-2 text-xs rounded-3xl">
-          {item.status}
-        </span>
+
+        {item.status === 'DONE' && (
+          <span className="absolute right-4 top-4 border border-gray-400 bg-slate-300 font-semibold text-gray-700 px-4 py-2 text-xs rounded-3xl">
+            {item.status}
+          </span>
+        )}
+
+        {item.status === 'HAPPENING' && (
+          <span className="absolute right-4 top-4 border border-gray-400 bg-green-300 font-semibold text-gray-700 px-4 py-2 text-xs rounded-3xl">
+            {item.status}
+          </span>
+        )}
+
+        {item.status === 'UPCOMING' && (
+          <span className="absolute right-4 top-4 border border-gray-400 bg-red-300 font-semibold text-gray-700 px-4 py-2 text-xs rounded-3xl">
+            {item.status}
+          </span>
+        )}
 
         <div className="mt-3">
           <PostContent
@@ -121,9 +138,8 @@ const EventItem: FC<Props> = ({
             type="events"
           />
         </div>
-
-        <div className="bg-gray-300 pl-2 rounded-md mt-3 flex gap-8 items-center">
-          <div className="relative group">
+        <div className="relative bg-gray-300 pl-2 rounded-md mt-3 flex gap-8 items-center">
+          <div className="group">
             <button
               onClick={() => handleAction()}
               className=" outline-none flex gap-1.5 py-1 items-center border-none hover:opacity-75">
@@ -141,9 +157,17 @@ const EventItem: FC<Props> = ({
                 </>
               )}
             </button>
-            <div className="absolute h-12 bg-black/70 top-full left-0 px-2 py-1 rounded-md text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              hahahahahaha
-            </div>
+            {listUserSubscribed.length > 0 && (
+              <div className="absolute z-[100] overflow-auto bg-black/70 top-full max-h-[200px]  flex flex-col flex-grow-0 left-0 px-2 py-1 w-auto rounded-md text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                {listUserSubscribed.map((user, index) => (
+                  <p
+                    key={index}
+                    className="w-full text-sm">
+                    {user.user.fullName}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
 
           <button

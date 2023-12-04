@@ -1,4 +1,5 @@
 import { IDocuments } from "./IPost"
+import { IUserData } from "./IUser"
 
 export interface IEvent {
     id?: string
@@ -11,4 +12,8 @@ export interface IEvent {
     content: string
     documents?: IDocuments[]
     isSubscriber?: boolean
+    users: {
+        userId: string
+        user: IUserData
+    }[]
 }

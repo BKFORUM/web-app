@@ -303,7 +303,7 @@ const Forum: FC<Props> = (): JSX.Element => {
                       onClick={() => setOpenModalEditForum(true)}
                       className="mt-2 px-4 py-1 bg-[#E6F0F6] text-black rounded-2xl flex items-center hover:bg-blue-300 transition-all duration-200">
                       <HiPencilAlt className="h-6 w-6 mr-2" />
-                      <span>Edit profile</span>
+                      <span>Edit forum</span>
                     </button>
                   )}
                 </div>
@@ -360,6 +360,7 @@ const Forum: FC<Props> = (): JSX.Element => {
             value={value}
             index={0}>
             <PostForum
+              yourStatus={detailForum?.yourStatus}
               data={dataPost}
               paginationModel={paginationModel}
               setOpenModal={setOpenModal}

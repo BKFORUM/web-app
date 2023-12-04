@@ -174,7 +174,7 @@ const WritingTools: FC<Props> = ({
   }
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter') handleAddMessage()
+    if (event.key === 'Enter' && inputText.trim() !== '') handleAddMessage()
   }
 
   const handleChangeValueInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

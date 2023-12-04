@@ -3,7 +3,7 @@ import PostContent from '@components/PostContent'
 import {
   HiOutlineHeart,
   HiMiniHeart,
-HiOutlineChatBubbleLeftEllipsis,
+  HiOutlineChatBubbleLeftEllipsis,
 } from 'react-icons/hi2'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { IPostViewForum } from '@interfaces/IPost'
@@ -136,7 +136,7 @@ const PostItem: FC<Props> = ({
             </div>
             <div className="flex items-center">
               <span className="text-sm font-thin">
-                {formatDateLocalV2(item.createdAt)}
+                {formatDateLocalV2(item.updatedAt)}
               </span>
               {(moderatorId === currentUserSuccess?.id ||
                 item.user.id === currentUserSuccess?.id) &&
