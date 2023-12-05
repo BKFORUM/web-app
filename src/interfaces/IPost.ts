@@ -6,7 +6,7 @@ export interface IDocuments {
     fileName: string;
     fileUrl: string;
     postId: string;
-    updateAt: string;
+    updatedAt: string;
     userId: string;
 }
 
@@ -16,7 +16,7 @@ export interface IPostViewForum {
     createdAt: string
     documents: IDocuments[]
     status: string
-    updateAt: string
+    updatedAt: string
     likedAt: Date | null
     forum: {
         name: string
@@ -43,5 +43,30 @@ export interface IComment {
     updateAt: string
     userId: string
     user: IUserData
+    replyComments: IComment[]
+    _count?: {
+        replyComments: number
+    }
+    commentId?: string
 
+}
+
+export interface IEditChild {
+    id: string
+    item: IComment
+}
+
+export interface IDataChild {
+    id: string
+    data: IComment[]
+}
+
+export interface IChildLoading {
+    id: string
+    isLoading: boolean
+}
+
+export interface ICountReply {
+    id: string
+    _count: number
 }

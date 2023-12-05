@@ -14,10 +14,7 @@ const MessageLayout: FC<Props> = ({ children }): JSX.Element => {
         <nav className="col-span-2  border-r border-gray-300   ">
           <SidebarMessage />
         </nav>
-        <main className="col-span-8 bg-slate-200 flex flex-col flex-1 ">
-          {/* <Outlet /> */}
-          {children}
-        </main>
+        <main className="col-span-8 bg-slate-200 flex flex-col flex-1 ">{children}</main>
       </div>
     </div>
   )

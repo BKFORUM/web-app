@@ -7,7 +7,8 @@ export const ROUTER = Object.freeze({
     MESSAGE: '/message',
     MESSAGE_GROUP: '/message/:id',
     PROFILE: '/profile/:id',
-    FORUM: '/forums/:id'
+    FORUM: '/forums/:id',
+    SEARCH: '/search'
 });
 
 export const DATA_SIDEBAR = [

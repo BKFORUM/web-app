@@ -14,6 +14,7 @@ interface Props {
   totalRowCount: number
   setPaginationModel: React.Dispatch<React.SetStateAction<pageMode | null>>
   paginationModel: pageMode | null
+  yourStatus?: string
 }
 
 const PostForum: FC<Props> = ({ ...props }: Props): JSX.Element => {
@@ -21,24 +22,27 @@ const PostForum: FC<Props> = ({ ...props }: Props): JSX.Element => {
   const { setPostSelected } = useStoreActions(postActionSelector)
   return (
     <div>
-      <div className="mt-4 relative flex-1 flex gap-2 items-center px-6 py-6 bg-white shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md z-10">
-        <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mr-2 border border-gray-400 bg-gray-400">
-          <img
-            className="w-full h-full "
-            src={currentUserSuccess?.avatarUrl}
-            alt={currentUserSuccess?.fullName}
+      {props?.yourStatus === 'ACTIVE' && (
+        <div className="mt-4 relative flex-1 flex gap-2 items-center px-6 py-6 bg-white shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md z-10">
+          <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mr-2 border border-gray-400 bg-gray-400">
+            <img
+              className="w-full h-full "
+              src={currentUserSuccess?.avatarUrl}
+              alt={currentUserSuccess?.fullName}
+            />
+          </div>
+          <input
+            onClick={() => {
+              props.setOpenModal(true)
+              setPostSelected(null)
+            }}
+            className="bg-gray-200 cursor-pointer px-4 py-2.5 rounded-3xl w-[200px] text-left flex-auto mr-2 hover:bg-gray-300 transition-all duration-300 z-10"
+            type="button"
+            value="Viết bài tại đây...."
           />
         </div>
-        <input
-          onClick={() => {
-            props.setOpenModal(true)
-            setPostSelected(null)
-          }}
-          className="bg-gray-200 cursor-pointer px-4 py-2.5 rounded-3xl w-[200px] text-left flex-auto mr-2 hover:bg-gray-300 transition-all duration-300 z-10"
-          type="button"
-          value="Viết bài tại đây...."
-        />
-      </div>
+      )}
+
       <div>
         <InfiniteScroll
           dataLength={props.data.length}

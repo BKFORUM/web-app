@@ -26,6 +26,14 @@ const getAllPost = (params: any) => {
     });
 };
 
+const getPostById = (id: string) => {
+    return BaseURL({
+        url: `/posts/` + id,
+        method: "GET",
+    });
+};
+
+
 const getAllPostByForum = ({ id, params }: IParams) => {
     return BaseURL({
         url: `/forums/${id}/posts`,
@@ -110,10 +118,42 @@ const getAllCommentPost = ({ id, params }: IParams) => {
     });
 }
 
+const replyCommentPost = (data: any) => {
+    return BaseURL({
+        url: `/comments/${data.id}/replies`,
+        method: "POST",
+        data,
+    });
+}
+
+const editReplyCommentPost = (data: any) => {
+    return BaseURL({
+        url: `/comments/${data.id}/replies/${data.replyId}`,
+        method: "PUT",
+        data: { content: data.content },
+    });
+}
+
+const deleteReplyCommentPost = (data: any) => {
+    return BaseURL({
+        url: `/comments/${data.id}/replies/${data.replyId}`,
+        method: "DELETE",
+    });
+}
+
+const getAllReplyByCommentId = ({ id, params }: IParams) => {
+    return BaseURL({
+        url: `/comments/${id}/replies`,
+        method: "GET",
+        params,
+    });
+}
+
 export {
     addPost,
     postImage,
     getAllPost,
+    getPostById,
     getAllPostByForum,
     getAllPostByUser,
     deletePost,
@@ -123,5 +163,9 @@ export {
     addCommentPost,
     getAllCommentPost,
     editCommentPost,
-    deleteCommentPost
+    deleteCommentPost,
+    replyCommentPost,
+    editReplyCommentPost,
+    deleteReplyCommentPost,
+    getAllReplyByCommentId,
 }    

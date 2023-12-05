@@ -10,26 +10,42 @@ import ModalEditForum from '@pages/Forum/components/ModalEditForum'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import logoBk from '../../../assets/images/logobkforum.png'
 import {
+  authStateSelector,
   forumActionSelector,
   forumStateSelector,
   notifyActionSelector,
   postActionSelector,
-  // userActionSelector,
+  searchActionSelector,
 } from '@store/index'
-
+import SearchInput from '@components/SearchInput'
+// import { connectSocket } from '@utils/functions/connectSocket'
+import socket from '@utils/socket/socketConfig'
 interface Props {}
 
 const Header: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
+  const { setTextSearch } = useStoreActions(searchActionSelector)
   const { addForum, setIsAddForumSuccess } = useStoreActions(forumActionSelector)
-  // const { setIsGetAllAgain } = useStoreActions(userActionSelector)
   const { isAddForumSuccess, messageErrorForum } = useStoreState(forumStateSelector)
   const { postImage } = useStoreActions(postActionSelector)
-
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { isLoginSuccess } = useStoreState(authStateSelector)
+
+  const searchParams = new URLSearchParams(window.location.search)
+  const search = searchParams.get('search')
 
   const [openModalEditForum, setOpenModalEditForum] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [inputSearch, setInputSearch] = useState<string>(search !== null ? search : '')
+
+  const addQueryParam = (valueSearch: string): void => {
+    if (valueSearch !== '') {
+      const queryParams = new URLSearchParams()
+      queryParams.set('search', valueSearch.trim())
+      const newURL = `/search?${queryParams.toString()}`
+      navigate(newURL)
+    }
+  }
 
   const handleAddForum = async (data: any): Promise<void> => {
     setIsLoading(true)
@@ -65,6 +81,30 @@ const Header: FC<Props> = (): JSX.Element => {
     }
   }
 
+  const handleChangeSearch = (value: string): void => {
+    setInputSearch(value)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      addQueryParam(inputSearch)
+      setTextSearch(inputSearch)
+    }
+  }
+
+  useEffect(() => {
+    if (isLoginSuccess) {
+      socket.connect()
+    }
+  }, [isLoginSuccess])
+
+  useEffect(() => {
+    if (search !== null) {
+      setTextSearch(search)
+      addQueryParam(search)
+    }
+  }, [])
+
   useEffect(() => {
     if (!isAddForumSuccess) {
       setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
@@ -81,6 +121,15 @@ const Header: FC<Props> = (): JSX.Element => {
             className="w-full h-full"
             src={logoBk}
             alt="logoBk"
+          />
+        </div>
+        <div>
+          <SearchInput
+            value={inputSearch}
+            setValue={handleChangeSearch}
+            width="320px"
+            size="small"
+            handleKeyDown={handleKeyDown}
           />
         </div>
         <div className="flex gap-6 items-center pr-8">

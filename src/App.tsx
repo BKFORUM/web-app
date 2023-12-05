@@ -31,6 +31,7 @@ function App() {
 
   useEffect(() => {
     if (auth) setAccessToken(auth?.accessToken)
+    
   }, [auth])
 
   useEffect(() => {

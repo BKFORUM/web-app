@@ -2,7 +2,7 @@ import RichTextEditTor from '@components/RichTextEditor'
 import { Dialog, Transition } from '@headlessui/react'
 import { Tooltip } from '@mui/material'
 import { FC, Fragment, useEffect, useRef, useState } from 'react'
-import { FaRegImages, FaRegSmile } from 'react-icons/fa'
+import { FaRegImages } from 'react-icons/fa'
 import { EditorState, convertToRaw, ContentState } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
 import MultiImage from '@components/MultiImage'
@@ -30,9 +30,9 @@ const ModalCreatePost: FC<Props> = ({
   isLoading,
   postSelected,
 }: Props): JSX.Element => {
-  const ImageRef: any = useRef()
   const [step, setStep] = useState('post')
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
+  const ImageRef: any = useRef()
   const [Images, setImages] = useState<Image[]>([])
   const [FileImages, setFileImages] = useState<File[]>([])
   const [imageEdit, setImageEdit] = useState<IDocuments[]>([])
@@ -182,11 +182,11 @@ const ModalCreatePost: FC<Props> = ({
                           />
                         </div>
                       </Tooltip>
-                      <Tooltip title="Icon">
+                      {/* <Tooltip title="Icon">
                         <div>
                           <FaRegSmile className="w-6 h-6 cursor-pointer text-amber-300" />
                         </div>
-                      </Tooltip>
+                      </Tooltip> */}
                     </div>
 
                     <Button

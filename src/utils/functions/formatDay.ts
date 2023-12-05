@@ -24,6 +24,11 @@ export const formatDateLocalV2 = (dateTime: string): string => {
     return formattedDate;
 }
 
+export const formatDateTimeLocal = (dateTime: string): string => {
+    const formattedTime = dayjs(dateTime).utc().format();
+    return formattedTime;
+}
+
 export const dayComparedToThePast = (dateTime: string): string => {
     const now = dayjs();
     const inputDate = dayjs(dateTime);

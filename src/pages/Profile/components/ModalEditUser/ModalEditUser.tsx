@@ -20,7 +20,7 @@ interface Props {
   isLoading: boolean
 }
 
-interface Image {
+export interface Image {
   name: string
   fileUrl: string
 }
@@ -124,6 +124,7 @@ const ModalEditUser: FC<Props> = ({
         new Event('submit', { cancelable: true, bubbles: true }),
       )
     }
+
   }
 
   useEffect(() => {

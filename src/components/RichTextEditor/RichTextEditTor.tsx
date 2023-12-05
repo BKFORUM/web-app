@@ -7,21 +7,41 @@ interface IProp {
   editorState: EditorState
   onEditorStateChange: (editorState: EditorState) => void
   height?: string
+  error?: any
+  type?: string
 }
 
-const RichTextEditTor = ({ editorState, onEditorStateChange, height }: IProp) => {
+const RichTextEditTor = ({
+  editorState,
+  onEditorStateChange,
+  height,
+  error,
+  type,
+}: IProp) => {
   return (
     <div>
       <Editor
         editorState={editorState}
-        wrapperClassName="demo-wrapper"
+        toolbarClassName="border border-gray-200 shadow"
+        wrapperClassName="demo-wrapper  "
         editorClassName={`demo-editor ${
           height === '100px' ? 'height-content-image' : 'height-content'
-        } overflow-auto`}
+        } overflow-auto ${type === 'events' && 'px-2 bg-[#E6F0F6] rounded-md'} ${
+          !!error && 'border border-red-500'
+        }`}
         onEditorStateChange={onEditorStateChange}
         placeholder="Viết bài tại đây ..."
         toolbar={{
-          options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign'],
+          options: [
+            'inline',
+            'blockType',
+            'fontSize',
+            'fontFamily',
+            'list',
+            'textAlign',
+            'link',
+            'emoji',
+          ],
           inline: { options: ['bold', 'italic', 'underline'], inDropdown: true },
           list: {
             options: ['unordered', 'indent', 'outdent'],
@@ -45,6 +65,7 @@ const RichTextEditTor = ({ editorState, onEditorStateChange, height }: IProp) =>
         }}
         hashtag={{}}
       />
+      {!!error && <span className="text-sm text-red-600">{error?.message}</span>}
     </div>
   )
 }

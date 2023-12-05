@@ -78,7 +78,6 @@ const PostRequest: FC<Props> = (): JSX.Element => {
 
   useEffect(() => {
     if (id) {
-      console.log(11)
       setDataPost([])
       setPaginationModel({ page: 0, pageSize: 10 })
     }
@@ -107,10 +106,8 @@ const PostRequest: FC<Props> = (): JSX.Element => {
             </p>
           }>
           {dataPost.map((item, index) => (
-            <>
-              <div
-                key={index}
-                className="my-4 bg-white flex-flex-col gap-2 min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
+            <div key={index}>
+              <div className="my-4 bg-white flex-flex-col gap-2 min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
                 <PostItem
                   item={item}
                   isRequest={true}
@@ -132,7 +129,7 @@ const PostRequest: FC<Props> = (): JSX.Element => {
                   </Button>
                 </div>
               </div>
-            </>
+            </div>
           ))}
         </InfiniteScroll>
       </div>

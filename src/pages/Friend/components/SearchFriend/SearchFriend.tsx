@@ -8,6 +8,7 @@ import { FC, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Button from '@components/Button'
 import { useNavigate } from 'react-router-dom'
+import notfound_data from '../../../../assets/images/notFoundSearch.jpg'
 
 interface Props {}
 
@@ -45,15 +46,27 @@ const SearchFriend: FC<Props> = (): JSX.Element => {
       const res = await requestFriend(id)
       if (res) {
         const index = data.findIndex((item) => item.id === id)
-        const newData: IUserData = { ...data[index], friendStatus: 'PENDING' }
+        const newData: IUserData = { ...data[index], friendStatus: 'PENDING_SENT' }
         data[index] = newData
         setData([...data])
       }
-    } else {
+    }
+
+    if (status == 'PENDING_SENT') {
       const res = await updateStatusFriend({ id: id, status: 'DELETED' })
       if (res) {
         const index = data.findIndex((item) => item.id === id)
         const newData: IUserData = { ...data[index], friendStatus: 'NOT FRIEND' }
+        data[index] = newData
+        setData([...data])
+      }
+    }
+
+    if (status == 'PENDING_RECEIVED') {
+      const res = await updateStatusFriend({ id: id, status: 'ACTIVE' })
+      if (res) {
+        const index = data.findIndex((item) => item.id === id)
+        const newData: IUserData = { ...data[index], friendStatus: 'ACTIVE' }
         data[index] = newData
         setData([...data])
       }
@@ -114,7 +127,7 @@ const SearchFriend: FC<Props> = (): JSX.Element => {
                   <div className="h-40 w-40">
                     <img
                       className="h-full w-full"
-                      src="../../../../assets/images/notFoundSearch.jpg"
+                      src={notfound_data}
                       alt="not found search"
                     />
                   </div>
@@ -159,16 +172,26 @@ const SearchFriend: FC<Props> = (): JSX.Element => {
                       </div>
                     )}
 
-                    {item.friendStatus === 'PENDING' && (
+                    {item.friendStatus === 'PENDING_SENT' && (
                       <div
-                        onClick={() => requestFriendUser(item.id || '', 'PENDING')}
+                        onClick={() => requestFriendUser(item.id || '', 'PENDING_SENT')}
                         className="">
                         <Button typeButton="cancel">Đã gửi yêu câu</Button>
                       </div>
                     )}
 
+                    {item.friendStatus === 'PENDING_RECEIVED' && (
+                      <div
+                        onClick={() =>
+                          requestFriendUser(item.id || '', 'PENDING_RECEIVED')
+                        }
+                        className="">
+                        <Button>Chấp nhận</Button>
+                      </div>
+                    )}
+
                     {item.friendStatus === 'ACTIVE' && (
-                      <span className="px-4 py-1.5 rounded-md bg-slate-100 shadow-sm">
+                      <span className="px-4 py-1.5 rounded-2xl bg-slate-100 shadow-sm">
                         Bạn bè
                       </span>
                     )}

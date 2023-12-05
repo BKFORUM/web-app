@@ -5,13 +5,20 @@ import { ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/ou
 import { useNavigate } from 'react-router-dom'
 import { Tooltip } from '@mui/material'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import { notifyActionSelector, userActionSelector, userStateSelector } from '@store/index'
+import {
+  authActionSelector,
+  notifyActionSelector,
+  userActionSelector,
+  userStateSelector,
+} from '@store/index'
+import socket from '@utils/socket/socketConfig'
 
 interface Props {}
 
 const AvatarHeader: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
-  const { setCurrentUserSuccess, setIsGetCurrentUserSuccess } =
+  const { setIsLoginSuccess, setIsLogoutSuccess } = useStoreActions(authActionSelector)
+  const { setCurrentUserSuccess, setIsGetCurrentUserSuccess, setListFriendOnline } =
     useStoreActions(userActionSelector)
   const { currentUserSuccess, messageErrorUser, isGetCurrentUserSuccess } =
     useStoreState(userStateSelector)
@@ -32,8 +39,14 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
   })
   const _logout = (): void => {
     setCurrentUserSuccess(null)
+    setIsLoginSuccess(false)
+    setIsLogoutSuccess(true)
+    setListFriendOnline([])
     localStorage.removeItem('auth')
     navigate('/auth/login')
+    if (socket) {
+      socket.disconnect()
+    }
   }
   return (
     <div className="relative">
@@ -74,12 +87,12 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
           onClick={() => {
             setOpen(!open)
           }}
-          className={`absolute rounded right-2 top-[120%] z-50 py-0.5 bg-white border shadow-md`}
-          style={{ minWidth: '18rem' }}>
+          className={`absolute rounded right-2 top-[120%] z-50 py-0.5 bg-white border shadow-md w-auto`}
+          style={{ minWidth: '17rem' }}>
           <li
             className="relative group list-none"
             onClick={() => navigate('/profile/' + currentUserSuccess?.id)}>
-            <a className="block w-full py-2 px-6 text-center clear-both whitespace-nowrap hover:text-primary-400 cursor-pointer group-hover:opacity-50 ">
+            <a className="block w-full py-2 px-6 clear-both whitespace-nowrap hover:text-primary-400 cursor-pointer group-hover:opacity-50 ">
               <img
                 className="h-10 w-10 rounded-full border border-gray-500 bg-gray-5  00 object-cover mr-2 inline"
                 src={currentUserSuccess?.avatarUrl}

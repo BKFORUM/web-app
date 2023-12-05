@@ -2,7 +2,7 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { DATA_SIDEBAR } from '@commom/constants'
 import { MdOutlineCalendarMonth } from 'react-icons/md'
 import { HiOutlineUserGroup, HiOutlineStar, HiOutlineHome } from 'react-icons/hi2'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { IUserForumResponse } from '@interfaces/IForum'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -14,6 +14,7 @@ interface IProps {
 }
 
 const Sidebar: FC<IProps> = (): JSX.Element => {
+  const { id } = useParams()
   const navigate = useNavigate()
   const contentRef = useRef<HTMLUListElement>(null)
   const { pathname } = useLocation()
@@ -51,11 +52,18 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
       setContentHeight(height)
     }
     dataForum.map((item) => {
-      if (item.id === pathname.split('/')[2]) {
+      if (item.id === id) {
         setSelected(item.id)
       }
     })
   }, [dataForum])
+
+  useEffect(() => {
+    const check = dataForum.find((item) => item.id === id)
+    if (check === undefined) {
+      setSelected(null)
+    }
+  }, [id])
 
   useEffect(() => {
     const routePath = `/${pathname.split('/')[1]}`

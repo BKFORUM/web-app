@@ -5,7 +5,14 @@ export interface IConversation {
     avatarUrl: string,
     displayName: string
     lastMessage: IMessage | null
-    users: IUserData[]
+    users: {
+        userId: string,
+        displayName: string | null
+        user: IUserData
+    }[]
+    type: string
+    isRead?: boolean
+    forumId?: string | null
 }
 
 export interface IMessage {
@@ -14,5 +21,7 @@ export interface IMessage {
     content: string,
     author: IUserData,
     createdAt: string,
+    updatedAt: string,
+    conversationId?: string,
     userId?: string
 }

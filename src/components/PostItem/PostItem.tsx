@@ -136,7 +136,7 @@ const PostItem: FC<Props> = ({
             </div>
             <div className="flex items-center">
               <span className="text-sm font-thin">
-                {formatDateLocalV2(item.createdAt)}
+                {formatDateLocalV2(item.updatedAt)}
               </span>
               {(moderatorId === currentUserSuccess?.id ||
                 item.user.id === currentUserSuccess?.id) &&
@@ -189,6 +189,7 @@ const PostItem: FC<Props> = ({
           setOpen={setOpenModalPostDetail}
           isFavourite={isFavourite}
           setIsFavourite={handleFavouritePost}
+          countLike={countLike}
         />
       )}
     </>

@@ -12,6 +12,9 @@ import { postModel as post, IPostModel } from "./models/post";
 import { forumModel as forum, IForumModel } from "./models/forum";
 import { friendModel as friend, IFriendModel } from "./models/friend";
 import { conversationModel as conversation, IConversationModel } from "./models/conversation";
+import { notificationModel as notification, INotificationModel } from "./models/notification";
+import { searchModel as search, ISearchModel } from "./models/search";
+import { eventModel as event, IEventModel } from "./models/event";
 
 export interface IStoreModel {
     auth: IAuthModel;
@@ -21,6 +24,10 @@ export interface IStoreModel {
     forum: IForumModel;
     friend: IFriendModel;
     conversation: IConversationModel;
+    notification: INotificationModel;
+    search: ISearchModel;
+    event: IEventModel
+
 }
 
 const storeModel: IStoreModel = {
@@ -31,6 +38,9 @@ const storeModel: IStoreModel = {
     forum,
     friend,
     conversation,
+    notification,
+    search,
+    event,
 }
 
 export const { useStoreActions, useStoreState, useStoreDispatch, useStore } =
@@ -66,6 +76,18 @@ export const friendActionSelector = (state: IActionMapper) => state.friend;
 //Conversation
 export const conversationStateSelector = (state: IStateMapper) => state.conversation;
 export const conversationActionSelector = (state: IActionMapper) => state.conversation;
+
+//Notification
+export const notificationStateSelector = (state: IStateMapper) => state.notification;
+export const notificationActionSelector = (state: IActionMapper) => state.notification;
+
+//Search
+export const searchStateSelector = (state: IStateMapper) => state.search;
+export const searchActionSelector = (state: IActionMapper) => state.search;
+
+//Event
+export const eventStateSelector = (state: IStateMapper) => state.event;
+export const eventActionSelector = (state: IActionMapper) => state.event;
 
 
 const store = createStore(storeModel, {
