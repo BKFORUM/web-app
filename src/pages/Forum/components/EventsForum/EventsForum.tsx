@@ -104,7 +104,7 @@ const EventsForum: FC<Props> = ({ moderator }: Props): JSX.Element => {
         const resImage = await postImage(formData)
         if (resImage) {
           const res = await editEvent({
-            ...data,
+            ...newData,
             documents: [...newUrls, ...resImage],
             type: 'GENERAL',
           })
@@ -118,7 +118,7 @@ const EventsForum: FC<Props> = ({ moderator }: Props): JSX.Element => {
               event.id === itemSelected.id
                 ? {
                     ...event,
-                    ...data,
+                    ...newData,
                     content: data.content,
                     documents: [...resImage, ...newUrls],
                   }
@@ -129,7 +129,7 @@ const EventsForum: FC<Props> = ({ moderator }: Props): JSX.Element => {
         }
       } else {
         const res = await editEvent({
-          ...data,
+          ...newData,
           documents: newUrls,
           type: 'GENERAL',
         })
@@ -143,7 +143,7 @@ const EventsForum: FC<Props> = ({ moderator }: Props): JSX.Element => {
             event.id === itemSelected.id
               ? {
                   ...event,
-                  ...data,
+                  ...newData,
                   content: data.content,
                   documents: newUrls,
                 }

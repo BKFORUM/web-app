@@ -65,15 +65,27 @@ const PeopleSearch: FC<Props> = ({
       const res = await requestFriend(id)
       if (res) {
         const index = data.findIndex((item) => item.id === id)
-        const newData: IUserData = { ...data[index], friendStatus: 'PENDING' }
+        const newData: IUserData = { ...data[index], friendStatus: 'PENDING_SENT' }
         data[index] = newData
         setData([...data])
       }
-    } else {
+    }
+
+    if (status === 'PENDING_SENT') {
       const res = await updateStatusFriend({ id: id, status: 'DELETED' })
       if (res) {
         const index = data.findIndex((item) => item.id === id)
         const newData: IUserData = { ...data[index], friendStatus: 'NOT FRIEND' }
+        data[index] = newData
+        setData([...data])
+      }
+    }
+
+    if (status == 'PENDING_RECEIVED') {
+      const res = await updateStatusFriend({ id: id, status: 'ACTIVE' })
+      if (res) {
+        const index = data.findIndex((item) => item.id === id)
+        const newData: IUserData = { ...data[index], friendStatus: 'ACTIVE' }
         data[index] = newData
         setData([...data])
       }

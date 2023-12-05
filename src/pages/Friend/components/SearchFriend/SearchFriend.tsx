@@ -46,7 +46,7 @@ const SearchFriend: FC<Props> = (): JSX.Element => {
       const res = await requestFriend(id)
       if (res) {
         const index = data.findIndex((item) => item.id === id)
-        const newData: IUserData = { ...data[index], friendStatus: 'PENDING' }
+        const newData: IUserData = { ...data[index], friendStatus: 'PENDING_SENT' }
         data[index] = newData
         setData([...data])
       }

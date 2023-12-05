@@ -1,6 +1,6 @@
 import { IEvent } from "@interfaces/IEvent";
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addCommentToEvent, addEvent, deleteCommentToEvent, deleteEvent, editCommentToEvent, editEvent, getAllCommentEventById, getAllEvent, getAllUserSub, subscribeToEvent, unSubscribeToEvent } from "../../services/event.service";
+import { addCommentToEvent, addEvent, deleteCommentToEvent, deleteEvent, editCommentToEvent, editEvent, getAllCommentEventById, getAllEvent, getAllUserSub, getEventById, subscribeToEvent, unSubscribeToEvent } from "../../services/event.service";
 import { IParams } from "@interfaces/IClient";
 
 export interface IEventModel {
@@ -62,6 +62,11 @@ export interface IEventModel {
     isGetAllUserSubSuccess: boolean;
     setIsGetAllUserSubSuccess: Action<IEventModel, boolean>
     getAllUserSub: Thunk<IEventModel, IParams>;
+
+    //getEventById
+    isGetEventByIdSuccess: boolean;
+    setIsGetEventByIdSuccess: Action<IEventModel, boolean>
+    getEventById: Thunk<IEventModel, string>;
 }
 
 export const eventModel: IEventModel = persist({
@@ -254,6 +259,23 @@ export const eventModel: IEventModel = persist({
             })
             .catch((error) => {
                 actions.setIsGetAllUserSubSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //GetEventById
+    isGetEventByIdSuccess: true,
+    setIsGetEventByIdSuccess: action((state, payload) => {
+        state.isGetEventByIdSuccess = payload;
+    }),
+    getEventById: thunk(async (actions, payload) => {
+        return getEventById(payload)
+            .then(async (res) => {
+                actions.setIsGetEventByIdSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetEventByIdSuccess(false)
                 actions.setMessageError(error?.response?.data?.message)
             });
     }),

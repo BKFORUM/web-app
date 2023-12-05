@@ -25,7 +25,7 @@ export const formatDateLocalV2 = (dateTime: string): string => {
 }
 
 export const formatDateTimeLocal = (dateTime: string): string => {
-    const formattedTime = dayjs(dateTime).format();
+    const formattedTime = dayjs(dateTime).utc().format();
     return formattedTime;
 }
 

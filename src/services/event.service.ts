@@ -87,4 +87,24 @@ const getAllUserSub = ({ id, params }: IParams) => {
     });
 }
 
-export { getAllEvent, addEvent, editEvent, deleteEvent, getAllCommentEventById, addCommentToEvent, editCommentToEvent, deleteCommentToEvent, subscribeToEvent, unSubscribeToEvent, getAllUserSub }
+const getEventById = (id: string) => {
+    return BaseURL({
+        url: `/events/${id}`,
+        method: "GET",
+    });
+}
+
+export {
+    getAllEvent,
+    addEvent,
+    editEvent,
+    deleteEvent,
+    getAllCommentEventById,
+    addCommentToEvent,
+    editCommentToEvent,
+    deleteCommentToEvent,
+    subscribeToEvent,
+    unSubscribeToEvent,
+    getAllUserSub,
+    getEventById
+}

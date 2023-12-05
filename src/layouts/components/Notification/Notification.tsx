@@ -2,10 +2,12 @@ import { Transition } from '@headlessui/react'
 import { FC, Fragment, useEffect, useState } from 'react'
 import { useClickOutside } from '@hooks/useClickOutside'
 import NotificationsIcon from '@mui/icons-material/Notifications'
+import { HiOutlineSpeakerphone } from 'react-icons/hi'
 import { Tooltip } from '@mui/material'
 import socket from '@utils/socket/socketConfig'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import {
+  eventActionSelector,
   notificationActionSelector,
   notificationStateSelector,
   notifyActionSelector,
@@ -21,6 +23,8 @@ import notfoundData from '../../../assets/images/notFoundSearch.jpg'
 import { IPostViewForum } from '@interfaces/IPost'
 import ModalDetailPost from '@components/ModalDetailPost'
 import { useNavigate } from 'react-router-dom'
+import { IEvent } from '@interfaces/IEvent'
+import ModalDetailEvent from '@components/ModalDetailEvent'
 
 interface Props {}
 
@@ -37,16 +41,18 @@ const Notification: FC<Props> = (): JSX.Element => {
   const { getPostById, likePost, unLikePost, setGetPostByIdSuccess } =
     useStoreActions(postActionSelector)
   const { isGetPostByIdSuccess, messageError } = useStoreState(postStateSelector)
+  const { getEventById } = useStoreActions(eventActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
   const [countLike, setCountLike] = useState<number>(0)
   const [openModalPostDetail, setOpenModalPostDetail] = useState<boolean>(false)
+  const [openModalEventDetail, setOpenModalEventDetail] = useState<boolean>(false)
   const [postSelected, setPostSelected] = useState<IPostViewForum | null>(null)
+  const [eventSelected, setEventSelected] = useState<IEvent>()
   const [isFavourite, setIsFavourite] = useState<boolean>(false)
   const [numberNotRead, setNumberNotRead] = useState<number>(0)
-
   const [open, setOpen] = useState<boolean>(false)
   let elementRef: any = useClickOutside(() => {
     if (open) {
@@ -122,9 +128,18 @@ const Notification: FC<Props> = (): JSX.Element => {
     if (item.modelName === 'friendship') {
       navigate('/profile/' + item.sender.id)
     }
+
+    if (item.modelName === 'event') {
+      const res = await getEventById(item.modelId)
+      if (res) {
+        setEventSelected(res)
+        setOpenModalEventDetail(true)
+      }
+    }
   }
 
   const handleNewNotification = (response: INotification) => {
+    console.log(response)
     setNumberNotRead(numberNotRead + 1)
     let newData
     if (listNotification.length >= 10 && listNotification.length < totalRowCount) {
@@ -176,6 +191,8 @@ const Notification: FC<Props> = (): JSX.Element => {
     socket.on('onFriendRequestCreated', handleNewNotification)
 
     socket.on('onFriendRequestApproved', handleNewNotification)
+
+    socket.on('onUpcomingEvent', handleNewNotification)
   }, [listNotification])
 
   useEffect(() => {
@@ -285,18 +302,22 @@ const Notification: FC<Props> = (): JSX.Element => {
                     key={index}
                     onClick={() => handleRead(item)}
                     className="relative flex p-2 hover:text-primary-400 cursor-pointer rounded-lg hover:bg-gray-200 transition-all duration-200 ">
-                    <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mr-2 border border-gray-700 bg-gray-700">
-                      <img
-                        className="h-full w-full object-cover "
-                        src={item.sender.avatarUrl}
-                        alt="avatar"
-                      />
-                    </div>
+                    {item.sender !== null ? (
+                      <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mr-2 border border-gray-700 bg-gray-700">
+                        <img
+                          className="h-full w-full object-cover "
+                          src={item.sender.avatarUrl}
+                          alt="avatar"
+                        />
+                      </div>
+                    ) : (
+                      <HiOutlineSpeakerphone className=" mr-2 p-1.5  h-10 w-10" />
+                    )}
                     <p className={`flex flex-col text-sm mr-0.5`}>
                       <span className="font-bold line-clamp-3">
-                        {item.sender.fullName}&nbsp;
+                        {item.sender?.fullName}&nbsp;
                         <span className={`${item.readAt && 'font-normal'}`}>
-                          {item.content}
+                          {item.content.trim()}
                         </span>
                       </span>
 
@@ -327,6 +348,16 @@ const Notification: FC<Props> = (): JSX.Element => {
           isFavourite={isFavourite}
           setIsFavourite={handleFavouritePost}
           countLike={countLike}
+        />
+      )}
+
+      {openModalEventDetail && (
+        <ModalDetailEvent
+          open={openModalEventDetail}
+          setOpen={setOpenModalEventDetail}
+          item={eventSelected}
+          // isUnsubscribed={isUnsubscribed}
+          // handleAction={handleAction}
         />
       )}
     </div>

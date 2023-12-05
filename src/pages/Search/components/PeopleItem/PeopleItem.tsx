@@ -33,16 +33,24 @@ const PeopleItem: FC<Props> = ({ item, requestFriendUser }: Props): JSX.Element 
         </div>
       )}
 
-      {item.friendStatus === 'PENDING' && (
+      {item.friendStatus === 'PENDING_SENT' && (
         <div
-          onClick={() => requestFriendUser(item.id || '', 'PENDING')}
+          onClick={() => requestFriendUser(item.id || '', 'PENDING_SENT')}
           className="">
-          <Button typeButton="cancel">Đã gửi yêu câu</Button>
+          <Button typeButton="cancel">Đã gửi yêu cầu</Button>
+        </div>
+      )}
+
+      {item.friendStatus === 'PENDING_RECEIVED' && (
+        <div
+          onClick={() => requestFriendUser(item.id || '', 'PENDING_RECEIVED')}
+          className="">
+          <Button>Chấp nhận</Button>
         </div>
       )}
 
       {item.friendStatus === 'ACTIVE' && (
-        <span className="px-4 py-1.5 rounded-md bg-slate-100 shadow-sm">Bạn bè</span>
+        <span className="px-4 py-1.5 rounded-2xl bg-slate-100 shadow-sm">Bạn bè</span>
       )}
     </div>
   )

@@ -13,7 +13,7 @@ import { HiOutlineStar, HiStar } from 'react-icons/hi'
 import { HiOutlineChatBubbleLeftEllipsis } from 'react-icons/hi2'
 
 interface Props {
-  item: IEvent
+  item?: IEvent
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   isUnsubscribed?: boolean
@@ -71,7 +71,7 @@ const ModalDetailEvent: FC<Props> = ({
   }, [item])
 
   const handleDeleteComment = async (id: string): Promise<void> => {
-    const res = await deleteCommentEvent({ id: item.id, eventCommentId: id })
+    const res = await deleteCommentEvent({ id: item?.id, eventCommentId: id })
     if (res) {
       const updatedComment = data.filter((item) => item.id !== id)
       setData(updatedComment)
@@ -124,15 +124,29 @@ const ModalDetailEvent: FC<Props> = ({
                     className="mt-2 max-h-[500px] overflow-y-auto px-3">
                     <div className="flex flex-col gap-1">
                       <span className="text-xs font-semibold text-red-600">
-                        Từ {formatDateLocalV2(item.startAt)} đến{' '}
-                        {formatDateLocalV2(item.endAt)}
+                        Từ {formatDateLocalV2(item?.startAt || '')} đến{' '}
+                        {formatDateLocalV2(item?.endAt || '')}
                       </span>
-                      <h4 className="text-lg font-medium">{item.displayName}</h4>
-                      <p className="text-sm font-thin ">{item.location}</p>
+                      <h4 className="text-lg font-medium">{item?.displayName}</h4>
+                      <p className="text-sm font-thin ">{item?.location}</p>
                     </div>
-                    <span className="absolute right-4 top-16 border border-gray-400 text-gray-700 px-4 py-2 text-xs rounded-3xl">
-                      {item.status}
-                    </span>
+                    {item?.status === 'DONE' && (
+                      <span className="absolute right-4 top-16 border border-gray-400 bg-slate-300 font-semibold text-gray-700 px-4 py-2 text-xs rounded-3xl">
+                        {item?.status}
+                      </span>
+                    )}
+
+                    {item?.status === 'HAPPENING' && (
+                      <span className="absolute right-4 top-16 border border-gray-400 bg-green-300 font-semibold text-gray-700 px-4 py-2 text-xs rounded-3xl">
+                        {item?.status}
+                      </span>
+                    )}
+
+                    {item?.status === 'UPCOMING' && (
+                      <span className="absolute right-4 top-16 border border-gray-400 bg-red-300 font-semibold text-gray-700 px-4 py-2 text-xs rounded-3xl">
+                        {item?.status}
+                      </span>
+                    )}
                     <div className="mt-2">
                       <PostContent
                         content={item?.content}
@@ -161,10 +175,10 @@ const ModalDetailEvent: FC<Props> = ({
                           )}
                         </button>
 
-                        <button className="outline-none flex gap-1.5 py-1 items-center border-none">
+                        <div className="outline-none flex gap-1.5 py-1 items-center border-none">
                           <HiOutlineChatBubbleLeftEllipsis className="text-blue-700 h-4 w-4" />
                           <span className="text-blue-700">Bình luận</span>
-                        </button>
+                        </div>
                       </div>
                       <div className="pb-4">
                         <Comment
@@ -188,7 +202,7 @@ const ModalDetailEvent: FC<Props> = ({
                       setTotalRowCount={setTotalRowCount}
                       rowSelected={rowSelected}
                       setRowSelected={setRowSelected}
-                      idEvent={item.id}
+                      idEvent={item?.id}
                       type="comment_event"
                     />
                   </>

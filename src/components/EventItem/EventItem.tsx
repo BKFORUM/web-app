@@ -104,7 +104,7 @@ const EventItem: FC<Props> = ({
 
   return (
     <>
-      <div className="px-3 py-4 relative">
+      <div className="item-event px-3 py-4 relative">
         <div className="flex flex-col gap-1">
           <span className="text-xs font-semibold text-red-600">
             Từ {formatDateLocalV2(item.startAt)} đến {formatDateLocalV2(item.endAt)}
