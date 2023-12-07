@@ -33,26 +33,37 @@ BaseURLUpLoadFile.interceptors.response.use(
     async (err) => {
         const originalConfig = err.config;
         if (originalConfig.url !== "/auth/login" && err.response) {
-            // Access Token was expired
             if (err.response.status === 401 && !originalConfig._retry) {
                 originalConfig._retry = true;
-                const auth: any = JSON.parse(String(localStorage.getItem("auth")));
-                try {
-                    const res = await axios.get('http://52.139.152.154/api/v1/auth/refresh', {
-                        headers: {
-                            Authorization: `Bearer ${auth?.refreshToken}`
-                        }
-                    })
-                    if (res) {
-                        localStorage.setItem('auth', JSON.stringify(res.data))
-                    }
-                } catch (error: any) {
-                    console.log('error', error?.response?.data?.message)
+                const resp = await refreshToken();
+                if (resp) {
+                    localStorage.setItem('auth', JSON.stringify(resp.data))
+                    const access_token = resp.data.accessToken;
+                    BaseURLUpLoadFile.defaults.headers.common[
+                        "Authorization"
+                    ] = `Bearer ${access_token}`;
+                    return BaseURLUpLoadFile(originalConfig);
                 }
             }
         }
         return Promise.reject(err);
     }
 );
+
+const refreshToken = async () => {
+    try {
+        const auth: any = JSON.parse(String(localStorage.getItem("auth")));
+        const resp = await BaseURLUpLoadFile.get("/auth/refresh", {
+            headers: {
+                Authorization: `Bearer ${auth?.refreshToken}`
+            }
+        })
+        return resp;
+    } catch (e) {
+        console.log("Error", e);
+        localStorage.removeItem('auth')
+    }
+};
+
 
 export default BaseURLUpLoadFile;

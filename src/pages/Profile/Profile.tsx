@@ -21,6 +21,7 @@ import ModalConfirm from '@components/ModalConfirm'
 import ModalEditUser from './components/ModalEditUser'
 import PostProfile from './components/PostProfile'
 import { pageMode } from '@interfaces/IClient'
+import { formatDateLocal, formatDateLocalV2 } from '@utils/functions/formatDay'
 
 interface Props {}
 
@@ -177,9 +178,10 @@ const Profile: FC<Props> = (): JSX.Element => {
   }
 
   const handleEditUser = async (data: any): Promise<void> => {
+    const newData = { ...data, dateOfBirth: formatDateLocal(data.dateOfBirth) }
     if (data?.avatarUrl.length === 0) {
       const res = await editEdit({
-        ...data,
+        ...newData,
         avatarUrl: user?.avatarUrl,
       })
       if (res) {
@@ -188,7 +190,6 @@ const Profile: FC<Props> = (): JSX.Element => {
           status: 'success',
           message: 'Edit user successfully',
         })
-        console.log(res)
         getProfile()
         setOpenModalEditUser(false)
       }
@@ -198,7 +199,7 @@ const Profile: FC<Props> = (): JSX.Element => {
       const resImage = await postImage(formData)
       if (resImage) {
         const res = await editEdit({
-          ...data,
+          ...newData,
           avatarUrl: resImage[0]?.fileUrl,
         })
         if (res) {

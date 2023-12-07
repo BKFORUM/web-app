@@ -32,11 +32,11 @@ BaseURL.interceptors.response.use(
 				originalConfig._retry = true;
 				const resp = await refreshToken();
 				if (resp) {
-					localStorage.setItem('auth', JSON.stringify(resp.data))
 					const access_token = resp.data.accessToken;
 					BaseURL.defaults.headers.common[
 						"Authorization"
 					] = `Bearer ${access_token}`;
+
 					return BaseURL(originalConfig);
 				}
 			}
@@ -53,6 +53,7 @@ const refreshToken = async () => {
 				Authorization: `Bearer ${auth?.refreshToken}`
 			}
 		})
+		localStorage.setItem('auth', JSON.stringify(resp.data))
 		return resp;
 	} catch (e) {
 		console.log("Error", e);

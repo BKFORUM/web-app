@@ -45,7 +45,9 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
     localStorage.removeItem('auth')
     navigate('/auth/login')
     if (socket) {
+      console.log(socket)
       socket.disconnect()
+      console.log(socket)
     }
   }
   return (

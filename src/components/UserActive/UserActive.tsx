@@ -11,15 +11,18 @@ const UserActive: FC<Props> = (): JSX.Element => {
   const { setListFriendOnline } = useStoreActions(userActionSelector)
   const { listFriendOnline } = useStoreState(userStateSelector)
   const getAllFriendOnline = (response: IUserData[]) => {
+    console.log('getAllFriendOnline', response)
     setListFriendOnline(response)
   }
 
   const AddFiendOnline = (response: IUserData) => {
+    console.log('AddFiendOnline', response)
     if (listFriendOnline.every((user) => user.id !== response.id))
       setListFriendOnline([...listFriendOnline, response])
   }
 
   const deleteFriendOffline = (response: IUserData) => {
+    console.log('deleteFriendOffline', response)
     const newData = listFriendOnline.filter((user) => {
       return user.id !== response.id
     })

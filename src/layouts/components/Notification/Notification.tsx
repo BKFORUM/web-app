@@ -139,7 +139,6 @@ const Notification: FC<Props> = (): JSX.Element => {
   }
 
   const handleNewNotification = (response: INotification) => {
-    console.log(response)
     setNumberNotRead(numberNotRead + 1)
     let newData
     if (listNotification.length >= 10 && listNotification.length < totalRowCount) {

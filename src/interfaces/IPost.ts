@@ -10,6 +10,14 @@ export interface IDocuments {
     userId: string;
 }
 
+export interface IUserLikePost {
+    createdAt: string
+    postId: string
+    updatedAt: string
+    userId: string
+    user: IUserData
+}
+
 export interface IPostViewForum {
     id: string;
     content: string;
@@ -18,6 +26,7 @@ export interface IPostViewForum {
     status: string
     updatedAt: string
     likedAt: Date | null
+    likes: IUserLikePost[]
     forum: {
         name: string
         fileUrl: string
