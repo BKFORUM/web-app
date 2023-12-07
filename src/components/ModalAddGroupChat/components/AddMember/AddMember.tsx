@@ -1,5 +1,5 @@
 import { useDebounce } from '@hooks/useDebounce'
-import { IViewUserAddList } from '@interfaces/IUser'
+import { IUserData } from '@interfaces/IUser'
 import { Checkbox } from '@mui/material'
 import { userActionSelector, userStateSelector } from '@store/index'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -17,8 +17,8 @@ const AddMember: FC<Props> = ({ setValue, errors }: Props): JSX.Element => {
   const { currentUserSuccess } = useStoreState(userStateSelector)
 
   const [inputSearch, setInputSearch] = useState<string>('')
-  const [data, setData] = useState<IViewUserAddList[]>([])
-  const [userSelected, setUserSelected] = useState<IViewUserAddList[]>([])
+  const [data, setData] = useState<IUserData[]>([])
+  const [userSelected, setUserSelected] = useState<IUserData[]>([])
   const [isLoading, setIsLoading] = useState<boolean | null>(null)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -30,7 +30,7 @@ const AddMember: FC<Props> = ({ setValue, errors }: Props): JSX.Element => {
     })
     if (res) {
       const data = res?.data
-        ?.map((item: IViewUserAddList) => {
+        ?.map((item: IUserData) => {
           if (item.id !== currentUserSuccess?.id) {
             return {
               ...item,
@@ -40,7 +40,7 @@ const AddMember: FC<Props> = ({ setValue, errors }: Props): JSX.Element => {
             return null
           }
         })
-        .filter((item: IViewUserAddList) => item !== null)
+        .filter((item: IUserData) => item !== null)
       setData(data)
     }
     setIsLoading(false)
@@ -123,7 +123,7 @@ const AddMember: FC<Props> = ({ setValue, errors }: Props): JSX.Element => {
                       alt="avatar"
                     />
                     <span
-                      onClick={() => handleCheckboxChange(item.id)}
+                      onClick={() => handleCheckboxChange(item?.id || '')}
                       className="absolute top-0.5 right-2.5 cursor-pointer text-gray-500 bg-white px-1.5 text-sm rounded-[50%] hover:bg-gray-200 transition-all duration-200 ">
                       X
                     </span>
@@ -184,7 +184,7 @@ const AddMember: FC<Props> = ({ setValue, errors }: Props): JSX.Element => {
                 className={`flex justify-between items-center cursor-pointer rounded-xl py-1.5 ${
                   item.checked ? 'bg-slate-100' : 'hover:bg-slate-100'
                 } `}
-                onClick={() => handleCheckboxChange(item.id)}>
+                onClick={() => handleCheckboxChange(item?.id || '')}>
                 <div className="flex gap-2 items-center">
                   <div>
                     <div className="h-12 w-12 flex-shrink rounded-full border border-gray-400 overflow-hidden ml-3">

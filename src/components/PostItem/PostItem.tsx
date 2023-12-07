@@ -6,7 +6,7 @@ import {
   HiOutlineChatBubbleLeftEllipsis,
 } from 'react-icons/hi2'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { IPostViewForum } from '@interfaces/IPost'
+import { IPostViewForum, IUserLikePost } from '@interfaces/IPost'
 import { formatDateLocalV2 } from '@utils/functions/formatDay'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { postActionSelector, userStateSelector } from '@store/index'
@@ -35,6 +35,7 @@ const PostItem: FC<Props> = ({
   const { likePost, unLikePost } = useStoreActions(postActionSelector)
 
   const [isFavourite, setIsFavourite] = useState<boolean>(!item.likedAt ? false : true)
+  const [listUserLike, setListUserLike] = useState<IUserLikePost[]>(item.likes)
   const [countLike, setCountLike] = useState<number>(item._count.likes)
   const [openModalPostDetail, setOpenModalPostDetail] = useState<boolean>(false)
 
@@ -44,12 +45,18 @@ const PostItem: FC<Props> = ({
       if (res) {
         setCountLike((prev) => prev - 1)
         setIsFavourite(false)
+        const newData = listUserLike.filter(
+          (user) => user.userId !== currentUserSuccess?.id,
+        )
+        setListUserLike(newData)
       }
     } else {
       const res = await likePost(item.id)
       if (res) {
         setCountLike((prev) => prev + 1)
         setIsFavourite(true)
+        const { post, ...data } = res
+        setListUserLike([data, ...listUserLike])
       }
     }
   }
@@ -157,25 +164,45 @@ const PostItem: FC<Props> = ({
           />
         </div>
         {!isRequest && (
-          <div className="mx-3 py-1 flex justify-around border-t border-gray-300 mt-3 ">
-            <div
-              onClick={() => handleFavouritePost()}
-              className={`${
-                isFavourite ? 'text-red-600' : 'text-[#0001CB]'
-              } cursor-pointer mr-12 transition-all duration-300 px-6 py-1.5 hover:bg-gray-200 rounded-md`}>
-              {isFavourite && <HiMiniHeart className="h-6 w-6 inline mr-2" />}
-              {!isFavourite && <HiOutlineHeart className="h-6 w-6 inline mr-2" />}
-              {isFavourite && (
-                <span className="text-black mr-2 text-sm ">{countLike}</span>
+          <div className="relative mx-3 py-1 flex justify-around border-t border-gray-300 mt-3">
+            <div className="group">
+              <div
+                onClick={() => handleFavouritePost()}
+                className={`${
+                  isFavourite ? 'text-red-600' : 'text-[#0001CB]'
+                } cursor-pointer mr-12 transition-all duration-300 px-6 py-1.5 hover:bg-gray-200 rounded-md`}>
+                {isFavourite && <HiMiniHeart className="h-6 w-6 inline mr-2" />}
+                {!isFavourite && <HiOutlineHeart className="h-6 w-6 inline mr-3" />}
+
+                {countLike > 0 && (
+                  <span className="text-[#0001CB] mr-1.5 text-sm font-semibold">
+                    {countLike}
+                  </span>
+                )}
+
+                {!isFavourite && <span>Yêu thích</span>}
+              </div>
+              {listUserLike.length > 0 && (
+                <div className="absolute z-[100] overflow-auto bg-black/70 top-full max-h-[200px]  flex flex-col flex-grow-0 left-0 px-2 py-1 w-auto rounded-md text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  {listUserLike.map((user, index) => (
+                    <p
+                      key={index}
+                      className="w-full text-sm">
+                      {user.user.fullName}
+                    </p>
+                  ))}
+                </div>
               )}
-              {!isFavourite && <span>Yêu thích</span>}
             </div>
+
             <div
               onClick={() => setOpenModalPostDetail(true)}
               className="text-[#0001CB] cursor-pointer px-6 py-1.5 hover:bg-gray-200 rounded-md">
               <HiOutlineChatBubbleLeftEllipsis className="h-6 w-6 inline mr-3" />
               {item._count.comments > 0 && (
-                <span className="text-black mr-1 text-sm ">{item._count.comments}</span>
+                <span className="text-[#0001CB] mr-1.5 text-sm font-semibold ">
+                  {item._count.comments}
+                </span>
               )}
               <span>Bình luận</span>
             </div>

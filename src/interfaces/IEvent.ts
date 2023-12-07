@@ -12,7 +12,7 @@ export interface IEvent {
     content: string
     documents?: IDocuments[]
     isSubscriber?: boolean
-    users: {
+    users?: {
         userId: string
         user: IUserData
     }[]

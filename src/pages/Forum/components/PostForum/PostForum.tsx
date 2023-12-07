@@ -45,6 +45,7 @@ const PostForum: FC<Props> = ({ ...props }: Props): JSX.Element => {
 
       <div>
         <InfiniteScroll
+          style={{ overflow: 'hidden' }}
           dataLength={props.data.length}
           next={() =>
             props.setPaginationModel((prevPaginationModel) => ({

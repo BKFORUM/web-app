@@ -286,7 +286,7 @@ export const postModel: IPostModel = persist({
         return PostService.likePost(payload)
             .then(async (res) => {
                 actions.setIsLikePostSuccess(true)
-                return res;
+                return res.data;
             })
             .catch((error) => {
                 actions.setIsLikePostSuccess(false)

@@ -54,7 +54,7 @@ const EventItem: FC<Props> = ({
     item.isSubscriber ? true : false,
   )
   const [listUserSubscribed, setListUserSubscribed] = useState<IUserSubscribe[]>(
-    item.users,
+    item?.users || [],
   )
 
   const handleAction = async (): Promise<void> => {

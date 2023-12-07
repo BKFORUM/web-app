@@ -245,6 +245,7 @@ const HomePage: FC<Props> = (): JSX.Element => {
 
           <div>
             <InfiniteScroll
+              style={{ overflow: 'hidden' }}
               dataLength={dataPost.length}
               next={() =>
                 setPaginationModel({
