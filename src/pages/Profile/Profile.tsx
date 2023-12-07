@@ -21,7 +21,7 @@ import ModalConfirm from '@components/ModalConfirm'
 import ModalEditUser from './components/ModalEditUser'
 import PostProfile from './components/PostProfile'
 import { pageMode } from '@interfaces/IClient'
-import { formatDateLocal, formatDateLocalV2 } from '@utils/functions/formatDay'
+import { formatDateLocal } from '@utils/functions/formatDay'
 
 interface Props {}
 

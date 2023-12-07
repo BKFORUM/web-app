@@ -21,7 +21,6 @@ import { useStoreActions, useStoreState } from 'easy-peasy'
 import { authActionSelector, authStateSelector, notifyActionSelector } from '@store/index'
 import { useNavigate } from 'react-router-dom'
 import { IUserLogin } from '@interfaces/IUser'
-import { connectSocket } from '@utils/functions/connectSocket'
 
 interface Props {}
 
