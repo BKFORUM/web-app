@@ -42,7 +42,8 @@ const Notification: FC<Props> = (): JSX.Element => {
     useStoreActions(postActionSelector)
   const { isGetPostByIdSuccess, messageError } = useStoreState(postStateSelector)
   const { getEventById } = useStoreActions(eventActionSelector)
-  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { setNotifySetting, setNotifyRealtime } = useStoreActions(notifyActionSelector)
+  const { subscribeToEvent, unSubscribeToEvent } = useStoreActions(eventActionSelector)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
@@ -52,6 +53,7 @@ const Notification: FC<Props> = (): JSX.Element => {
   const [postSelected, setPostSelected] = useState<IPostViewForum | null>(null)
   const [eventSelected, setEventSelected] = useState<IEvent>()
   const [isFavourite, setIsFavourite] = useState<boolean>(false)
+  const [isUnsubscribed, setIsUnsubscribed] = useState<boolean>(false)
   const [numberNotRead, setNumberNotRead] = useState<number>(0)
   const [open, setOpen] = useState<boolean>(false)
   let elementRef: any = useClickOutside(() => {
@@ -94,6 +96,20 @@ const Notification: FC<Props> = (): JSX.Element => {
     }
   }
 
+  const handleActionSubscribed = async (): Promise<void> => {
+    if (eventSelected && eventSelected.isSubscriber) {
+      const res = await unSubscribeToEvent(String(eventSelected.id))
+      if (res) {
+        setIsUnsubscribed(false)
+      }
+    } else {
+      const res = await subscribeToEvent(String(eventSelected?.id))
+      if (res) {
+        setIsUnsubscribed(true)
+      }
+    }
+  }
+
   const handleRead = async (item: INotification): Promise<void> => {
     if (!item.readAt) {
       const res = await updateNotification(item.id)
@@ -133,12 +149,14 @@ const Notification: FC<Props> = (): JSX.Element => {
       const res = await getEventById(item.modelId)
       if (res) {
         setEventSelected(res)
+        setIsUnsubscribed(res.isSubscriber)
         setOpenModalEventDetail(true)
       }
     }
   }
 
   const handleNewNotification = (response: INotification) => {
+    setNotifyRealtime({ show: true, notify: response })
     setNumberNotRead(numberNotRead + 1)
     let newData
     if (listNotification.length >= 10 && listNotification.length < totalRowCount) {
@@ -179,20 +197,20 @@ const Notification: FC<Props> = (): JSX.Element => {
 
     socket.on('onCommentCreated', handleNewNotification)
 
-    socket.on('onRequestForumCreated', handleNewNotification) // user request to forum
+    socket.on('onRequestForumCreated', handleNewNotification)
 
-    socket.on('onRequestForumApproved', handleNewNotification) // moderator approve request user
+    socket.on('onRequestForumApproved', handleNewNotification)
 
-    socket.on('onPostRequestCreated', handleNewNotification) // user request post to forum
+    socket.on('onPostRequestCreated', handleNewNotification)
 
-    socket.on('onPostRequestApproved', handleNewNotification) // moderator approve request post of user
+    socket.on('onPostRequestApproved', handleNewNotification)
 
     socket.on('onFriendRequestCreated', handleNewNotification)
 
     socket.on('onFriendRequestApproved', handleNewNotification)
 
     socket.on('onUpcomingEvent', handleNewNotification)
-  }, [listNotification])
+  }, [listNotification, numberNotRead])
 
   useEffect(() => {
     if (postSelected) {
@@ -355,8 +373,8 @@ const Notification: FC<Props> = (): JSX.Element => {
           open={openModalEventDetail}
           setOpen={setOpenModalEventDetail}
           item={eventSelected}
-          // isUnsubscribed={isUnsubscribed}
-          // handleAction={handleAction}
+          isUnsubscribed={isUnsubscribed}
+          handleAction={handleActionSubscribed}
         />
       )}
     </div>

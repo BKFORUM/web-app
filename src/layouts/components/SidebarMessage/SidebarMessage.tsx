@@ -31,7 +31,7 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
   const { listConversation, currentConverSationMessage } = useStoreState(
     conversationStateSelector,
   )
-  const { currentUserSuccess } = useStoreState(userStateSelector)
+  const { currentUserSuccess, listFriendOnline } = useStoreState(userStateSelector)
 
   const [inputSearch, setInputSearch] = useState<string>('')
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
@@ -189,6 +189,16 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
                         src={item?.avatarUrl || default_forum}
                         alt="avatar"
                       />
+                      {item.type === 'CHAT' &&
+                        listFriendOnline.some(
+                          (user) =>
+                            user.id === item.users[0].userId ||
+                            user.id === item.users[1].userId,
+                        ) && (
+                          <span
+                            title="online"
+                            className="flex ml-auto flex-shrink-0 absolute bottom-1 right-1.5 bg-green-500 border border-white w-[11px] h-[11px] rounded-full"></span>
+                        )}
                     </a>
                     <div className="flex flex-col w-full ">
                       <span className="font-semibold whitespace-nowrap truncate ">

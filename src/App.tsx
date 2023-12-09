@@ -16,10 +16,11 @@ import {
 import Notify from '@components/Notify'
 import { useEffect } from 'react'
 import ForgotPassword from '@pages/Auth/ForgotPassword'
+import NotifyRealtime from '@components/NotifyRealtime'
 
 function App() {
-  const { notifySetting } = useStoreState(notifyStateSelector)
-  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { notifySetting, notifyRealtime } = useStoreState(notifyStateSelector)
+  const { setNotifySetting, setNotifyRealtime } = useStoreActions(notifyActionSelector)
   const { getCurrentUser } = useStoreActions(userActionSelector)
   const { accessToken } = useStoreState(authStateSelector)
   const { setAccessToken } = useStoreActions(authActionSelector)
@@ -31,7 +32,6 @@ function App() {
 
   useEffect(() => {
     if (auth) setAccessToken(auth?.accessToken)
-    
   }, [auth])
 
   useEffect(() => {
@@ -77,9 +77,15 @@ function App() {
           element={<NotFound />}
         />
       </Routes>
+
       <Notify
         notifySetting={notifySetting}
         setNotifySetting={setNotifySetting}
+      />
+
+      <NotifyRealtime
+        notifyRealtime={notifyRealtime}
+        setNotifyRealtime={setNotifyRealtime}
       />
     </>
   )

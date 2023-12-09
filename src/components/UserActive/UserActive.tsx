@@ -1,45 +1,13 @@
-import { FC, useEffect } from 'react'
+import { FC } from 'react'
 import { HiOutlineChatBubbleLeftRight } from 'react-icons/hi2'
-import socket from '@utils/socket/socketConfig'
-import { useStoreActions, useStoreState } from 'easy-peasy'
-import { userActionSelector, userStateSelector } from '@store/index'
-import { IUserData } from '@interfaces/IUser'
+import { useStoreState } from 'easy-peasy'
+import { userStateSelector } from '@store/index'
 
 interface Props {}
 
 const UserActive: FC<Props> = (): JSX.Element => {
-  const { setListFriendOnline } = useStoreActions(userActionSelector)
   const { listFriendOnline } = useStoreState(userStateSelector)
-  const getAllFriendOnline = (response: IUserData[]) => {
-    console.log('getAllFriendOnline', response)
-    setListFriendOnline(response)
-  }
 
-  const AddFiendOnline = (response: IUserData) => {
-    console.log('AddFiendOnline', response)
-    if (listFriendOnline.every((user) => user.id !== response.id))
-      setListFriendOnline([...listFriendOnline, response])
-  }
-
-  const deleteFriendOffline = (response: IUserData) => {
-    console.log('deleteFriendOffline', response)
-    const newData = listFriendOnline.filter((user) => {
-      return user.id !== response.id
-    })
-    setListFriendOnline(newData)
-  }
-
-  useEffect(() => {
-    socket.emit('onGetOnlineFriends', {})
-
-    socket.on('onGetOnlineFriends', getAllFriendOnline)
-  }, [])
-
-  useEffect(() => {
-    socket.on('onFriendOnline', AddFiendOnline)
-
-    socket.on('onFriendOffline', deleteFriendOffline)
-  }, [listFriendOnline])
   return (
     <div className="bg-white px-1 w-72 fixed top-[82px] right-10 py-3 shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md">
       <div className="flex items-center gap-2 px-3 text-[#0001CB] mb-2">

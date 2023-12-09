@@ -27,6 +27,13 @@ export interface ICurrentUser {
             name: string
         }
     ]
+    forums: {
+        id: string
+        avatarUrl: string
+        modId: string
+        name: string
+        type: string
+    }[]
 }
 
 export interface IUserData {
