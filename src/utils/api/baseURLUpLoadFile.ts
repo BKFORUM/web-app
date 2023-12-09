@@ -35,14 +35,21 @@ BaseURLUpLoadFile.interceptors.response.use(
         if (originalConfig.url !== "/auth/login" && err.response) {
             if (err.response.status === 401 && !originalConfig._retry) {
                 originalConfig._retry = true;
-                const resp = await refreshToken();
-                if (resp) {
-                    localStorage.setItem('auth', JSON.stringify(resp.data))
-                    const access_token = resp.data.accessToken;
-                    BaseURLUpLoadFile.defaults.headers.common[
-                        "Authorization"
-                    ] = `Bearer ${access_token}`;
-                    return BaseURLUpLoadFile(originalConfig);
+                const auth: any = JSON.parse(String(localStorage.getItem("auth")));
+                console.log(auth);
+                if (auth !== undefined) {
+                    const resp = await refreshToken();
+                    if (resp) {
+                        localStorage.setItem('auth', JSON.stringify(resp.data))
+                        const access_token = resp.data.accessToken;
+                        BaseURLUpLoadFile.defaults.headers.common[
+                            "Authorization"
+                        ] = `Bearer ${access_token}`;
+                        return BaseURLUpLoadFile(originalConfig);
+                    }
+                }
+                else {
+                    originalConfig._retry = false;
                 }
             }
         }
@@ -51,18 +58,20 @@ BaseURLUpLoadFile.interceptors.response.use(
 );
 
 const refreshToken = async () => {
+    const auth: any = JSON.parse(String(localStorage.getItem("auth")));
     try {
-        const auth: any = JSON.parse(String(localStorage.getItem("auth")));
         const resp = await BaseURLUpLoadFile.get("/auth/refresh", {
             headers: {
                 Authorization: `Bearer ${auth?.refreshToken}`
             }
         })
+        localStorage.setItem('auth', JSON.stringify(resp.data))
         return resp;
     } catch (e) {
-        console.log("Error", e);
+        // console.log("Error", e);
         localStorage.removeItem('auth')
     }
+
 };
 
 

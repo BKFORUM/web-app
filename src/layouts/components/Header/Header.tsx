@@ -16,9 +16,11 @@ import {
   notifyActionSelector,
   postActionSelector,
   searchActionSelector,
+  userActionSelector,
+  userStateSelector,
 } from '@store/index'
 import SearchInput from '@components/SearchInput'
-// import { connectSocket } from '@utils/functions/connectSocket'
+import { IUserData } from '@interfaces/IUser'
 import socket from '@utils/socket/socketConfig'
 interface Props {}
 
@@ -29,6 +31,8 @@ const Header: FC<Props> = (): JSX.Element => {
   const { isAddForumSuccess, messageErrorForum } = useStoreState(forumStateSelector)
   const { postImage } = useStoreActions(postActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { setListFriendOnline } = useStoreActions(userActionSelector)
+  const { listFriendOnline } = useStoreState(userStateSelector)
   const { isLoginSuccess } = useStoreState(authStateSelector)
 
   const searchParams = new URLSearchParams(window.location.search)
@@ -91,12 +95,43 @@ const Header: FC<Props> = (): JSX.Element => {
       setTextSearch(inputSearch)
     }
   }
+  const getAllFriendOnline = (response: IUserData[]) => {
+    console.log('getAllFriendOnline', response)
+    setListFriendOnline(response)
+  }
+
+  const AddFiendOnline = (response: IUserData) => {
+    // console.log('AddFiendOnline', response)
+    if (listFriendOnline.every((user) => user.id !== response.id))
+      setListFriendOnline([...listFriendOnline, response])
+  }
+
+  const deleteFriendOffline = (response: IUserData) => {
+    // console.log('deleteFriendOffline', response)
+    const newData = listFriendOnline.filter((user) => {
+      return user.id !== response.id
+    })
+    setListFriendOnline(newData)
+  }
 
   useEffect(() => {
     if (isLoginSuccess) {
       socket.connect()
     }
   }, [isLoginSuccess])
+
+  useEffect(() => {
+    console.log(socket)
+    socket.emit('onGetOnlineFriends', {})
+
+    socket.on('onGetOnlineFriends', getAllFriendOnline)
+  }, [])
+
+  useEffect(() => {
+    socket.on('onFriendOnline', AddFiendOnline)
+
+    socket.on('onFriendOffline', deleteFriendOffline)
+  }, [listFriendOnline])
 
   useEffect(() => {
     if (search !== null) {
@@ -111,6 +146,7 @@ const Header: FC<Props> = (): JSX.Element => {
       setIsAddForumSuccess(true)
     }
   }, [isAddForumSuccess])
+
   return (
     <>
       <div className="h-[60px] bg-[#0001CB] flex justify-between items-center px-3 fixed top-0 right-0 left-0 z-[50] ">

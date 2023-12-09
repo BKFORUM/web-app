@@ -37,8 +37,7 @@ const schema = yup.object().shape({
 
 const Login: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
-  const { messageError, isLoginSuccess, isLogoutSuccess } =
-    useStoreState(authStateSelector)
+  const { messageError, isLoginSuccess } = useStoreState(authStateSelector)
 
   const { login, setIsLoginSuccess } = useStoreActions(authActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
@@ -49,7 +48,7 @@ const Login: FC<Props> = (): JSX.Element => {
   })
 
   useEffect(() => {
-    if (!isLoginSuccess && !isLogoutSuccess) {
+    if (!isLoginSuccess) {
       setNotifySetting({ show: true, status: 'error', message: messageError })
       setIsLoginSuccess(true)
     }

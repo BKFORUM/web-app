@@ -17,3 +17,8 @@ export interface INotification {
     sender: IUserData
 }
 
+export interface INotificationSetting {
+    show: boolean
+    notify?: INotification
+}
+

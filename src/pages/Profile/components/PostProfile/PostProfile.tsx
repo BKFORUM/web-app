@@ -75,6 +75,7 @@ const PostProfile: FC<Props> = ({
 
       <div className="col-span-4 ">
         <InfiniteScroll
+          style={{ overflow: 'hidden' }}
           dataLength={dataPost.length}
           next={() =>
             setPaginationModel((prevPaginationModel) => ({

@@ -1,6 +1,7 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
 import { forgotPassword, login, resetPassword } from "../../services/auth.service";
 import { IUserLogin } from "@interfaces/IUser";
+import { Socket } from 'socket.io-client';
 
 export interface IAuthModel {
     //MessageError
@@ -10,6 +11,10 @@ export interface IAuthModel {
     //isAccessToken
     accessToken: string;
     setAccessToken: Action<IAuthModel, string>
+
+    //Socket
+    socket: Socket | null
+    setSocket: Action<IAuthModel, Socket | null>
 
     //Login
     isLoginSuccess: boolean;
@@ -41,6 +46,11 @@ export const authModel: IAuthModel = persist({
     accessToken: '',
     setAccessToken: action((state, payload) => {
         state.accessToken = payload;
+    }),
+
+    socket: null,
+    setSocket: action((state, payload) => {
+        state.socket = payload;
     }),
 
     //Login

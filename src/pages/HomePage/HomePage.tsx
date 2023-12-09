@@ -22,7 +22,7 @@ const HomePage: FC<Props> = (): JSX.Element => {
   const { getAllForumByUser, setIsGetAllAgain } = useStoreActions(userActionSelector)
   const { currentUserSuccess, isGetAllAgain } = useStoreState(userStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
-  const { addPost, postImage, deletePost, editPost, getAllPost } =
+  const { addPost, postImage, deletePost, editPost, getAllPost, setPostSelected } =
     useStoreActions(postActionSelector)
   const { postSelected } = useStoreState(postStateSelector)
 
@@ -88,6 +88,7 @@ const HomePage: FC<Props> = (): JSX.Element => {
       return
     }
     setError('')
+    setPostSelected(null)
     setOpenModal(true)
   }
 
@@ -161,13 +162,24 @@ const HomePage: FC<Props> = (): JSX.Element => {
             documents: resImage,
           })
           if (res) {
-            setNotifySetting({
-              show: true,
-              status: 'success',
-              message: 'Add post successfully',
-            })
-            setDataPost([])
-            setPaginationModel({ page: 0, pageSize: 10 })
+            if (
+              currentUserSuccess &&
+              currentUserSuccess.forums.some((item) => item.id === forumSelected)
+            ) {
+              setNotifySetting({
+                show: true,
+                status: 'success',
+                message: 'Add post successfully',
+              })
+              setDataPost([])
+              setPaginationModel({ page: 0, pageSize: 10 })
+            } else {
+              setNotifySetting({
+                show: true,
+                status: 'success',
+                message: 'Request post successfully',
+              })
+            }
           }
         }
         setIsLoading(false)
@@ -178,13 +190,24 @@ const HomePage: FC<Props> = (): JSX.Element => {
           content: data.content,
         })
         if (res) {
-          setNotifySetting({
-            show: true,
-            status: 'success',
-            message: 'Add post successfully',
-          })
-          setDataPost([])
-          setPaginationModel({ page: 0, pageSize: 10 })
+          if (
+            currentUserSuccess &&
+            currentUserSuccess.forums.some((item) => item.id === forumSelected)
+          ) {
+            setNotifySetting({
+              show: true,
+              status: 'success',
+              message: 'Add post successfully',
+            })
+            setDataPost([])
+            setPaginationModel({ page: 0, pageSize: 10 })
+          } else {
+            setNotifySetting({
+              show: true,
+              status: 'success',
+              message: 'Request post successfully',
+            })
+          }
         }
         setIsLoading(false)
         setOpenModal(false)

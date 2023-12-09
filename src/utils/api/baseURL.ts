@@ -30,14 +30,20 @@ BaseURL.interceptors.response.use(
 		if (originalConfig.url !== "/auth/login" && err.response) {
 			if (err.response.status === 401 && !originalConfig._retry) {
 				originalConfig._retry = true;
-				const resp = await refreshToken();
-				if (resp) {
-					const access_token = resp.data.accessToken;
-					BaseURL.defaults.headers.common[
-						"Authorization"
-					] = `Bearer ${access_token}`;
-
-					return BaseURL(originalConfig);
+				const auth: any = JSON.parse(String(localStorage.getItem("auth")));
+				if (auth !== null) {
+					const resp = await refreshToken();
+					if (resp) {
+						localStorage.setItem('auth', JSON.stringify(resp.data))
+						const access_token = resp.data.accessToken;
+						BaseURL.defaults.headers.common[
+							"Authorization"
+						] = `Bearer ${access_token}`;
+						return BaseURL(originalConfig);
+					}
+				}
+				else {
+					originalConfig._retry = false;
 				}
 			}
 		}
@@ -56,8 +62,8 @@ const refreshToken = async () => {
 		localStorage.setItem('auth', JSON.stringify(resp.data))
 		return resp;
 	} catch (e) {
-		console.log("Error", e);
 		localStorage.removeItem('auth')
+		console.log("Error", e);
 	}
 };
 

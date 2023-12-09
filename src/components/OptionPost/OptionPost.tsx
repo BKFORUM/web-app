@@ -40,6 +40,7 @@ const OptionPost: FC<Props> = ({
         </div>
       </div>
       <Transition
+        appear={true}
         show={open}
         as={Fragment}
         enter="transition ease-out duration-100"
