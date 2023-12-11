@@ -156,7 +156,7 @@ const Notification: FC<Props> = (): JSX.Element => {
   }
 
   const handleNewNotification = (response: INotification) => {
-    setNotifyRealtime({ show: true, notify: response })
+    setNotifyRealtime({ show: true, notify: response, type: 'notify' })
     setNumberNotRead(numberNotRead + 1)
     let newData
     if (listNotification.length >= 10 && listNotification.length < totalRowCount) {

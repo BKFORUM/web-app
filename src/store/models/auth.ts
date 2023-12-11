@@ -1,7 +1,7 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
 import { forgotPassword, login, resetPassword } from "../../services/auth.service";
 import { IUserLogin } from "@interfaces/IUser";
-import { Socket } from 'socket.io-client';
+// import { Socket } from 'socket.io-client';
 
 export interface IAuthModel {
     //MessageError
@@ -13,8 +13,8 @@ export interface IAuthModel {
     setAccessToken: Action<IAuthModel, string>
 
     //Socket
-    socket: Socket | null
-    setSocket: Action<IAuthModel, Socket | null>
+    socket: any
+    setSocket: Action<IAuthModel, any>
 
     //Login
     isLoginSuccess: boolean;

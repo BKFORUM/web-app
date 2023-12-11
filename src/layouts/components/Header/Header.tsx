@@ -96,7 +96,7 @@ const Header: FC<Props> = (): JSX.Element => {
     }
   }
   const getAllFriendOnline = (response: IUserData[]) => {
-    console.log('getAllFriendOnline', response)
+    // console.log('getAllFriendOnline', response)
     setListFriendOnline(response)
   }
 
@@ -115,13 +115,20 @@ const Header: FC<Props> = (): JSX.Element => {
   }
 
   useEffect(() => {
-    if (isLoginSuccess) {
+    const auth: any = JSON.parse(String(localStorage.getItem('auth')))
+    if (isLoginSuccess && auth?.accessToken) {
+      socket.io.opts.transportOptions = {
+        polling: {
+          extraHeaders: {
+            Authorization: `Bearer ${auth.accessToken}`,
+          },
+        },
+      }
       socket.connect()
     }
   }, [isLoginSuccess])
 
   useEffect(() => {
-    console.log(socket)
     socket.emit('onGetOnlineFriends', {})
 
     socket.on('onGetOnlineFriends', getAllFriendOnline)

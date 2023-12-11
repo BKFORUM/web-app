@@ -1,10 +1,11 @@
 import SearchInput from '@components/SearchInput'
 import { FC, useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import {
   conversationActionSelector,
   conversationStateSelector,
+  notifyActionSelector,
   userStateSelector,
 } from '@store/index'
 import { pageMode } from '@interfaces/IClient'
@@ -20,6 +21,7 @@ import socket from '@utils/socket/socketConfig'
 interface Props {}
 const SidebarMessage: FC<Props> = (): JSX.Element => {
   const { id } = useParams()
+  const { pathname } = useLocation()
   const navigate = useNavigate()
   const {
     getAllConverSation,
@@ -32,6 +34,7 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
     conversationStateSelector,
   )
   const { currentUserSuccess, listFriendOnline } = useStoreState(userStateSelector)
+  const { setNotifyRealtime } = useStoreActions(notifyActionSelector)
 
   const [inputSearch, setInputSearch] = useState<string>('')
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
@@ -83,6 +86,14 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
         return item.id !== response.conversationId
       })
       setListConversation([newConversation, ...newList])
+
+      if (
+        pathname.split('/')[1] !== 'message' &&
+        currentUserSuccess?.id !== response.author.id
+      ) {
+        console.log(111111)
+        setNotifyRealtime({ show: true, message: newConversation, type: 'message' })
+      }
     }
   }
 

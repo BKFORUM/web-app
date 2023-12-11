@@ -196,6 +196,7 @@ const EventItem: FC<Props> = ({
           item={item}
           isUnsubscribed={isUnsubscribed}
           handleAction={handleAction}
+          
         />
       )}
     </>

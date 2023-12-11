@@ -36,9 +36,7 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
     setListFriendOnline([])
     localStorage.removeItem('auth')
     navigate('/auth/login')
-    if (socket) {
-      socket.disconnect()
-    }
+    socket.disconnect()
   }
   return (
     <div className="relative">

@@ -1,3 +1,4 @@
+import { IMessage } from "./IConversation";
 import { IUserData } from "./IUser";
 
 export interface INotify {
@@ -20,5 +21,7 @@ export interface INotification {
 export interface INotificationSetting {
     show: boolean
     notify?: INotification
+    type?: string
+    message?: IMessage
 }
 
