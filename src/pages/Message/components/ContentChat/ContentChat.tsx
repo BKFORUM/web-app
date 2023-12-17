@@ -112,14 +112,15 @@ const ContentChat: FC<Props> = ({
               )}
               <Tooltip title={formatDateLocalV2(item.createdAt)}>
                 <div className="flex max-w-[700px] ">
-                  <span
+                  <p
                     className={`text-base px-2.5 py-0.5 break-words ${
                       item.author.id === currentUserSuccess?.id
                         ? 'bg-blue-400 text-white'
                         : 'bg-gray-100 text-black'
-                    } rounded-2xl`}>
+                    } rounded-2xl`}
+                    style={{ wordBreak: 'break-all' }}>
                     {item.content}
-                  </span>
+                  </p>
                 </div>
               </Tooltip>
             </div>

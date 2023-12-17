@@ -288,7 +288,34 @@ const Notification: FC<Props> = (): JSX.Element => {
                 }))
               }
               hasMore={listNotification.length !== totalRowCount}
-              loader={<div>{isLoading && <span>Loading...</span>}</div>}
+              loader={
+                isLoading && (
+                  <>
+                    <div className="flex gap-2 p-2 animate-pulse">
+                      <div className="h-10 w-10 rounded-full bg-slate-200"></div>
+                      <div className="flex flex-col gap-2 flex-1 w-full">
+                        <div className="h-4 w-full flex-1 flex-grow rounded-md bg-slate-200"></div>
+                        <div className="h-2 w-8 rounded-md bg-slate-200"></div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 p-2 animate-pulse">
+                      <div className="h-10 w-10 rounded-full bg-slate-200"></div>
+                      <div className="flex flex-col gap-2 flex-1 w-full">
+                        <div className="h-4 w-full flex-1 flex-grow rounded-md bg-slate-200"></div>
+                        <div className="h-2 w-8 rounded-md bg-slate-200"></div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 p-2 animate-pulse">
+                      <div className="h-10 w-10 rounded-full bg-slate-200"></div>
+                      <div className="flex flex-col gap-2 flex-1 w-full">
+                        <div className="h-3.5 w-full flex-1 flex-grow rounded-md bg-slate-200"></div>
+                        <div className="h-2 w-8 rounded-md bg-slate-200"></div>
+                      </div>
+                    </div>
+                  </>
+                )
+              }
               scrollableTarget="scrollableDiv"
               endMessage={
                 <>
@@ -320,9 +347,9 @@ const Notification: FC<Props> = (): JSX.Element => {
                     onClick={() => handleRead(item)}
                     className="relative flex p-2 hover:text-primary-400 cursor-pointer rounded-lg hover:bg-gray-200 transition-all duration-200 ">
                     {item.sender !== null ? (
-                      <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mr-2 border border-gray-700 bg-gray-700">
+                      <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mt-1 mr-2 border border-gray-700 bg-gray-700">
                         <img
-                          className="h-full w-full object-cover "
+                          className="h-full w-full object-cover  "
                           src={item.sender.avatarUrl}
                           alt="avatar"
                         />

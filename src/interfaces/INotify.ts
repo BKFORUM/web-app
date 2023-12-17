@@ -1,4 +1,4 @@
-import { IMessage } from "./IConversation";
+import { IConversation, IMessage } from "./IConversation";
 import { IUserData } from "./IUser";
 
 export interface INotify {

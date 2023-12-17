@@ -17,6 +17,7 @@ import { BiMessageAdd } from 'react-icons/bi'
 import { Tooltip } from '@mui/material'
 import ModalAddGroupChat from '@components/ModalAddGroupChat'
 import socket from '@utils/socket/socketConfig'
+import { useDebounce } from '@hooks/useDebounce'
 
 interface Props {}
 const SidebarMessage: FC<Props> = (): JSX.Element => {
@@ -104,10 +105,12 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
     }
   }, [id, currentUserSuccess?.id, listConversation])
 
+  const debounce = useDebounce(inputSearch, 500)
+
   useEffect(() => {
     setListConversation([])
     setPaginationModel({ page: 0, pageSize: 10 })
-  }, [])
+  }, [debounce])
 
   useEffect(() => {
     getAllConversationPage()

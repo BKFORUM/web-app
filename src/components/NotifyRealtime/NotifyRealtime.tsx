@@ -44,7 +44,7 @@ const NotifyRealtime: FC<Props> = ({
         className={`z-50 pointer-events-none fixed bottom-2 ${
           notifyRealtime.type === 'notify'
             ? 'left-2 min-w-[200px] max-w-[380px]'
-            : 'right-2 min-w-[300px] max-w-[380px]'
+            : 'right-2 min-w-[450px] max-w-[550px]'
         }
           flex items-end px-4 py-6 sm:items-start sm:p-6`}>
         <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
@@ -105,25 +105,31 @@ const NotifyRealtime: FC<Props> = ({
                 {notifyRealtime.type === 'message' && (
                   <li
                     onClick={() => {
-                      navigate('/message/' + notifyRealtime?.message?.id),
-                        setCurrentConversation(notifyRealtime?.message || null)
-                      if (!notifyRealtime?.message?.isRead) {
-                        setIsReadConversation(notifyRealtime?.message?.id || '')
-                      }
+                      navigate('/message/' + notifyRealtime?.message?.conversationId)
+                      setCurrentConversation(
+                        notifyRealtime?.message?.conversation || null,
+                      )
+                      setIsReadConversation(notifyRealtime?.message?.conversationId || '')
+                      setNotifyRealtime({ show: false, type: notifyRealtime.type })
                     }}
                     className={`flex px-2 py-1  transition-all duration-200 rounded-md cursor-pointer
                 `}>
                     <a className="relative flex-shrink-0">
                       <img
                         className="h-12 w-12 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 "
-                        src={notifyRealtime?.message?.avatarUrl || default_forum}
+                        src={
+                          notifyRealtime?.message?.conversation?.avatarUrl ||
+                          default_forum
+                        }
                         alt="avatar"
                       />
-                      {notifyRealtime?.message?.type === 'CHAT' &&
+                      {notifyRealtime?.message?.conversation?.type === 'CHAT' &&
                         listFriendOnline.some(
                           (user) =>
-                            user.id === notifyRealtime?.message?.users[0].userId ||
-                            user.id === notifyRealtime?.message?.users[1].userId,
+                            user.id ===
+                              notifyRealtime?.message?.conversation?.users[0].userId ||
+                            user.id ===
+                              notifyRealtime?.message?.conversation?.users[1].userId,
                         ) && (
                           <span
                             title="online"
@@ -132,20 +138,30 @@ const NotifyRealtime: FC<Props> = ({
                     </a>
                     <div className="flex flex-col w-full ">
                       <span className="font-semibold whitespace-nowrap truncate ">
-                        {notifyRealtime?.message?.displayName}
+                        {notifyRealtime?.message?.conversation?.displayName}
                       </span>
                       <div
                         className={`flex items-center gap-2 ${
-                          !notifyRealtime?.message?.isRead && 'font-semibold'
+                          // !notifyRealtime?.message?.isRead &&
+                          'font-semibold'
                         }`}>
-                        <span className={` text-sm max-w-[125px] break-words truncate `}>
-                          {notifyRealtime?.message?.lastMessage?.content}
+                        <span className={` text-sm max-w-[200px] break-words truncate `}>
+                          {notifyRealtime?.message?.conversation?.type ===
+                            'GROUP_CHAT' && (
+                            <span>
+                              {notifyRealtime.message.author.displayName ||
+                                notifyRealtime.message.author.fullName}
+                              :
+                            </span>
+                          )}
+                          {notifyRealtime?.message?.content}
                         </span>
                         <span className=" text-xs">
-                          {notifyRealtime?.message?.lastMessage &&
+                          {/* {notifyRealtime?.message?.lastMessage &&
                             dayComparedToThePast(
                               notifyRealtime?.message.lastMessage.createdAt,
-                            )}
+                            )} */}
+                          vừa xong
                         </span>
                       </div>
                     </div>

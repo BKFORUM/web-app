@@ -5,12 +5,14 @@ import AvatarHeader from '../AvatarHeader/AvatarHeader'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import Tooltip from '@mui/material/Tooltip'
 import Notification from '../Notification'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import ModalEditForum from '@pages/Forum/components/ModalEditForum'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import logoBk from '../../../assets/images/logobkforum.png'
 import {
   authStateSelector,
+  conversationActionSelector,
+  conversationStateSelector,
   forumActionSelector,
   forumStateSelector,
   notifyActionSelector,
@@ -22,18 +24,27 @@ import {
 import SearchInput from '@components/SearchInput'
 import { IUserData } from '@interfaces/IUser'
 import socket from '@utils/socket/socketConfig'
+import { IMessage } from '@interfaces/IConversation'
 interface Props {}
 
 const Header: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
+  const { id } = useParams()
+  const { pathname } = useLocation()
   const { setTextSearch } = useStoreActions(searchActionSelector)
   const { addForum, setIsAddForumSuccess } = useStoreActions(forumActionSelector)
   const { isAddForumSuccess, messageErrorForum } = useStoreState(forumStateSelector)
   const { postImage } = useStoreActions(postActionSelector)
-  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { setNotifySetting, setNotifyRealtime } = useStoreActions(notifyActionSelector)
   const { setListFriendOnline } = useStoreActions(userActionSelector)
-  const { listFriendOnline } = useStoreState(userStateSelector)
+  const { listFriendOnline, currentUserSuccess } = useStoreState(userStateSelector)
   const { isLoginSuccess } = useStoreState(authStateSelector)
+  const { setCurrentConverSationMessage, setListConversation } = useStoreActions(
+    conversationActionSelector,
+  )
+  const { currentConverSationMessage, listConversation } = useStoreState(
+    conversationStateSelector,
+  )
 
   const searchParams = new URLSearchParams(window.location.search)
   const search = searchParams.get('search')
@@ -114,6 +125,37 @@ const Header: FC<Props> = (): JSX.Element => {
     setListFriendOnline(newData)
   }
 
+  const handleNewMessage = (response: IMessage) => {
+    console.log(response)
+    const location = pathname.split('/')[1]
+
+    if (location !== 'message') {
+      setNotifyRealtime({ show: true, message: response, type: 'message' })
+    } else {
+      if (
+        response?.author.id !== currentUserSuccess?.id &&
+        response?.conversationId === id
+      ) {
+        setCurrentConverSationMessage([response, ...currentConverSationMessage])
+      }
+      const getConversationAdd = listConversation.find((item) => {
+        return item.id === response.conversationId
+      })
+
+      if (getConversationAdd) {
+        const newConversation = {
+          ...getConversationAdd,
+          isRead: id === response.conversationId,
+          lastMessage: response,
+        }
+        const newList = listConversation.filter((item) => {
+          return item.id !== response.conversationId
+        })
+        setListConversation([newConversation, ...newList])
+      }
+    }
+  }
+
   useEffect(() => {
     const auth: any = JSON.parse(String(localStorage.getItem('auth')))
     if (isLoginSuccess && auth?.accessToken) {
@@ -127,6 +169,13 @@ const Header: FC<Props> = (): JSX.Element => {
       socket.connect()
     }
   }, [isLoginSuccess])
+
+  useEffect(() => {
+    socket.on('onMessage', handleNewMessage)
+    return () => {
+      socket.off('onMessage', handleNewMessage)
+    }
+  }, [id, currentUserSuccess?.id, listConversation, socket])
 
   useEffect(() => {
     socket.emit('onGetOnlineFriends', {})

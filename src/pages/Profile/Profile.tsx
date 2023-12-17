@@ -48,6 +48,7 @@ const Profile: FC<Props> = (): JSX.Element => {
 
   const getAllPostByUserData = async (): Promise<void> => {
     if (id && paginationModel) {
+      setIsLoading(true)
       const res = await getAllPostByUser({
         id: id,
         params: {
@@ -60,6 +61,7 @@ const Profile: FC<Props> = (): JSX.Element => {
         setTotalRowCount(res.totalRecords)
         setDataPost([...dataPost, ...res.data])
       }
+      setIsLoading(false)
     }
   }
 
@@ -286,6 +288,7 @@ const Profile: FC<Props> = (): JSX.Element => {
             setOpenModalDelete={setOpenModalDelete}
             setPaginationModel={setPaginationModel}
             totalRowCount={totalRowCount}
+            isLoading={isLoading}
           />
         </TabPanel>
 

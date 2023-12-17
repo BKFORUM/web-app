@@ -73,6 +73,7 @@ const Forum: FC<Props> = (): JSX.Element => {
 
   const getAllPostByForumData = async (): Promise<void> => {
     if (id && paginationModel) {
+      setIsLoading(true)
       const res = await getAllPostByForum({
         id: id,
         params: {
@@ -85,6 +86,7 @@ const Forum: FC<Props> = (): JSX.Element => {
         setTotalRowCount(res.totalRecords)
         setDataPost([...dataPost, ...res.data])
       }
+      setIsLoading(false)
     }
   }
 
@@ -377,6 +379,7 @@ const Forum: FC<Props> = (): JSX.Element => {
                 setPaginationModel={setPaginationModel}
                 totalRowCount={totalRowCount}
                 moderatorId={detailForum?.moderator.id}
+                isLoading={isLoading}
               />
             </TabPanel>
 
