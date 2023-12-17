@@ -11,11 +11,11 @@ import { pageMode } from '@interfaces/IClient'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { dayComparedToThePast } from '@utils/functions/formatDay'
 import default_forum from '../../../assets/images/default_forum.png'
-import { IConversation, IMessage } from '@interfaces/IConversation'
+import { IConversation } from '@interfaces/IConversation'
 import { BiMessageAdd } from 'react-icons/bi'
 import { Tooltip } from '@mui/material'
 import ModalAddGroupChat from '@components/ModalAddGroupChat'
-import socket from '@utils/socket/socketConfig'
+import { useDebounce } from '@hooks/useDebounce'
 
 interface Props {}
 const SidebarMessage: FC<Props> = (): JSX.Element => {
@@ -26,12 +26,9 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
     setCurrentConversation,
     setListConversation,
     setIsReadConversation,
-    setCurrentConverSationMessage,
   } = useStoreActions(conversationActionSelector)
-  const { listConversation, currentConverSationMessage } = useStoreState(
-    conversationStateSelector,
-  )
-  const { currentUserSuccess, listFriendOnline } = useStoreState(userStateSelector)
+  const { listConversation } = useStoreState(conversationStateSelector)
+  const { listFriendOnline } = useStoreState(userStateSelector)
 
   const [inputSearch, setInputSearch] = useState<string>('')
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
@@ -61,42 +58,52 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
     setIsLoading(false)
   }
 
-  const handleNewMessage = (response: IMessage) => {
-    console.log(response)
-    if (
-      response?.author.id !== currentUserSuccess?.id &&
-      response?.conversationId === id
-    ) {
-      setCurrentConverSationMessage([response, ...currentConverSationMessage])
-    }
-    const getConversationAdd = listConversation.find((item) => {
-      return item.id === response.conversationId
-    })
+  // const handleNewMessage = (response: IMessage) => {
+  //   console.log(response)
+  //   if (
+  //     response?.author.id !== currentUserSuccess?.id &&
+  //     response?.conversationId === id
+  //   ) {
+  //     setCurrentConverSationMessage([response, ...currentConverSationMessage])
+  //   }
+  //   const getConversationAdd = listConversation.find((item) => {
+  //     return item.id === response.conversationId
+  //   })
 
-    if (getConversationAdd) {
-      const newConversation = {
-        ...getConversationAdd,
-        isRead: id === response.conversationId,
-        lastMessage: response,
-      }
-      const newList = listConversation.filter((item) => {
-        return item.id !== response.conversationId
-      })
-      setListConversation([newConversation, ...newList])
-    }
-  }
+  //   if (getConversationAdd) {
+  //     const newConversation = {
+  //       ...getConversationAdd,
+  //       isRead: id === response.conversationId,
+  //       lastMessage: response,
+  //     }
+  //     const newList = listConversation.filter((item) => {
+  //       return item.id !== response.conversationId
+  //     })
+  //     setListConversation([newConversation, ...newList])
 
-  useEffect(() => {
-    socket.on('onMessage', handleNewMessage)
-    return () => {
-      socket.off('onMessage', handleNewMessage)
-    }
-  }, [id, currentUserSuccess?.id, listConversation])
+  //     if (
+  //       pathname.split('/')[1] !== 'message' &&
+  //       currentUserSuccess?.id !== response.author.id
+  //     ) {
+  //       console.log(111111)
+  //       setNotifyRealtime({ show: true, message: newConversation, type: 'message' })
+  //     }
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   socket.on('onMessage', handleNewMessage)
+  //   return () => {
+  //     socket.off('onMessage', handleNewMessage)
+  //   }
+  // }, [id, currentUserSuccess?.id, listConversation])
+
+  const debounce = useDebounce(inputSearch, 500)
 
   useEffect(() => {
     setListConversation([])
     setPaginationModel({ page: 0, pageSize: 10 })
-  }, [])
+  }, [debounce])
 
   useEffect(() => {
     getAllConversationPage()

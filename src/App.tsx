@@ -22,7 +22,7 @@ function App() {
   const { notifySetting, notifyRealtime } = useStoreState(notifyStateSelector)
   const { setNotifySetting, setNotifyRealtime } = useStoreActions(notifyActionSelector)
   const { getCurrentUser } = useStoreActions(userActionSelector)
-  const { accessToken } = useStoreState(authStateSelector)
+  const { accessToken, socket } = useStoreState(authStateSelector)
   const { setAccessToken } = useStoreActions(authActionSelector)
   const auth: any = JSON.parse(String(localStorage.getItem('auth')))
 
@@ -31,8 +31,14 @@ function App() {
   }
 
   useEffect(() => {
-    if (auth) setAccessToken(auth?.accessToken)
+    if (auth) {
+      setAccessToken(auth.accessToken)
+    }
   }, [auth])
+
+  useEffect(() => {
+    console.log(socket)
+  }, [socket])
 
   useEffect(() => {
     if (accessToken) getCurrentUserApp()

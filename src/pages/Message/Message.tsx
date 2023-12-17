@@ -117,11 +117,19 @@ const Message: FC<Props> = (): JSX.Element => {
           author: res?.author,
         }
         setTotalRowMessages(totalRowMessages + 1)
-        const newData = [
-          newDataRow,
-          ...currentConverSationMessage.slice(0, currentConverSationMessage.length - 1),
-          ...currentConverSationMessage.slice(currentConverSationMessage.length),
-        ] as IMessage[]
+        let newData
+        if (
+          currentConverSationMessage.length >= 10 &&
+          currentConverSationMessage.length < totalRowMessages
+        ) {
+          newData = [
+            newDataRow,
+            ...currentConverSationMessage.slice(0, currentConverSationMessage.length - 1),
+            ...currentConverSationMessage.slice(currentConverSationMessage.length),
+          ] as IMessage[]
+        } else {
+          newData = [newDataRow, ...currentConverSationMessage] as IMessage[]
+        }
         setInputText('')
         setCurrentConverSationMessage(newData)
       }

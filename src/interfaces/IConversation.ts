@@ -23,5 +23,6 @@ export interface IMessage {
     createdAt: string,
     updatedAt: string,
     conversationId?: string,
+    conversation?: IConversation
     userId?: string
 }

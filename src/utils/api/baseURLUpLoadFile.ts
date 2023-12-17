@@ -1,3 +1,4 @@
+import socket from "@utils/socket/socketConfig";
 import axios from "axios";
 
 const BaseURLUpLoadFile = axios.create({
@@ -42,6 +43,14 @@ BaseURLUpLoadFile.interceptors.response.use(
                     if (resp) {
                         localStorage.setItem('auth', JSON.stringify(resp.data))
                         const access_token = resp.data.accessToken;
+                        socket.io.opts.transportOptions = {
+                            polling: {
+                                extraHeaders: {
+                                    Authorization: `Bearer ${access_token}`,
+                                },
+                            },
+                        }
+                        socket.connect()
                         BaseURLUpLoadFile.defaults.headers.common[
                             "Authorization"
                         ] = `Bearer ${access_token}`;
