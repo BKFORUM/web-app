@@ -10,7 +10,6 @@ import ModalEditForum from '@pages/Forum/components/ModalEditForum'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import logoBk from '../../../assets/images/logobkforum.png'
 import {
-  authStateSelector,
   conversationActionSelector,
   conversationStateSelector,
   forumActionSelector,
@@ -38,7 +37,6 @@ const Header: FC<Props> = (): JSX.Element => {
   const { setNotifySetting, setNotifyRealtime } = useStoreActions(notifyActionSelector)
   const { setListFriendOnline } = useStoreActions(userActionSelector)
   const { listFriendOnline, currentUserSuccess } = useStoreState(userStateSelector)
-  const { isLoginSuccess } = useStoreState(authStateSelector)
   const { setCurrentConverSationMessage, setListConversation } = useStoreActions(
     conversationActionSelector,
   )
@@ -157,20 +155,6 @@ const Header: FC<Props> = (): JSX.Element => {
   }
 
   useEffect(() => {
-    const auth: any = JSON.parse(String(localStorage.getItem('auth')))
-    if (isLoginSuccess && auth?.accessToken) {
-      socket.io.opts.transportOptions = {
-        polling: {
-          extraHeaders: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-        },
-      }
-      socket.connect()
-    }
-  }, [isLoginSuccess])
-
-  useEffect(() => {
     socket.on('onMessage', handleNewMessage)
     return () => {
       socket.off('onMessage', handleNewMessage)
@@ -181,13 +165,13 @@ const Header: FC<Props> = (): JSX.Element => {
     socket.emit('onGetOnlineFriends', {})
 
     socket.on('onGetOnlineFriends', getAllFriendOnline)
-  }, [])
+  }, [socket])
 
   useEffect(() => {
     socket.on('onFriendOnline', AddFiendOnline)
 
     socket.on('onFriendOffline', deleteFriendOffline)
-  }, [listFriendOnline])
+  }, [listFriendOnline, socket])
 
   useEffect(() => {
     if (search !== null) {

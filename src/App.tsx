@@ -17,12 +17,13 @@ import Notify from '@components/Notify'
 import { useEffect } from 'react'
 import ForgotPassword from '@pages/Auth/ForgotPassword'
 import NotifyRealtime from '@components/NotifyRealtime'
+import socket from '@utils/socket/socketConfig'
 
 function App() {
   const { notifySetting, notifyRealtime } = useStoreState(notifyStateSelector)
   const { setNotifySetting, setNotifyRealtime } = useStoreActions(notifyActionSelector)
   const { getCurrentUser } = useStoreActions(userActionSelector)
-  const { accessToken, socket } = useStoreState(authStateSelector)
+  const { accessToken, isLoginSuccess } = useStoreState(authStateSelector)
   const { setAccessToken } = useStoreActions(authActionSelector)
   const auth: any = JSON.parse(String(localStorage.getItem('auth')))
 
@@ -37,12 +38,38 @@ function App() {
   }, [auth])
 
   useEffect(() => {
-    console.log(socket)
-  }, [socket])
-
-  useEffect(() => {
     if (accessToken) getCurrentUserApp()
   }, [accessToken])
+
+  useEffect(() => {
+    console.log(11111)
+    const auth: any = JSON.parse(String(localStorage.getItem('auth')))
+    if (isLoginSuccess && auth?.accessToken) {
+      socket.io.opts.transportOptions = {
+        polling: {
+          extraHeaders: {
+            Authorization: `Bearer ${auth.accessToken}`,
+          },
+        },
+      }
+      socket.connect()
+      socket.on('connect', () => {
+        console.log('Socket connected')
+      })
+
+      socket.on('connect_error', () => {
+        socket.io.opts.transportOptions = {
+          polling: {
+            extraHeaders: {
+              Authorization: `Bearer ${auth.accessToken}`,
+            },
+          },
+        }
+        socket.connect()
+      })
+    }
+  }, [isLoginSuccess])
+
   return (
     <>
       <Routes>

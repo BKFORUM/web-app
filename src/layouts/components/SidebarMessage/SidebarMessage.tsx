@@ -11,11 +11,11 @@ import { pageMode } from '@interfaces/IClient'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { dayComparedToThePast } from '@utils/functions/formatDay'
 import default_forum from '../../../assets/images/default_forum.png'
-import { IConversation } from '@interfaces/IConversation'
 import { BiMessageAdd } from 'react-icons/bi'
 import { Tooltip } from '@mui/material'
 import ModalAddGroupChat from '@components/ModalAddGroupChat'
 import { useDebounce } from '@hooks/useDebounce'
+import socket from '@utils/socket/socketConfig'
 
 interface Props {}
 const SidebarMessage: FC<Props> = (): JSX.Element => {
@@ -46,57 +46,11 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
       })
       if (res) {
         setTotalRowCount(res.totalRecords)
-        const newData: IConversation[] = res?.data.map((item: IConversation) => {
-          return {
-            ...item,
-            isRead: true,
-          }
-        })
-        setListConversation([...listConversation, ...newData])
+        setListConversation([...listConversation, ...res.data])
       }
     }
     setIsLoading(false)
   }
-
-  // const handleNewMessage = (response: IMessage) => {
-  //   console.log(response)
-  //   if (
-  //     response?.author.id !== currentUserSuccess?.id &&
-  //     response?.conversationId === id
-  //   ) {
-  //     setCurrentConverSationMessage([response, ...currentConverSationMessage])
-  //   }
-  //   const getConversationAdd = listConversation.find((item) => {
-  //     return item.id === response.conversationId
-  //   })
-
-  //   if (getConversationAdd) {
-  //     const newConversation = {
-  //       ...getConversationAdd,
-  //       isRead: id === response.conversationId,
-  //       lastMessage: response,
-  //     }
-  //     const newList = listConversation.filter((item) => {
-  //       return item.id !== response.conversationId
-  //     })
-  //     setListConversation([newConversation, ...newList])
-
-  //     if (
-  //       pathname.split('/')[1] !== 'message' &&
-  //       currentUserSuccess?.id !== response.author.id
-  //     ) {
-  //       console.log(111111)
-  //       setNotifyRealtime({ show: true, message: newConversation, type: 'message' })
-  //     }
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   socket.on('onMessage', handleNewMessage)
-  //   return () => {
-  //     socket.off('onMessage', handleNewMessage)
-  //   }
-  // }, [id, currentUserSuccess?.id, listConversation])
 
   const debounce = useDebounce(inputSearch, 500)
 
@@ -111,6 +65,11 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
 
   const handleChangeSearch = (value: string): void => {
     setInputSearch(value)
+  }
+
+  const handleReadMessage = (messageId: string, conversationId: string): void => {
+    setIsReadConversation(conversationId)
+    socket.emit('onReadMessage', { messageId: messageId, conversationId: conversationId })
   }
   return (
     <>
@@ -184,7 +143,7 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
                     onClick={() => {
                       navigate('/message/' + item.id), setCurrentConversation(item)
                       if (!item.isRead) {
-                        setIsReadConversation(item.id)
+                        handleReadMessage(item.lastMessage?.id || '', item.id)
                       }
                     }}
                     className={`flex px-2 py-1  transition-all duration-200 rounded-md cursor-pointer

@@ -29,6 +29,7 @@ interface Props {
 const PostProfile: FC<Props> = ({
   user,
   dataPost,
+  paginationModel,
   setPaginationModel,
   totalRowCount,
   setOpenModal,
@@ -115,15 +116,16 @@ const PostProfile: FC<Props> = ({
               {!isLoading &&
                 dataPost.length === totalRowCount &&
                 dataPost.length !== 0 && (
-                  <p style={{ textAlign: 'center' }}>
+                  <p className="text-center pt-3 pb-6">
                     <b>Đã hiển thị tất cả các bài viết của người dùng</b>
                   </p>
                 )}
 
               {!isLoading &&
+                paginationModel !== null &&
                 dataPost.length === totalRowCount &&
                 dataPost.length === 0 && (
-                  <p style={{ textAlign: 'center' }}>
+                  <p className="text-center pt-3 pb-6">
                     <b>Người dùng hiện tại chưa có bài viết nào</b>
                   </p>
                 )}

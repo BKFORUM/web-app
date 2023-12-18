@@ -158,7 +158,9 @@ const EventItem: FC<Props> = ({
               )}
             </button>
             {listUserSubscribed.length > 0 && (
-              <div className="absolute z-[100] overflow-auto bg-black/70 top-full max-h-[200px]  flex flex-col flex-grow-0 left-0 px-2 py-1 w-auto rounded-md text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div
+                className="absolute z-[100] overflow-auto bg-black/70 top-full max-h-[200px]  flex flex-col flex-grow-0 left-0 px-2 py-1 w-auto 
+              rounded-md text-slate-100 opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300 pointer-events-none">
                 {listUserSubscribed.map((user, index) => (
                   <p
                     key={index}
@@ -196,7 +198,6 @@ const EventItem: FC<Props> = ({
           item={item}
           isUnsubscribed={isUnsubscribed}
           handleAction={handleAction}
-          
         />
       )}
     </>

@@ -41,7 +41,59 @@ const ContentChat: FC<Props> = ({
       }}
       hasMore={data.length !== totalRowCount}
       height={heightContent !== undefined ? heightContent : '0'}
-      loader={<div>{loading && <span>Loading...</span>}</div>}
+      loader={
+        loading && (
+          <div className=" flex flex-col px-2 gap-2">
+            <div className="animate-pulse justify-start flex gap-2">
+              <div className="h-8 w-8 rounded-full bg-slate-200 mt-auto"></div>
+              <div className="flex flex-col">
+                <p className="w-20 h-2 rounded-md bg-slate-200"></p>
+                <p className="w-52 h-5 rounded-md mt-2 bg-slate-200"></p>
+              </div>
+            </div>
+            <div className="animate-pulse justify-start flex gap-2">
+              <div className="h-8 w-8 rounded-full bg-slate-200 mt-auto"></div>
+              <div className="flex flex-col">
+                <p className="w-20 h-2 rounded-md bg-slate-200"></p>
+                <p className="w-72 h-5 rounded-md mt-2 bg-slate-200"></p>
+              </div>
+            </div>
+
+            <div className="animate-pulse justify-end flex gap-2">
+              <div className="flex flex-col">
+                <p className="w-14 h-5 rounded-md mt-2 bg-slate-200"></p>
+              </div>
+            </div>
+            <div className="animate-pulse justify-end flex gap-2">
+              <div className="flex flex-col">
+                <p className="w-28 h-5 rounded-md mt-2 bg-slate-200"></p>
+              </div>
+            </div>
+
+            <div className="animate-pulse justify-start flex gap-2">
+              <div className="h-8 w-8 rounded-full bg-slate-200 mt-auto"></div>
+              <div className="flex flex-col">
+                <p className="w-20 h-2 rounded-md bg-slate-200"></p>
+                <p className="w-16 h-5 rounded-md mt-2 bg-slate-200"></p>
+              </div>
+            </div>
+
+            <div className="animate-pulse justify-end flex gap-2">
+              <div className="flex flex-col">
+                <p className="w-20 h-5 rounded-md mt-2 bg-slate-200"></p>
+              </div>
+            </div>
+
+            <div className="animate-pulse justify-start flex gap-2">
+              <div className="h-8 w-8 rounded-full bg-slate-200 mt-auto"></div>
+              <div className="flex flex-col">
+                <p className="w-20 h-2 rounded-md bg-slate-200"></p>
+                <p className="w-40 h-5 rounded-md mt-2 bg-slate-200"></p>
+              </div>
+            </div>
+          </div>
+        )
+      }
       style={{ display: 'flex', flexDirection: 'column-reverse' }}
       inverse={true}
       endMessage={
