@@ -83,17 +83,22 @@ const PostForum: FC<Props> = ({ ...props }: Props): JSX.Element => {
           }
           endMessage={
             <>
-              {!props.isLoading && props.data.length === props.totalRowCount && props.data.length !== 0 && (
-                <p style={{ textAlign: 'center' }}>
-                  <b>Đã hiển thị tất cả các bài viết của forum</b>
-                </p>
-              )}
+              {!props.isLoading &&
+                props.data.length === props.totalRowCount &&
+                props.data.length !== 0 && (
+                  <p className="text-center pt-3 pb-6">
+                    <b>Đã hiển thị tất cả các bài viết của forum</b>
+                  </p>
+                )}
 
-              {!props.isLoading && props.data.length === props.totalRowCount && props.data.length === 0 && (
-                <p style={{ textAlign: 'center' }}>
-                  <b>Forum hiện tại chưa có bài viết nào</b>
-                </p>
-              )}
+              {!props.isLoading &&
+                props.paginationModel !== null &&
+                props.data.length === props.totalRowCount &&
+                props.data.length === 0 && (
+                  <p className="text-center pt-3 pb-6">
+                    <b>Forum hiện tại chưa có bài viết nào</b>
+                  </p>
+                )}
             </>
           }>
           {props.data.map((item, index) => (

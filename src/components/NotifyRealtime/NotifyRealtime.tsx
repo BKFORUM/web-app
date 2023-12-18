@@ -75,102 +75,104 @@ const NotifyRealtime: FC<Props> = ({
                     <XMarkIcon className="h-5 w-5" />
                   </button>
                 </div>
-                {notifyRealtime.type === 'notify' && (
-                  <div className="relative flex-1 pt-0.5 flex gap-2 items-center">
-                    {notifyRealtime.notify?.sender && (
-                      <div className="h-12 w-12 overflow-hidden flex-shrink-0">
-                        <img
-                          className="w-full h-full rounded-full border border-gray-500"
-                          src={notifyRealtime.notify?.sender.avatarUrl}
-                          alt={notifyRealtime.notify?.sender.fullName}
-                        />
-                      </div>
-                    )}
-                    <div className="flex flex-col gap-0.5">
-                      <p className="text-sm font-medium text-gray-900 flex-1 max-w-[90%]">
-                        <span>{notifyRealtime.notify?.sender?.fullName} </span>
-                        {notifyRealtime.notify?.content}
-                      </p>
-                      <span className={`text-xs font-semibold text-blue-500`}>
-                        {dayComparedToThePast(notifyRealtime.notify?.createdAt || '')}
-                      </span>
-                    </div>
-
-                    <span
-                      title="not read"
-                      className="flex flex-shrink-0 ml-auto absolute right-1 top-1/2 -translate-y-1/2 bg-blue-500 border border-white w-[10px] h-[10px] rounded-full"></span>
-                  </div>
-                )}
-
-                {notifyRealtime.type === 'message' && (
-                  <li
-                    onClick={() => {
-                      navigate('/message/' + notifyRealtime?.message?.conversationId)
-                      setCurrentConversation(
-                        notifyRealtime?.message?.conversation || null,
-                      )
-                      setIsReadConversation(notifyRealtime?.message?.conversationId || '')
-                      setNotifyRealtime({ show: false, type: notifyRealtime.type })
-                    }}
-                    className={`flex px-2 py-1  transition-all duration-200 rounded-md cursor-pointer
-                `}>
-                    <a className="relative flex-shrink-0">
-                      <img
-                        className="h-12 w-12 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 "
-                        src={
-                          notifyRealtime?.message?.conversation?.avatarUrl ||
-                          default_forum
-                        }
-                        alt="avatar"
-                      />
-                      {notifyRealtime?.message?.conversation?.type === 'CHAT' &&
-                        listFriendOnline.some(
-                          (user) =>
-                            user.id ===
-                              notifyRealtime?.message?.conversation?.users[0].userId ||
-                            user.id ===
-                              notifyRealtime?.message?.conversation?.users[1].userId,
-                        ) && (
-                          <span
-                            title="online"
-                            className="flex ml-auto flex-shrink-0 absolute bottom-1 right-1.5 bg-green-500 border border-white w-[11px] h-[11px] rounded-full"></span>
-                        )}
-                    </a>
-                    <div className="flex flex-col w-full ">
-                      <span className="font-semibold whitespace-nowrap truncate ">
-                        {notifyRealtime?.message?.conversation?.displayName}
-                      </span>
-                      <div
-                        className={`flex items-center gap-2 ${
-                          // !notifyRealtime?.message?.isRead &&
-                          'font-semibold'
-                        }`}>
-                        <span className={` text-sm max-w-[200px] break-words truncate `}>
-                          {notifyRealtime?.message?.conversation?.type ===
-                            'GROUP_CHAT' && (
-                            <span>
-                              {notifyRealtime.message.author.displayName ||
-                                notifyRealtime.message.author.fullName}
-                              :
-                            </span>
-                          )}
-                          {notifyRealtime?.message?.content}
+                {notifyRealtime.type === 'notify' &&
+                  notifyRealtime.notify !== undefined && (
+                    <div className="relative flex-1 pt-0.5 flex gap-2 items-center">
+                      {notifyRealtime.notify?.sender && (
+                        <div className="h-12 w-12 overflow-hidden flex-shrink-0">
+                          <img
+                            className="w-full h-full rounded-full border border-gray-500"
+                            src={notifyRealtime.notify?.sender.avatarUrl}
+                            alt={notifyRealtime.notify?.sender.fullName}
+                          />
+                        </div>
+                      )}
+                      <div className="flex flex-col gap-0.5">
+                        <p className="text-sm font-medium text-gray-900 flex-1 max-w-[90%]">
+                          <span>{notifyRealtime.notify?.sender?.fullName} </span>
+                          {notifyRealtime.notify?.content}
+                        </p>
+                        <span className={`text-xs font-semibold text-blue-500`}>
+                          {dayComparedToThePast(notifyRealtime.notify?.createdAt || '')}
                         </span>
-                        <span className=" text-xs">
-                          {/* {notifyRealtime?.message?.lastMessage &&
+                      </div>
+
+                      <span
+                        title="not read"
+                        className="flex flex-shrink-0 ml-auto absolute right-1 top-1/2 -translate-y-1/2 bg-blue-500 border border-white w-[10px] h-[10px] rounded-full"></span>
+                    </div>
+                  )}
+
+                {notifyRealtime.type === 'message' &&
+                  notifyRealtime.message !== undefined && (
+                    <li
+                      onClick={() => {
+                        navigate('/message/' + notifyRealtime?.message?.conversationId)
+                        setCurrentConversation(
+                          notifyRealtime?.message?.conversation || null,
+                        )
+                        setIsReadConversation(
+                          notifyRealtime?.message?.conversationId || '',
+                        )
+                        setNotifyRealtime({ show: false, type: notifyRealtime.type })
+                      }}
+                      className={`flex px-2 py-1  transition-all duration-200 rounded-md cursor-pointer
+                `}>
+                      <a className="relative flex-shrink-0">
+                        <img
+                          className="h-12 w-12 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 "
+                          src={
+                            notifyRealtime?.message?.conversation?.avatarUrl ||
+                            default_forum
+                          }
+                          alt="avatar"
+                        />
+                        {notifyRealtime?.message?.conversation?.type === 'CHAT' &&
+                          listFriendOnline !== undefined &&
+                          listFriendOnline.some(
+                            (user) => user.id === notifyRealtime?.message?.author.id,
+                          ) && (
+                            <span
+                              title="online"
+                              className="flex ml-auto flex-shrink-0 absolute bottom-1 right-1.5 bg-green-500 border border-white w-[11px] h-[11px] rounded-full"></span>
+                          )}
+                      </a>
+                      <div className="flex flex-col w-full ">
+                        <span className="font-semibold whitespace-nowrap truncate ">
+                          {notifyRealtime?.message?.conversation?.displayName}
+                        </span>
+                        <div
+                          className={`flex items-center gap-2 ${
+                            // !notifyRealtime?.message?.isRead &&
+                            'font-semibold'
+                          }`}>
+                          <span
+                            className={` text-sm max-w-[200px] break-words truncate `}>
+                            {notifyRealtime?.message?.conversation?.type ===
+                              'GROUP_CHAT' && (
+                              <span>
+                                {notifyRealtime.message.author.displayName ||
+                                  notifyRealtime.message.author.fullName}
+                                :
+                              </span>
+                            )}
+                            {notifyRealtime?.message?.content}
+                          </span>
+                          <span className=" text-xs">
+                            {/* {notifyRealtime?.message?.lastMessage &&
                             dayComparedToThePast(
                               notifyRealtime?.message.lastMessage.createdAt,
                             )} */}
-                          vừa xong
-                        </span>
+                            vừa xong
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
-                    <span
-                      title="not read"
-                      className="flex ml-auto flex-shrink-0  transform translate-y-[18px] bg-blue-500 border border-white w-[10px] h-[10px] rounded-full"></span>
-                  </li>
-                )}
+                      <span
+                        title="not read"
+                        className="flex ml-auto flex-shrink-0  transform translate-y-[18px] bg-blue-500 border border-white w-[10px] h-[10px] rounded-full"></span>
+                    </li>
+                  )}
               </div>
             </div>
           </Transition>

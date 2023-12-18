@@ -48,7 +48,7 @@ const Login: FC<Props> = (): JSX.Element => {
   })
 
   useEffect(() => {
-    if (!isLoginSuccess) {
+    if (!isLoginSuccess && messageError !== '') {
       setNotifySetting({ show: true, status: 'error', message: messageError })
       setIsLoginSuccess(true)
     }

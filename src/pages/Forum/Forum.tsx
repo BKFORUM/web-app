@@ -43,7 +43,7 @@ const Forum: FC<Props> = (): JSX.Element => {
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const { setIsGetAllAgain } = useStoreActions(userActionSelector)
 
-  const [value, setValue] = useState(0)
+  const [value, setValue] = useState<null | number>(null)
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [openModalDelete, setOpenModalDelete] = useState<boolean>(false)
   const [openModalEditForum, setOpenModalEditForum] = useState<boolean>(false)
@@ -63,6 +63,7 @@ const Forum: FC<Props> = (): JSX.Element => {
         const usersList = res?.users.map((userData: { user: IUserData }) => {
           return userData.user
         })
+        setValue(res?.yourStatus === 'ACTIVE' ? 0 : 1)
         setListUserForum(usersList)
         setStatusLoading('LOADING_SUCCESS')
       } else {
@@ -93,7 +94,6 @@ const Forum: FC<Props> = (): JSX.Element => {
   useEffect(() => {
     window.scrollTo(0, 0)
     if (id) {
-      setValue(0)
       getForumData()
       setDataPost([])
       setPaginationModel({ page: 0, pageSize: 10 })
@@ -324,6 +324,7 @@ const Forum: FC<Props> = (): JSX.Element => {
               {detailForum && (
                 <OptionForum
                   yourStatus={detailForum?.yourStatus}
+                  modId={detailForum?.moderator.id}
                   id={id}
                 />
               )}
@@ -334,17 +335,25 @@ const Forum: FC<Props> = (): JSX.Element => {
                 onChange={handleChange}
                 aria-label="basic tabs example">
                 <Tab
-                  sx={{ textTransform: 'none' }}
+                  sx={{
+                    textTransform: 'none',
+                    display: detailForum?.yourStatus === 'ACTIVE' ? 'flex' : 'none',
+                  }}
                   label="Posts"
                   {...a11yProps(0)}
                 />
+
                 <Tab
                   sx={{ textTransform: 'none' }}
                   label="Members"
                   {...a11yProps(1)}
                 />
+
                 <Tab
-                  sx={{ textTransform: 'none' }}
+                  sx={{
+                    textTransform: 'none',
+                    display: detailForum?.yourStatus === 'ACTIVE' ? 'flex' : 'none',
+                  }}
                   label="Events"
                   {...a11yProps(2)}
                 />

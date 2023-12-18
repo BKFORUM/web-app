@@ -210,7 +210,7 @@ const Notification: FC<Props> = (): JSX.Element => {
     socket.on('onFriendRequestApproved', handleNewNotification)
 
     socket.on('onUpcomingEvent', handleNewNotification)
-  }, [listNotification, numberNotRead])
+  }, [listNotification, numberNotRead, socket])
 
   useEffect(() => {
     if (postSelected) {

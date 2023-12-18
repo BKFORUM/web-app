@@ -5,7 +5,12 @@ import { ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/ou
 import { useNavigate } from 'react-router-dom'
 import { Tooltip } from '@mui/material'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import { notifyActionSelector, userActionSelector, userStateSelector } from '@store/index'
+import {
+  authActionSelector,
+  notifyActionSelector,
+  userActionSelector,
+  userStateSelector,
+} from '@store/index'
 import socket from '@utils/socket/socketConfig'
 
 interface Props {}
@@ -17,6 +22,8 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
   const { currentUserSuccess, messageErrorUser, isGetCurrentUserSuccess } =
     useStoreState(userStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { setIsLoginSuccess } = useStoreActions(authActionSelector)
+
   const [open, setOpen] = useState<boolean>(false)
 
   useEffect(() => {
@@ -34,6 +41,7 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
   const _logout = (): void => {
     setCurrentUserSuccess(null)
     setListFriendOnline([])
+    setIsLoginSuccess(false)
     localStorage.removeItem('auth')
     navigate('/auth/login')
     socket.disconnect()

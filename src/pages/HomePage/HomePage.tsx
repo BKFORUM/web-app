@@ -15,6 +15,7 @@ import UserActive from '../../components/UserActive'
 import ModalConfirm from '@components/ModalConfirm'
 import { IPostViewForum } from '@interfaces/IPost'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { pageMode } from '@interfaces/IClient'
 
 interface Props {}
 
@@ -35,10 +36,7 @@ const HomePage: FC<Props> = (): JSX.Element => {
   const [dataForum, setDataForum] = useState<IOption[]>([])
   const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10,
-  })
+  const [paginationModel, setPaginationModel] = useState<null | pageMode>(null)
 
   const getAllForumByUserData = async (): Promise<void> => {
     if (currentUserSuccess?.id) {
@@ -53,13 +51,15 @@ const HomePage: FC<Props> = (): JSX.Element => {
   }
 
   const getAllPostData = async (): Promise<void> => {
-    const res = await getAllPost({
-      skip: paginationModel.page * 10,
-      take: paginationModel.pageSize,
-    })
-    if (res) {
-      setTotalRowCount(res.totalRecords)
-      setDataPost([...dataPost, ...res.data])
+    if (paginationModel) {
+      const res = await getAllPost({
+        skip: paginationModel.page * 10,
+        take: paginationModel.pageSize,
+      })
+      if (res) {
+        setTotalRowCount(res.totalRecords)
+        setDataPost([...dataPost, ...res.data])
+      }
     }
   }
 
@@ -76,6 +76,7 @@ const HomePage: FC<Props> = (): JSX.Element => {
 
   useEffect(() => {
     getAllForumByUserData()
+    setPaginationModel({ page: 0, pageSize: 10 })
   }, [currentUserSuccess?.id])
 
   const handleChange = (value: string): void => {
@@ -272,7 +273,7 @@ const HomePage: FC<Props> = (): JSX.Element => {
               dataLength={dataPost.length}
               next={() =>
                 setPaginationModel({
-                  page: paginationModel.page + 1,
+                  page: (paginationModel && paginationModel.page + 1) || 0,
                   pageSize: 10,
                 })
               }
@@ -308,15 +309,16 @@ const HomePage: FC<Props> = (): JSX.Element => {
                   {!isLoading &&
                     dataPost.length === totalRowCount &&
                     dataPost.length !== 0 && (
-                      <p style={{ textAlign: 'center' }}>
+                      <p className="text-center pt-3 pb-6">
                         <b>Đã hiển thị tất cả các bài viết</b>
                       </p>
                     )}
 
                   {!isLoading &&
+                    paginationModel &&
                     dataPost.length === totalRowCount &&
                     dataPost.length === 0 && (
-                      <p style={{ textAlign: 'center' }}>
+                      <p className="text-center pt-3 pb-6">
                         <b>Hiện tại chưa có bài viết nào</b>
                       </p>
                     )}

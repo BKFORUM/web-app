@@ -14,9 +14,10 @@ import { useNavigate } from 'react-router-dom'
 interface Props {
   yourStatus?: string
   id?: string
+  modId?: string
 }
 
-const OptionForum: FC<Props> = ({ id, yourStatus }: Props): JSX.Element => {
+const OptionForum: FC<Props> = ({ id, yourStatus, modId }: Props): JSX.Element => {
   const navigate = useNavigate()
   const { exitForum, setIsExitForumSuccess, requestOnForum, updateStatusUserFromForum } =
     useStoreActions(forumActionSelector)
@@ -83,11 +84,15 @@ const OptionForum: FC<Props> = ({ id, yourStatus }: Props): JSX.Element => {
   return (
     <div className="relative">
       <div
-        className="flex text-sm rounded-full focus:outline-none cursor-pointer"
+        className="flex text-sm rounded-full focus:outline-none"
         id="user-menu-button"
         onClick={() => setOpen(!open)}>
         {status === 'ACTIVE' && (
-          <div className="relative border-2 border-gray-600 px-4 py-2 rounded-2xl flex items-center hover:bg-gray-200 transition-all duration-200   ">
+          <div
+            className={`relative border-2 border-gray-600 px-4 py-2 rounded-2xl flex items-center ${
+              modId !== currentUserSuccess?.id &&
+              'hover:bg-gray-200 transition-all duration-200 cursor-pointer'
+            } `}>
             <span className="text-base mr-4">Đã tham gia</span>
             <HiChevronDown className="h-5 w-5" />
           </div>
@@ -109,7 +114,7 @@ const OptionForum: FC<Props> = ({ id, yourStatus }: Props): JSX.Element => {
           </div>
         )}
       </div>
-      {status === 'ACTIVE' && (
+      {status === 'ACTIVE' && modId !== currentUserSuccess?.id && (
         <Transition
           show={open}
           as={Fragment}
