@@ -248,6 +248,7 @@ const EventsForum: FC<Props> = ({ moderator }: Props): JSX.Element => {
 
         <div>
           <InfiniteScroll
+            style={{ overflow: 'hidden' }}
             dataLength={dataEvents.length}
             next={() =>
               setPaginationModel((prevPaginationModel) => ({

@@ -31,7 +31,7 @@ const DetailConversation: FC<Props> = (): JSX.Element => {
     setIsDeleteMemberOfConversationSuccess,
     setCurrentConversation,
     setListConversation,
-    addConversation,
+    addUserToConversation,
   } = useStoreActions(conversationActionSelector)
   const {
     messageError,
@@ -52,7 +52,10 @@ const DetailConversation: FC<Props> = (): JSX.Element => {
   const handleAddUser = async (data: any): Promise<void> => {
     console.log(data)
     const userIds = data.map((user: IUserData) => user.id)
-    const res = await addConversation({ id: currentConversation?.id, userIds: userIds })
+    const res = await addUserToConversation({
+      id: currentConversation?.id,
+      userIds: userIds,
+    })
     if (res) {
       setNotifySetting({
         show: true,
