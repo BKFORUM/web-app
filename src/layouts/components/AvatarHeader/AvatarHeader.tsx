@@ -1,7 +1,8 @@
 import { Transition } from '@headlessui/react'
 import { FC, Fragment, useEffect, useState } from 'react'
 import { useClickOutside } from '@hooks/useClickOutside'
-import { ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/outline'
+import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline'
+// Cog6ToothIcon
 import { useNavigate } from 'react-router-dom'
 import { Tooltip } from '@mui/material'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -102,12 +103,12 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
           <li className="relative list-none">
             <hr className="border-t border-gray-200 my-0" />
           </li>
-          <li className="relative group list-none ">
+          {/* <li className="relative group list-none ">
             <a className="block w-full py-2 px-6 clear-both whitespace-nowrap hover:text-primary-400 cursor-pointer group-hover:opacity-50 ">
               <Cog6ToothIcon className="inline w-4 h-4 mr-2 mb-0.5" />
               <span>Change Password</span>
             </a>
-          </li>
+          </li> */}
           <li className="relative list-none">
             <hr className="border-t border-gray-200 my-0" />
           </li>
