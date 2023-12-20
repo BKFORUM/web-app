@@ -42,30 +42,15 @@ function App() {
   }, [accessToken])
 
   useEffect(() => {
-    console.log(11111)
     const auth: any = JSON.parse(String(localStorage.getItem('auth')))
     if (isLoginSuccess && auth?.accessToken) {
-      socket.io.opts.transportOptions = {
-        polling: {
-          extraHeaders: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-        },
+      socket.auth = {
+        token: auth.accessToken,
       }
+
       socket.connect()
       socket.on('connect', () => {
         console.log('Socket connected')
-      })
-
-      socket.on('connect_error', () => {
-        socket.io.opts.transportOptions = {
-          polling: {
-            extraHeaders: {
-              Authorization: `Bearer ${auth.accessToken}`,
-            },
-          },
-        }
-        socket.connect()
       })
     }
   }, [isLoginSuccess])

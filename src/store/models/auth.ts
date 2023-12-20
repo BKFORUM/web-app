@@ -64,6 +64,7 @@ export const authModel: IAuthModel = persist({
                 actions.setAccessToken(res.data?.accessToken)
                 localStorage.setItem('auth', JSON.stringify(res.data))
                 actions.setIsLoginSuccess(true)
+                actions.setMessageError('')
                 return res.data;
             })
             .catch((error) => {

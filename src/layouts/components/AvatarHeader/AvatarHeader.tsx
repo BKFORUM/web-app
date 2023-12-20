@@ -46,6 +46,7 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
     localStorage.removeItem('auth')
     navigate('/auth/login')
     socket.disconnect()
+    setNotifySetting({ show: true, status: 'success', message: 'Log out successfully' })
   }
   return (
     <div className="relative">
