@@ -19,7 +19,9 @@ const NotifyRealtime: FC<Props> = ({
 }: Props): JSX.Element => {
   const navigate = useNavigate()
   const { listFriendOnline } = useStoreState(userStateSelector)
-  const { setIsReadConversation } = useStoreActions(conversationActionSelector)
+  const { setIsReadConversation, setCurrentConversation } = useStoreActions(
+    conversationActionSelector,
+  )
   useEffect(() => {
     let countTimeout: any
     if (notifyRealtime.show) {
@@ -106,9 +108,9 @@ const NotifyRealtime: FC<Props> = ({
                     <li
                       onClick={() => {
                         navigate('/message/' + notifyRealtime?.message?.conversationId)
-                        // setCurrentConversation(
-                        //   notifyRealtime?.message?.conversation || null,
-                        // )
+                        setCurrentConversation(
+                          notifyRealtime?.message?.conversation || null,
+                        )
                         setIsReadConversation(
                           notifyRealtime?.message?.conversationId || '',
                         )

@@ -45,10 +45,6 @@ const DetailConversation: FC<Props> = (): JSX.Element => {
   const [openDropDownSettings, setOpenDropDownSettings] = useState<boolean>(false)
   const [openModalEditNickName, setOpenModalEditNickName] = useState<boolean>(false)
 
-  const userProfile = currentConversation?.users.filter((user) => {
-    return user.userId !== currentUserSuccess?.id
-  })
-
   const handleAddUser = async (data: any): Promise<void> => {
     console.log(data)
     const userIds = data.map((user: IUserData) => user.id)
@@ -122,7 +118,10 @@ const DetailConversation: FC<Props> = (): JSX.Element => {
           <div
             className="flex flex-col items-center justify-center mt-4"
             onClick={() => {
-              if (userProfile) navigate('/profile/' + userProfile[0]?.userId)
+              const userProfile = currentConversation.users.filter((user) => {
+                return user.userId === currentUserSuccess?.id
+              })
+              if (userProfile.length > 0) navigate('/profile/' + userProfile[0]?.userId)
             }}>
             <IoPersonCircleOutline className="h-8 w-8 p-1 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300" />
             <span className="text-sm">Trang cá nhân</span>
@@ -177,21 +176,22 @@ const DetailConversation: FC<Props> = (): JSX.Element => {
           <div className="w-full flex flex-col">
             <span className=" px-2 py-1">Thành viên của nhóm</span>
             <ul>
-              {currentConversation.users.map((item, index) => (
-                <li
-                  key={index}
-                  className="relative group list-none flex justify-between items-center py-1.5 px-2  text-left clear-both whitespace-nowrap rounded-md hover:bg-gray-200 hover:text-primary-400 cursor-pointer group-hover:opacity-80 transition-all duration-200   ">
-                  <a className="relative w-full  flex ">
-                    <img
-                      className="h-8 w-8 flex-shrink-0 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 inline"
-                      src={item.user.avatarUrl}
-                      alt="avatar"
-                    />
-                    <span className="font-semibold text-sm">{item.user.fullName}</span>
-                  </a>
-                  <OptionGroup id={item.userId} />
-                </li>
-              ))}
+              {currentConversation.users !== undefined &&
+                currentConversation.users.map((item, index) => (
+                  <li
+                    key={index}
+                    className="relative group list-none flex justify-between items-center py-1.5 px-2  text-left clear-both whitespace-nowrap rounded-md hover:bg-gray-200 hover:text-primary-400 cursor-pointer group-hover:opacity-80 transition-all duration-200   ">
+                    <a className="relative w-full  flex ">
+                      <img
+                        className="h-8 w-8 flex-shrink-0 rounded-full border border-gray-700 bg-gray-700 object-cover mr-2 inline"
+                        src={item.user.avatarUrl}
+                        alt="avatar"
+                      />
+                      <span className="font-semibold text-sm">{item.user.fullName}</span>
+                    </a>
+                    <OptionGroup id={item.userId} />
+                  </li>
+                ))}
             </ul>
           </div>
         )}
