@@ -112,7 +112,9 @@ const PostItem: FC<Props> = ({
           <div className="flex p-3 cursor-pointer justify-between">
             <div className="flex items-center">
               <div className="relative flex-shrink-0  mr-4 ">
-                <div className="h-10 w-10 rounded-xl overflow-hidden border border-gray-700 bg-gray-700 ">
+                <div
+                  onClick={() => navigate(`/forums/${item.forum.id}`)}
+                  className="h-10 w-10 rounded-xl overflow-hidden border border-gray-700 bg-gray-700 ">
                   <img
                     className="h-full w-full object-cover"
                     src={item.forum.avatarUrl || default_forum}
@@ -127,7 +129,9 @@ const PostItem: FC<Props> = ({
                 />
               </div>
               <div className="block">
-                <h6 className="text-base font-medium leading-[18px] ">
+                <h6
+                  onClick={() => navigate(`/forums/${item.forum.id}`)}
+                  className="text-base font-medium leading-[18px] ">
                   {item.forum.name}
                 </h6>
                 <span className="text-sm font-medium leading-[0px]  text-gray-700">

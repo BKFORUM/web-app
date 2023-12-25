@@ -27,9 +27,12 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
     setListConversation,
     setIsReadConversation,
   } = useStoreActions(conversationActionSelector)
-  const { listConversation } = useStoreState(conversationStateSelector)
+  const { listConversation, currentConversation } = useStoreState(
+    conversationStateSelector,
+  )
   const { listFriendOnline } = useStoreState(userStateSelector)
 
+  // const idRef = useRef<null | string>(null)
   const [inputSearch, setInputSearch] = useState<string>('')
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
@@ -67,10 +70,20 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
     setInputSearch(value)
   }
 
+  useEffect(() => {
+    if (currentConversation?.users === undefined) {
+      const newData = listConversation.find((item) => item.id === currentConversation?.id)
+      if (newData) {
+        setCurrentConversation(newData)
+      }
+    }
+  }, [id, listConversation])
+
   const handleReadMessage = (messageId: string, conversationId: string): void => {
     setIsReadConversation(conversationId)
     socket.emit('onReadMessage', { messageId: messageId, conversationId: conversationId })
   }
+
   return (
     <>
       <div className="flex flex-col">
@@ -141,7 +154,9 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
                   <li
                     key={index}
                     onClick={() => {
-                      navigate('/message/' + item.id), setCurrentConversation(item)
+                      navigate('/message/' + item.id)
+                      setCurrentConversation(item)
+
                       if (!item.isRead) {
                         handleReadMessage(item.lastMessage?.id || '', item.id)
                       }

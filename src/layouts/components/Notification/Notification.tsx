@@ -2,7 +2,7 @@ import { Transition } from '@headlessui/react'
 import { FC, Fragment, useEffect, useState } from 'react'
 import { useClickOutside } from '@hooks/useClickOutside'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import { HiOutlineSpeakerphone } from 'react-icons/hi'
+import { HiOutlineSpeakerphone, HiOutlineCheck } from 'react-icons/hi'
 import { Tooltip } from '@mui/material'
 import socket from '@utils/socket/socketConfig'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -35,6 +35,7 @@ const Notification: FC<Props> = (): JSX.Element => {
     updateNotification,
     setListNotification,
     setTotalRowCount,
+    readAllNotification,
   } = useStoreActions(notificationActionSelector)
   const { listNotification, totalRowCount } = useStoreState(notificationStateSelector)
   const { currentUserSuccess } = useStoreState(userStateSelector)
@@ -172,6 +173,21 @@ const Notification: FC<Props> = (): JSX.Element => {
     setListNotification(newData)
   }
 
+  const handleReadAllNotifications = async () => {
+    const res = await readAllNotification()
+    if (res) {
+      var now = new Date()
+      const newData = listNotification.map((notification: INotification) =>
+        notification.readAt === null
+          ? { ...notification, readAt: now.toISOString() }
+          : notification,
+      )
+
+      setListNotification(newData)
+      setNumberNotRead(0)
+    }
+  }
+
   useEffect(() => {
     if (!isGetPostByIdSuccess) {
       setNotifySetting({
@@ -267,12 +283,18 @@ const Notification: FC<Props> = (): JSX.Element => {
         leaveTo="transform opacity-0 scale-95">
         <div
           ref={elementRef}
-          onClick={() => {
-            setOpen(!open)
-          }}
           className={`absolute rounded right-2 top-[120%] z-50 py-0.5 px-1.5 bg-white border shadow-md`}
           style={{ width: '20rem' }}>
-          <h4 className="p-2 text-xl font-medium">Notification</h4>
+          <div className="flex justify-between items-center">
+            <h4 className="p-2 text-xl font-medium">Notification</h4>
+            <div>
+              <Tooltip title="Đánh dấu tất cả đã đọc">
+                <div onClick={() => handleReadAllNotifications()}>
+                  <HiOutlineCheck className="cursor-pointer h-5 w-5 mr-2 hover:text-green-500" />
+                </div>
+              </Tooltip>
+            </div>
+          </div>
           <div
             id="scrollableDiv"
             style={{
@@ -344,7 +366,10 @@ const Notification: FC<Props> = (): JSX.Element => {
                 listNotification.map((item, index) => (
                   <li
                     key={index}
-                    onClick={() => handleRead(item)}
+                    onClick={() => {
+                      handleRead(item)
+                      setOpen(!open)
+                    }}
                     className="relative flex p-2 hover:text-primary-400 cursor-pointer rounded-lg hover:bg-gray-200 transition-all duration-200 ">
                     {item.sender !== null ? (
                       <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden mt-1 mr-2 border border-gray-700 bg-gray-700">

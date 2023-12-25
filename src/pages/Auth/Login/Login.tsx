@@ -52,7 +52,7 @@ const Login: FC<Props> = (): JSX.Element => {
       setNotifySetting({ show: true, status: 'error', message: messageError })
       setIsLoginSuccess(true)
     }
-  }, [isLoginSuccess])
+  }, [isLoginSuccess, messageError])
 
   const [showPassword, setShowPassword] = React.useState(false)
 

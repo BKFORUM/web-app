@@ -28,6 +28,7 @@ export interface IPostViewForum {
     likedAt: Date | null
     likes: IUserLikePost[]
     forum: {
+        id: string
         name: string
         fileUrl: string
         modId: string

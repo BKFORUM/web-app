@@ -37,12 +37,8 @@ BaseURL.interceptors.response.use(
 					if (resp) {
 						localStorage.setItem('auth', JSON.stringify(resp.data))
 						const access_token = resp.data.accessToken;
-						socket.io.opts.transportOptions = {
-							polling: {
-								extraHeaders: {
-									Authorization: `Bearer ${access_token}`,
-								},
-							},
+						socket.auth = {
+							token: auth?.accessToken,
 						}
 						socket.connect()
 						BaseURL.defaults.headers.common[

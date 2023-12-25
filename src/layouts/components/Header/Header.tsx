@@ -124,7 +124,7 @@ const Header: FC<Props> = (): JSX.Element => {
   }
 
   const handleNewMessage = (response: IMessage) => {
-    console.log(response)
+    // console.log(response)
     const location = pathname.split('/')[1]
 
     if (location !== 'message') {
@@ -134,6 +134,7 @@ const Header: FC<Props> = (): JSX.Element => {
         response?.author.id !== currentUserSuccess?.id &&
         response?.conversationId === id
       ) {
+        console.log(1111)
         setCurrentConverSationMessage([response, ...currentConverSationMessage])
       }
       const getConversationAdd = listConversation.find((item) => {
@@ -143,7 +144,7 @@ const Header: FC<Props> = (): JSX.Element => {
       if (getConversationAdd) {
         const newConversation = {
           ...getConversationAdd,
-          isRead: id === response.conversationId,
+          isRead: false,
           lastMessage: response,
         }
         const newList = listConversation.filter((item) => {
@@ -159,7 +160,7 @@ const Header: FC<Props> = (): JSX.Element => {
     return () => {
       socket.off('onMessage', handleNewMessage)
     }
-  }, [id, currentUserSuccess?.id, listConversation, socket])
+  }, [id, currentUserSuccess?.id, listConversation, currentConverSationMessage])
 
   useEffect(() => {
     socket.emit('onGetOnlineFriends', {})

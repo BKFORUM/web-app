@@ -31,12 +31,9 @@ const RequestFriend: FC<Props> = (): JSX.Element => {
         addFriendAtList(user)
       }
       const newData = data.filter((item) => {
-        console.log(item.sender.id)
         return item.sender.id !== user.id
       })
       setData(newData)
-
-      console.log(newData)
     }
     setIsLoading(false)
   }

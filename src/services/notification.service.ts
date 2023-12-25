@@ -15,4 +15,11 @@ const updateNotification = (id: string) => {
     });
 }
 
-export { getAllNotification, updateNotification }
+const readAllNotification = () => {
+    return BaseURL({
+        url: `/notifications/all`,
+        method: "PATCH",
+    });
+}
+
+export { getAllNotification, updateNotification, readAllNotification }

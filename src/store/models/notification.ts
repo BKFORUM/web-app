@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { getAllNotification, updateNotification } from "../../services/notification.service";
+import { getAllNotification, readAllNotification, updateNotification } from "../../services/notification.service";
 import { INotification } from "@interfaces/INotify";
 
 export interface INotificationModel {
@@ -20,6 +20,9 @@ export interface INotificationModel {
     setListNotification: Action<INotificationModel, INotification[]>;
     totalRowCount: number;
     setTotalRowCount: Action<INotificationModel, number>;
+
+    //readAllNotification
+    readAllNotification: Thunk<INotificationModel, undefined>;
 
 }
 
@@ -59,6 +62,17 @@ export const notificationModel: INotificationModel = persist({
     //updateNotification
     updateNotification: thunk(async (actions, payload) => {
         return updateNotification(payload)
+            .then(async (res) => {
+                return res;
+            })
+            .catch((error) => {
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //readAllNotification
+    readAllNotification: thunk(async (actions) => {
+        return readAllNotification()
             .then(async (res) => {
                 return res;
             })
