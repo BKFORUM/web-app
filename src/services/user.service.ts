@@ -38,4 +38,11 @@ const editUser = (data: IUserData) => {
     });
 }
 
-export { getAllUser, getCurrentUser, getUserById, getAllForumByUser, editUser }
+const getAllFriendUser = (id: string) => {
+    return BaseURL({
+        url: `/users/${id}/friends`,
+        method: "GET",
+    });
+}
+
+export { getAllUser, getCurrentUser, getUserById, getAllForumByUser, editUser, getAllFriendUser }

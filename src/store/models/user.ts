@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { editUser, getAllForumByUser, getAllUser, getCurrentUser, getUserById } from "../../services/user.service";
+import { editUser, getAllForumByUser, getAllFriendUser, getAllUser, getCurrentUser, getUserById } from "../../services/user.service";
 import { ICurrentUser, IUserData } from "@interfaces/IUser";
 
 export interface IUserModel {
@@ -41,6 +41,8 @@ export interface IUserModel {
     isEditUserSuccess: boolean;
     setIsEditUserSuccess: Action<IUserModel, boolean>;
     editEdit: Thunk<IUserModel, IUserData>;
+
+    getAllFriendUser: Thunk<IUserModel, string>;
 }
 
 export const userModel: IUserModel = persist({
@@ -147,6 +149,16 @@ export const userModel: IUserModel = persist({
             })
             .catch((error) => {
                 actions.setIsEditUserSuccess(false)
+                actions.setMessageErrorUser(error?.response?.data?.message)
+            });
+    }),
+
+    getAllFriendUser: thunk(async (actions, payload) => {
+        return getAllFriendUser(payload)
+            .then(async (res) => {
+                return res.data;
+            })
+            .catch((error) => {
                 actions.setMessageErrorUser(error?.response?.data?.message)
             });
     }),

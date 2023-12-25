@@ -5,15 +5,15 @@ import { Box, Tab, Tabs } from '@mui/material'
 import TabPanel from '@layouts/components/TabPanel'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import {
-  // friendActionSelector,
+  friendActionSelector,
   notifyActionSelector,
   postActionSelector,
   postStateSelector,
   userActionSelector,
   userStateSelector,
 } from '@store/index'
-import { useParams } from 'react-router-dom'
-import { ICurrentUser } from '@interfaces/IUser'
+import { useNavigate, useParams } from 'react-router-dom'
+import { ICurrentUser, IUserData } from '@interfaces/IUser'
 import { IPostViewForum } from '@interfaces/IPost'
 import { IUserForumResponse } from '@interfaces/IForum'
 import ForumUserItem from './components/ForumUserItem'
@@ -24,19 +24,26 @@ import PostProfile from './components/PostProfile'
 import { pageMode } from '@interfaces/IClient'
 import { formatDateLocal } from '@utils/functions/formatDay'
 import OptionProfile from './components/OptionProfile'
+import Button from '@components/Button'
 
 interface Props {}
 
 const Profile: FC<Props> = (): JSX.Element => {
   const { id } = useParams()
-  const { getUserById, getAllForumByUser, editEdit, setCurrentUserSuccess } =
-    useStoreActions(userActionSelector)
+  const navigate = useNavigate()
+  const {
+    getUserById,
+    getAllForumByUser,
+    editEdit,
+    setCurrentUserSuccess,
+    getAllFriendUser,
+  } = useStoreActions(userActionSelector)
   const { getAllPostByUser, deletePost, editPost, postImage } =
     useStoreActions(postActionSelector)
   const { postSelected } = useStoreState(postStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const { currentUserSuccess } = useStoreState(userStateSelector)
-  // const {getFriendMe} = useStoreActions(friendActionSelector)
+  const { updateStatusFriend } = useStoreActions(friendActionSelector)
 
   const [value, setValue] = useState(0)
   const [openModalDelete, setOpenModalDelete] = useState<boolean>(false)
@@ -46,7 +53,7 @@ const Profile: FC<Props> = (): JSX.Element => {
   const [user, setUser] = useState<ICurrentUser>()
   const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
   const [dataForum, setDataForum] = useState<IUserForumResponse[]>([])
-  // const [listFriend, setListFriend] = useState<IUserData[]>([])
+  const [listFriend, setListFriend] = useState<IUserData[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
 
@@ -78,14 +85,15 @@ const Profile: FC<Props> = (): JSX.Element => {
     }
   }
 
-  // const getAllFriendMe = async (): Promise<void> => {
-  //   if (id) {
-  //     const res = await getFriendMe()
-  //     if (res) {
-  //       setListFriend()
-  //     }
-  //   }
-  // }
+  const getAllFriendMe = async (): Promise<void> => {
+    if (id) {
+      const res = await getAllFriendUser(id)
+      if (res) {
+        console.log(res)
+        setListFriend(res.friends)
+      }
+    }
+  }
 
   useEffect(() => {
     getAllPostByUserData()
@@ -104,10 +112,11 @@ const Profile: FC<Props> = (): JSX.Element => {
   useEffect(() => {
     window.scrollTo(0, 0)
     if (id) {
+      setValue(0)
       setDataPost([])
       setPaginationModel({ page: 0, pageSize: 10 })
       const fetchData = async () => {
-        await Promise.all([getProfile(), getAllForumByUserData()])
+        await Promise.all([getProfile(), getAllForumByUserData(), getAllFriendMe()])
       }
       fetchData()
     }
@@ -230,6 +239,16 @@ const Profile: FC<Props> = (): JSX.Element => {
     }
   }
 
+  const handleDeleteFriend = (id: string): void => {
+    const res = updateStatusFriend({ id: id, status: 'DELETED' })
+    if (res) {
+      const newData = listFriend.filter((user) => {
+        return user.id !== id
+      })
+      setListFriend(newData)
+    }
+  }
+
   const a11yProps = (index: number) => {
     return {
       id: `simple-tab-${index}`,
@@ -292,7 +311,7 @@ const Profile: FC<Props> = (): JSX.Element => {
               <Tab
                 sx={{ textTransform: 'none' }}
                 label="Bạn bè"
-                {...a11yProps(1)}
+                {...a11yProps(2)}
               />
             </Tabs>
           </Box>
@@ -321,6 +340,45 @@ const Profile: FC<Props> = (): JSX.Element => {
             dataForum={dataForum}
             idUser={user?.id}
           />
+        </TabPanel>
+
+        <TabPanel
+          value={value}
+          index={2}>
+          <div className="my-4 bg-white min-h-[100px] shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-md ">
+            {listFriend.length > 0 && (
+              <div className="grid grid-cols-2 gap-3 my-6 px-4 py-4">
+                {listFriend.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-3 hover:bg-gray-200 transition-all duration-300 p-2  rounded-md border border-gray-200">
+                    <div
+                      className="flex items-center gap-3 cursor-pointer "
+                      onClick={() => navigate('/profile/' + item.id)}>
+                      <div className="h-12 w-12 overflow-hidden">
+                        <img
+                          className="h-full w-full border border-gray-300 rounded-full"
+                          src={item.avatarUrl}
+                          alt={item.fullName}
+                        />
+                      </div>
+                      <span>{item.fullName}</span>
+                    </div>
+
+                    {currentUserSuccess?.id === user?.id && (
+                      <div className="flex items-center gap-2">
+                        <Button
+                          onClick={() => handleDeleteFriend(item.id || '')}
+                          typeButton="cancel">
+                          Hủy kết bạn
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </TabPanel>
       </div>
       {openModal && (
