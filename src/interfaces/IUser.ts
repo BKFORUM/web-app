@@ -34,6 +34,7 @@ export interface ICurrentUser {
         name: string
         type: string
     }[]
+    friendStatus: string
 }
 
 export interface IUserData {

@@ -39,7 +39,7 @@ const PostProfile: FC<Props> = ({
   return (
     <div className="grid grid-cols-6 gap-4 ">
       <div className="col-span-2">
-        <div className="flex flex-col px-4 gap-6 bg-white rounded-md py-4 mt-4">
+        <div className="flex flex-col px-4 gap-6 bg-white rounded-md py-4 my-4 ">
           <div className="flex items-center">
             <MdOutlinePermContactCalendar className="w-7 h-7 " />
             <span className="text-base font-semibold ml-4">

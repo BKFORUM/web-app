@@ -79,26 +79,6 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
     }
   }, [id, listConversation])
 
-  useEffect(() => {
-    // Lưu id cũ
-
-    socket.emit('onConversationJoin', { id: id })
-
-    // console.log(previousId)
-    // if (previousId !== id) {
-    //   socket.emit('onConversationLeave', { id: previousId })
-    //   previousId = id
-    // }
-
-    return () => {
-      // socket.emit('onConversationLeave', { id: id })
-    }
-  }, [id])
-
-  // useEffect(() => {
-  //   console.log(idRef.current)
-  // }, [idRef.current])
-
   const handleReadMessage = (messageId: string, conversationId: string): void => {
     setIsReadConversation(conversationId)
     socket.emit('onReadMessage', { messageId: messageId, conversationId: conversationId })

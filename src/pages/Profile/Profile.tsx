@@ -5,6 +5,7 @@ import { Box, Tab, Tabs } from '@mui/material'
 import TabPanel from '@layouts/components/TabPanel'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import {
+  // friendActionSelector,
   notifyActionSelector,
   postActionSelector,
   postStateSelector,
@@ -22,6 +23,7 @@ import ModalEditUser from './components/ModalEditUser'
 import PostProfile from './components/PostProfile'
 import { pageMode } from '@interfaces/IClient'
 import { formatDateLocal } from '@utils/functions/formatDay'
+import OptionProfile from './components/OptionProfile'
 
 interface Props {}
 
@@ -34,6 +36,7 @@ const Profile: FC<Props> = (): JSX.Element => {
   const { postSelected } = useStoreState(postStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const { currentUserSuccess } = useStoreState(userStateSelector)
+  // const {getFriendMe} = useStoreActions(friendActionSelector)
 
   const [value, setValue] = useState(0)
   const [openModalDelete, setOpenModalDelete] = useState<boolean>(false)
@@ -43,6 +46,7 @@ const Profile: FC<Props> = (): JSX.Element => {
   const [user, setUser] = useState<ICurrentUser>()
   const [dataPost, setDataPost] = useState<IPostViewForum[]>([])
   const [dataForum, setDataForum] = useState<IUserForumResponse[]>([])
+  // const [listFriend, setListFriend] = useState<IUserData[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
 
@@ -73,6 +77,15 @@ const Profile: FC<Props> = (): JSX.Element => {
       }
     }
   }
+
+  // const getAllFriendMe = async (): Promise<void> => {
+  //   if (id) {
+  //     const res = await getFriendMe()
+  //     if (res) {
+  //       setListFriend()
+  //     }
+  //   }
+  // }
 
   useEffect(() => {
     getAllPostByUserData()
@@ -242,17 +255,20 @@ const Profile: FC<Props> = (): JSX.Element => {
             <div className="flex flex-col gap-2">
               <div className="flex items-center">
                 <h4 className="text-2xl font-semibold mr-4 mb-1">{user?.fullName}</h4>
-                {currentUserSuccess?.id === user?.id && (
+              </div>
+              <div>
+                {currentUserSuccess?.id === user?.id ? (
                   <button
                     onClick={() => setOpenModalEditUser(true)}
                     className="px-4 py-1 bg-[#E6F0F6] text-black rounded-2xl flex items-center hover:bg-blue-300 transition-all duration-200">
                     <HiPencilAlt className="h-6 w-6 mr-2" />
                     <span>Edit profile</span>
                   </button>
+                ) : (
+                  <>
+                    <OptionProfile friendStatus={user?.friendStatus}></OptionProfile>
+                  </>
                 )}
-              </div>
-              <div>
-                <span className="px-4 py-1 bg-[#E6F0F6] rounded-2xl">445 bạn bè</span>
               </div>
             </div>
           </div>
@@ -264,12 +280,18 @@ const Profile: FC<Props> = (): JSX.Element => {
               aria-label="basic tabs example">
               <Tab
                 sx={{ textTransform: 'none' }}
-                label="Posts"
+                label="Bài viết"
                 {...a11yProps(0)}
               />
               <Tab
                 sx={{ textTransform: 'none' }}
                 label="Forums"
+                {...a11yProps(1)}
+              />
+
+              <Tab
+                sx={{ textTransform: 'none' }}
+                label="Bạn bè"
                 {...a11yProps(1)}
               />
             </Tabs>
