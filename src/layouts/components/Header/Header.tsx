@@ -134,17 +134,15 @@ const Header: FC<Props> = (): JSX.Element => {
         response?.author.id !== currentUserSuccess?.id &&
         response?.conversationId === id
       ) {
-        console.log(1111)
         setCurrentConverSationMessage([response, ...currentConverSationMessage])
       }
       const getConversationAdd = listConversation.find((item) => {
         return item.id === response.conversationId
       })
-
       if (getConversationAdd) {
         const newConversation = {
           ...getConversationAdd,
-          isRead: false,
+          isRead: response?.author.id === currentUserSuccess?.id,
           lastMessage: response,
         }
         const newList = listConversation.filter((item) => {

@@ -30,7 +30,7 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
   const { listConversation, currentConversation } = useStoreState(
     conversationStateSelector,
   )
-  const { listFriendOnline } = useStoreState(userStateSelector)
+  const { listFriendOnline, currentUserSuccess } = useStoreState(userStateSelector)
 
   // const idRef = useRef<null | string>(null)
   const [inputSearch, setInputSearch] = useState<string>('')
@@ -49,7 +49,19 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
       })
       if (res) {
         setTotalRowCount(res.totalRecords)
-        setListConversation([...listConversation, ...res.data])
+        const newData = res.data.map((item: any) => {
+          return {
+            ...item,
+            lastMessage:
+              item.lastMessage !== null
+                ? {
+                    ...item.lastMessage,
+                    author: { ...item.lastMessage.author.user },
+                  }
+                : null,
+          }
+        })
+        setListConversation([...listConversation, ...newData])
       }
     }
     setIsLoading(false)
@@ -190,7 +202,15 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
                           !item.isRead && 'font-semibold'
                         }`}>
                         <span className={` text-sm max-w-[125px] break-words truncate `}>
-                          {item.lastMessage?.content}
+                          {item.lastMessage?.type === 'TEXT' &&
+                            `${item.lastMessage?.content}`}
+                          {item.lastMessage?.type === 'IMAGE' &&
+                            (item.lastMessage.author.id === currentUserSuccess?.id
+                              ? 'Bạn đã gửi một ảnh'
+                              : `${
+                                  item.lastMessage.author.displayName ||
+                                  item.lastMessage.author.fullName
+                                } đã gửi mọt ảnh`)}
                         </span>
                         <span className=" text-xs">
                           {item?.lastMessage &&
@@ -220,13 +240,5 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
     </>
   )
 }
-
-// {
-//   item.isOnline && (
-//     <span
-//       title="online"
-//       className="flex justify-center absolute left-11 bottom-2  text-center bg-green-500 border border-white w-[10px] h-[10px] rounded-full"></span>
-//   )
-// }
 
 export default SidebarMessage

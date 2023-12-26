@@ -23,8 +23,8 @@ export interface IConversationModel {
   getAllConverSation: Thunk<IConversationModel, any>;
 
   //GetConverSationById
-  isGetConverSationByIdSuccess: boolean;
-  setIsGetConverSationByIdSuccess: Action<IConversationModel, boolean>;
+  isGetConverSationByIdSuccess: null | boolean;
+  setIsGetConverSationByIdSuccess: Action<IConversationModel, null | boolean>;
   currentConverSationMessage: IMessage[];
   setCurrentConverSationMessage: Action<IConversationModel, IMessage[]>;
   totalRowMessages: number;
@@ -106,7 +106,7 @@ export const conversationModel: IConversationModel = persist({
   }),
 
   //GetConverSationById
-  isGetConverSationByIdSuccess: true,
+  isGetConverSationByIdSuccess: null,
   setIsGetConverSationByIdSuccess: action((state, payload) => {
     state.isGetConverSationByIdSuccess = payload;
   }),
@@ -130,6 +130,7 @@ export const conversationModel: IConversationModel = persist({
       })
       .catch((error) => {
         actions.setIsGetConverSationByIdSuccess(false)
+        actions.setTotalRowMessages(0)
         actions.setMessageError(error?.response?.data?.message)
       });
   }),
