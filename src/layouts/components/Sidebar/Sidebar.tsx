@@ -47,16 +47,17 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
   }, [currentUserSuccess?.id])
 
   useEffect(() => {
-    if (pathname.split('/')[2] === 'forums')
-      if (contentRef.current) {
-        const height = contentRef.current.scrollHeight
-        setContentHeight(height)
-      }
-    dataForum.map((item) => {
-      if (item.id === id) {
-        setSelected(item.id)
-      }
-    })
+    if (contentRef.current) {
+      const height = contentRef.current.scrollHeight
+      setContentHeight(height)
+    }
+    if (pathname.split('/')[2] === 'forums') {
+      dataForum.map((item) => {
+        if (item.id === id) {
+          setSelected(item.id)
+        }
+      })
+    }
   }, [dataForum, pathname])
 
   useEffect(() => {
