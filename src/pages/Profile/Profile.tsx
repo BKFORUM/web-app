@@ -35,6 +35,7 @@ const Profile: FC<Props> = (): JSX.Element => {
     getUserById,
     getAllForumByUser,
     editEdit,
+    setIsEditUserSuccess,
     setCurrentUserSuccess,
     getAllFriendUser,
   } = useStoreActions(userActionSelector)
@@ -42,7 +43,8 @@ const Profile: FC<Props> = (): JSX.Element => {
     useStoreActions(postActionSelector)
   const { postSelected } = useStoreState(postStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
-  const { currentUserSuccess } = useStoreState(userStateSelector)
+  const { currentUserSuccess, isEditUserSuccess, messageErrorUser } =
+    useStoreState(userStateSelector)
   const { updateStatusFriend } = useStoreActions(friendActionSelector)
 
   const [value, setValue] = useState(0)
@@ -89,7 +91,6 @@ const Profile: FC<Props> = (): JSX.Element => {
     if (id) {
       const res = await getAllFriendUser(id)
       if (res) {
-        console.log(res)
         setListFriend(res.friends)
       }
     }
@@ -121,6 +122,17 @@ const Profile: FC<Props> = (): JSX.Element => {
       fetchData()
     }
   }, [id])
+
+  useEffect(() => {
+    if (!isEditUserSuccess) {
+      setNotifySetting({
+        show: true,
+        status: 'error',
+        message: messageErrorUser,
+      })
+      setIsEditUserSuccess(true)
+    }
+  }, [isEditUserSuccess])
 
   const handleAction = async (data: any): Promise<void> => {
     setIsLoading(true)
@@ -215,7 +227,6 @@ const Profile: FC<Props> = (): JSX.Element => {
           message: 'Edit user successfully',
         })
         getProfile()
-        setOpenModalEditUser(false)
       }
     } else {
       const formData = new FormData()
@@ -233,10 +244,10 @@ const Profile: FC<Props> = (): JSX.Element => {
             message: 'Edit user successfully',
           })
           getProfile()
-          setOpenModalEditUser(false)
         }
       }
     }
+    setOpenModalEditUser(false)
   }
 
   const handleDeleteFriend = (id: string): void => {

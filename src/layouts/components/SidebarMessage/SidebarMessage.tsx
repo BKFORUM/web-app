@@ -16,6 +16,7 @@ import { Tooltip } from '@mui/material'
 import ModalAddGroupChat from '@components/ModalAddGroupChat'
 import { useDebounce } from '@hooks/useDebounce'
 import socket from '@utils/socket/socketConfig'
+import { HiMiniUserGroup } from 'react-icons/hi2'
 
 interface Props {}
 const SidebarMessage: FC<Props> = (): JSX.Element => {
@@ -194,8 +195,13 @@ const SidebarMessage: FC<Props> = (): JSX.Element => {
                         )}
                     </a>
                     <div className="flex flex-col w-full ">
-                      <span className="font-semibold whitespace-nowrap truncate ">
+                      <span className="font-semibold whitespace-nowrap truncate max-w-[200px] ">
                         {item?.displayName}
+                        {item.forumId === null && item.type === 'GROUP_CHAT' && (
+                          <span>
+                            <HiMiniUserGroup className="inline mb-1 h-4 w-4 ml-1.5" />
+                          </span>
+                        )}
                       </span>
                       <div
                         className={`flex items-center gap-2 ${

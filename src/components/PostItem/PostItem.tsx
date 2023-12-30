@@ -135,7 +135,9 @@ const PostItem: FC<Props> = ({
                   {item.forum.name}
                 </h6>
                 <span className="text-sm font-medium leading-[0px]  text-gray-700">
-                  {item.user.fullName}
+                  <span onClick={() => navigate('/profile/' + item.user.id)}>
+                    {item.user.fullName}
+                  </span>
                   {(moderatorId === item.user.id ||
                     item.user.id === item.forum.modId) && (
                     <span className="px-2 py-0.5 text-xs ml-3 bg-sky-200 rounded-xl">

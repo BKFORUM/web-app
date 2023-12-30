@@ -1,7 +1,12 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { DATA_SIDEBAR } from '@commom/constants'
 import { MdOutlineCalendarMonth } from 'react-icons/md'
-import { HiOutlineUserGroup, HiOutlineStar, HiOutlineHome } from 'react-icons/hi2'
+import {
+  HiOutlineUserGroup,
+  HiOutlineStar,
+  HiOutlineHome,
+  HiOutlineCog8Tooth,
+} from 'react-icons/hi2'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { IUserForumResponse } from '@interfaces/IForum'
@@ -183,6 +188,9 @@ const Sidebar: FC<IProps> = (): JSX.Element => {
                   />
                 </div>
                 <p className="text-xs">{item.name}</p>
+                {item.moderator.id === currentUserSuccess?.id && (
+                  <HiOutlineCog8Tooth className="h-4 w-4 ml-1.5" />
+                )}
               </li>
             ))}
           </ul>

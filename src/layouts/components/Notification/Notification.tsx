@@ -289,7 +289,10 @@ const Notification: FC<Props> = (): JSX.Element => {
             <h4 className="p-2 text-xl font-medium">Notification</h4>
             <div>
               <Tooltip title="Đánh dấu tất cả đã đọc">
-                <div onClick={() => handleReadAllNotifications()}>
+                <div
+                  onClick={() => {
+                    numberNotRead > 0 && handleReadAllNotifications()
+                  }}>
                   <HiOutlineCheck className="cursor-pointer h-5 w-5 mr-2 hover:text-green-500" />
                 </div>
               </Tooltip>
