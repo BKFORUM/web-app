@@ -36,9 +36,18 @@ const optionsGender: IOption[] = [
   },
 ]
 
+const today = new Date()
+const minDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate())
+
 const schema = yup.object().shape({
   fullName: yup.string().required('Name is valid!'),
-  dateOfBirth: yup.string().required('Date of birth is valid!'),
+  dateOfBirth: yup
+    .string()
+    .required('Date of birth is required!')
+    .test('is-over-18', 'Must be over 18 years old', function (value) {
+      const birthDate = new Date(value)
+      return birthDate <= minDate
+    }),
   gender: yup.string().required('Gender is valid!'),
   type: yup.string().required('Role is valid!'),
   email: yup
@@ -48,7 +57,10 @@ const schema = yup.object().shape({
       'Invalid email format. Please use the format: 123456789@sv1.dut.udn.vn',
     )
     .required('Email is required'),
-  phoneNumber: yup.string().required('Phone number is valid!'),
+  phoneNumber: yup
+    .string()
+    .required('Phone number is required!')
+    .matches(/^[0-9]{10}$/, 'Phone number must be exactly 10 digits'),
 })
 
 const ModalEditUser: FC<Props> = ({
@@ -124,7 +136,6 @@ const ModalEditUser: FC<Props> = ({
         new Event('submit', { cancelable: true, bubbles: true }),
       )
     }
-
   }
 
   useEffect(() => {
@@ -173,7 +184,9 @@ const ModalEditUser: FC<Props> = ({
                 leaveTo="opacity-0 scale-95">
                 <Dialog.Panel className="relative w-full max-w-[800px] flex flex-col transform  rounded-xl bg-white p-4 text-left align-middle shadow-xl transition-all">
                   <div className="flex flex-col gap-2 relative">
-                    <h2 className="m-auto text-xl font-semibold">Edit user</h2>
+                    <h2 className="m-auto text-xl font-semibold">
+                      Chỉnh sửa thông tin cá nhân
+                    </h2>
                     <span
                       className="absolute top-0 right-0 text-xl text-gray-500 cursor-pointer"
                       onClick={() => setOpen(false)}>
@@ -206,7 +219,7 @@ const ModalEditUser: FC<Props> = ({
                             : 'h-auto'
                         }`}
                         onSubmit={handleSubmit(onSubmit)}>
-                        <div className="grid grid-cols-2  gap-2 items-center ">
+                        <div className="grid grid-cols-2  gap-2 items-start ">
                           <div className="flex flex-col">
                             <label
                               htmlFor=""
@@ -250,7 +263,7 @@ const ModalEditUser: FC<Props> = ({
                             />
                           </div>
 
-                          <div className="flex flex-col">
+                          <div className="flex flex-col ">
                             <label
                               htmlFor=""
                               className="font-semibold text-gray-700">

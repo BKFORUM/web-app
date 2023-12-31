@@ -55,7 +55,7 @@ const OptionPost: FC<Props> = ({
             setOpen(!open)
           }}
           className={`absolute rounded right-2 top-[120%] z-50  bg-white border shadow-md`}
-          style={{ width: '8rem' }}>
+          style={{ width: '10rem' }}>
           {item.user.id === currentUserSuccess?.id && (
             <li
               className="list-none flex items-center gap-4 hover:bg-gray-200 cursor-pointer py-2 px-4 transition-all duration-300"
@@ -64,7 +64,7 @@ const OptionPost: FC<Props> = ({
                 setPostSelected(item)
               }}>
               <HiOutlinePencilSquare className="h-6 w-6" />
-              <span className="font-semibold">Edit</span>
+              <span className="font-semibold">Chỉnh sửa</span>
             </li>
           )}
 
@@ -74,8 +74,8 @@ const OptionPost: FC<Props> = ({
               if (setOpenModalDelete !== undefined) setOpenModalDelete(true)
               setPostSelected(item)
             }}>
-            <HiOutlineTrash className="h-5 w-5" />
-            <span className="font-semibold">Delete</span>
+            <HiOutlineTrash className="h-6 w-6" />
+            <span className="font-semibold">Xóa</span>
           </li>
         </ul>
       </Transition>

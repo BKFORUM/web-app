@@ -24,6 +24,7 @@ import DetailConversation from './components/DetailConversation'
 import notFoundSearch from '../../assets/images/notFoundSearch.jpg'
 import { base64StringToBlob } from '@utils/functions/partBlobToFile'
 import ViewImagePaste from './components/ViewImagePaste'
+import EmojiPicker from 'emoji-picker-react'
 
 interface Props {}
 
@@ -53,10 +54,10 @@ const Message: FC<Props> = (): JSX.Element => {
   const [heightContent, setHeightContent] = useState<number | undefined>()
   const [loading, setIsLoading] = useState<boolean | null>(null)
   const [loadingImage, setIsLoadingImage] = useState<boolean>(false)
-
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
   const [checkNext, setCheckNext] = useState<boolean>(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const [showEmoji, setShowEmoji] = useState<boolean>(false)
 
   const getDetailConversation = async (): Promise<void> => {
     if (id && paginationModel) {
@@ -297,8 +298,11 @@ const Message: FC<Props> = (): JSX.Element => {
                     </div>
                   </Tooltip>
                   <Tooltip title="Thêm chi chưa biết">
-                    <div>
+                    <div className="relative">
                       <IoPawSharp className="h-6 w-6 text-[#0001CB] cursor-pointer" />
+                      {/* <div className="absolute top-[-200px]">
+                        <EmojiPicker className="w-28 h-60" />
+                      </div> */}
                     </div>
                   </Tooltip>
                   <div

@@ -286,10 +286,13 @@ const Notification: FC<Props> = (): JSX.Element => {
           className={`absolute rounded right-2 top-[120%] z-50 py-0.5 px-1.5 bg-white border shadow-md`}
           style={{ width: '20rem' }}>
           <div className="flex justify-between items-center">
-            <h4 className="p-2 text-xl font-medium">Notification</h4>
+            <h4 className="p-2 text-xl font-medium">Thông báo</h4>
             <div>
               <Tooltip title="Đánh dấu tất cả đã đọc">
-                <div onClick={() => handleReadAllNotifications()}>
+                <div
+                  onClick={() => {
+                    numberNotRead > 0 && handleReadAllNotifications()
+                  }}>
                   <HiOutlineCheck className="cursor-pointer h-5 w-5 mr-2 hover:text-green-500" />
                 </div>
               </Tooltip>

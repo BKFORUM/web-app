@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { forgotPassword, login, resetPassword } from "../../services/auth.service";
+import { changePassword, forgotPassword, login, resetPassword } from "../../services/auth.service";
 import { IUserLogin } from "@interfaces/IUser";
 // import { Socket } from 'socket.io-client';
 
@@ -34,6 +34,11 @@ export interface IAuthModel {
     isResetPasswordSuccess: boolean;
     setIsResetPasswordSuccess: Action<IAuthModel, boolean>;
     resetPassword: Thunk<IAuthModel, any>;
+
+    //ChangePassword
+    isChangePasswordSuccess: boolean;
+    setIsChangePasswordSuccess: Action<IAuthModel, boolean>;
+    changePassword: Thunk<IAuthModel, any>;
 }
 
 export const authModel: IAuthModel = persist({
@@ -109,6 +114,23 @@ export const authModel: IAuthModel = persist({
             })
             .catch((error) => {
                 actions.setIsResetPasswordSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //ChangePassword
+    isChangePasswordSuccess: true,
+    setIsChangePasswordSuccess: action((state, payload) => {
+        state.isChangePasswordSuccess = payload;
+    }),
+    changePassword: thunk(async (actions, payload) => {
+        return changePassword(payload)
+            .then(async (res) => {
+                actions.setIsChangePasswordSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsChangePasswordSuccess(false)
                 actions.setMessageError(error?.response?.data?.message)
             });
     }),

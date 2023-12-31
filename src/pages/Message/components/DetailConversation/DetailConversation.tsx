@@ -106,20 +106,19 @@ const DetailConversation: FC<Props> = (): JSX.Element => {
       <div
         className="col-span-2 border-l border-gray-300 flex flex-col py-4 items-center px-2 overflow-y-auto"
         style={{ maxHeight: 'calc(100vh - 62px)' }}>
-        <div className="h-20 w-20 overflow-hidden rounded-full border border-gray-500">
-          <img
-            className="h-full w-full object-cover"
-            src={currentConversation?.avatarUrl}
-            alt={currentConversation?.displayName}
-          />
-        </div>
+        <img
+          className="h-20 w-20 rounded-full border border-gray-500 object-cover flex-shrink-0"
+          src={currentConversation?.avatarUrl}
+          alt={currentConversation?.displayName}
+        />
+
         <span className="font-semibold text-lg">{currentConversation?.displayName}</span>
         {currentConversation?.type === 'CHAT' && (
           <div
             className="flex flex-col items-center justify-center mt-4"
             onClick={() => {
               const userProfile = currentConversation.users.filter((user) => {
-                return user.userId === currentUserSuccess?.id
+                return user.userId !== currentUserSuccess?.id
               })
               if (userProfile.length > 0) navigate('/profile/' + userProfile[0]?.userId)
             }}>
