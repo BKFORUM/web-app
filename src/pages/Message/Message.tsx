@@ -24,7 +24,7 @@ import DetailConversation from './components/DetailConversation'
 import notFoundSearch from '../../assets/images/notFoundSearch.jpg'
 import { base64StringToBlob } from '@utils/functions/partBlobToFile'
 import ViewImagePaste from './components/ViewImagePaste'
-import EmojiPicker from 'emoji-picker-react'
+// import EmojiPicker from 'emoji-picker-react'
 
 interface Props {}
 
@@ -57,7 +57,7 @@ const Message: FC<Props> = (): JSX.Element => {
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
   const [checkNext, setCheckNext] = useState<boolean>(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
-  const [showEmoji, setShowEmoji] = useState<boolean>(false)
+  // const [showEmoji, setShowEmoji] = useState<boolean>(false)
 
   const getDetailConversation = async (): Promise<void> => {
     if (id && paginationModel) {
