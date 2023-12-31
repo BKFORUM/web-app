@@ -37,9 +37,15 @@ const Forum: FC<Props> = (): JSX.Element => {
   const { addPost, postImage, getAllPostByForum, deletePost, editPost } =
     useStoreActions(postActionSelector)
   const { postSelected } = useStoreState(postStateSelector)
-  const { getForumById, editForum, setIsGetAllAgainForumById, setListUserForum } =
-    useStoreActions(forumActionSelector)
-  const { isGetAllAgainForumById } = useStoreState(forumStateSelector)
+  const {
+    getForumById,
+    editForum,
+    setIsGetAllAgainForumById,
+    setListUserForum,
+    setIsEditForumSuccess,
+  } = useStoreActions(forumActionSelector)
+  const { isGetAllAgainForumById, isEditForumSuccess, messageErrorForum } =
+    useStoreState(forumStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const { setIsGetAllAgain } = useStoreActions(userActionSelector)
 
@@ -99,6 +105,17 @@ const Forum: FC<Props> = (): JSX.Element => {
       setPaginationModel({ page: 0, pageSize: 10 })
     }
   }, [id])
+
+  useEffect(() => {
+    if (!isEditForumSuccess) {
+      setNotifySetting({
+        show: true,
+        status: 'error',
+        message: messageErrorForum,
+      })
+      setIsEditForumSuccess(true)
+    }
+  }, [isEditForumSuccess])
 
   useEffect(() => {
     if (isGetAllAgainForumById) {
@@ -261,7 +278,6 @@ const Forum: FC<Props> = (): JSX.Element => {
         setIsGetAllAgain(true)
       }
       setIsLoading(false)
-      setOpenModalEditForum(false)
     } else {
       const formData = new FormData()
       formData.append(`documents`, data?.avatarUrl[0])
@@ -279,8 +295,8 @@ const Forum: FC<Props> = (): JSX.Element => {
         }
       }
       setIsLoading(false)
-      setOpenModalEditForum(false)
     }
+    setOpenModalEditForum(false)
   }
 
   const a11yProps = (index: number) => {
@@ -314,7 +330,7 @@ const Forum: FC<Props> = (): JSX.Element => {
                         onClick={() => setOpenModalEditForum(true)}
                         className="mt-2 px-4 py-1 bg-[#E6F0F6] text-black rounded-2xl flex items-center hover:bg-blue-300 transition-all duration-200">
                         <HiPencilAlt className="h-6 w-6 mr-2" />
-                        <span>Edit forum</span>
+                        <span>Chỉnh sửa</span>
                       </button>
                     )}
                   </div>
@@ -339,13 +355,13 @@ const Forum: FC<Props> = (): JSX.Element => {
                     textTransform: 'none',
                     display: detailForum?.yourStatus === 'ACTIVE' ? 'flex' : 'none',
                   }}
-                  label="Posts"
+                  label="Bài viết"
                   {...a11yProps(0)}
                 />
 
                 <Tab
                   sx={{ textTransform: 'none' }}
-                  label="Members"
+                  label="Thành viên"
                   {...a11yProps(1)}
                 />
 
@@ -354,20 +370,20 @@ const Forum: FC<Props> = (): JSX.Element => {
                     textTransform: 'none',
                     display: detailForum?.yourStatus === 'ACTIVE' ? 'flex' : 'none',
                   }}
-                  label="Events"
+                  label="Sự kiện"
                   {...a11yProps(2)}
                 />
                 {detailForum?.moderator.id === currentUserSuccess?.id && (
                   <Tab
                     sx={{ textTransform: 'none' }}
-                    label="Members request"
+                    label="Phê duyệt thành viên"
                     {...a11yProps(3)}
                   />
                 )}
                 {detailForum?.moderator.id === currentUserSuccess?.id && (
                   <Tab
                     sx={{ textTransform: 'none' }}
-                    label="Posts request"
+                    label="Phê duyệt bài viết"
                     {...a11yProps(4)}
                   />
                 )}

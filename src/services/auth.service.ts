@@ -25,4 +25,12 @@ const resetPassword = (data: any) => {
     });
 };
 
-export { login, forgotPassword, resetPassword }    
+const changePassword = (data: any) => {
+    return BaseURL({
+        url: `/auth/change-password`,
+        method: "POST",
+        data,
+    });
+}
+
+export { login, forgotPassword, resetPassword, changePassword }    

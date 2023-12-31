@@ -292,7 +292,7 @@ const Profile: FC<Props> = (): JSX.Element => {
                     onClick={() => setOpenModalEditUser(true)}
                     className="px-4 py-1 bg-[#E6F0F6] text-black rounded-2xl flex items-center hover:bg-blue-300 transition-all duration-200">
                     <HiPencilAlt className="h-6 w-6 mr-2" />
-                    <span>Edit profile</span>
+                    <span>Chỉnh sửa</span>
                   </button>
                 ) : (
                   <>

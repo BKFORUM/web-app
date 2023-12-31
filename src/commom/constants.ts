@@ -21,14 +21,14 @@ export const DATA_SIDEBAR = [
     },
     {
         id: 1,
-        name: 'Friends',
+        name: 'Bạn bè',
         pathName: "/friends",
         icon: "friend",
         children: [],
     },
     {
         id: 2,
-        name: 'Event',
+        name: 'Sự kiện',
         pathName: "/event",
         icon: "event",
         children: [],

@@ -184,7 +184,9 @@ const ModalEditUser: FC<Props> = ({
                 leaveTo="opacity-0 scale-95">
                 <Dialog.Panel className="relative w-full max-w-[800px] flex flex-col transform  rounded-xl bg-white p-4 text-left align-middle shadow-xl transition-all">
                   <div className="flex flex-col gap-2 relative">
-                    <h2 className="m-auto text-xl font-semibold">Edit user</h2>
+                    <h2 className="m-auto text-xl font-semibold">
+                      Chỉnh sửa thông tin cá nhân
+                    </h2>
                     <span
                       className="absolute top-0 right-0 text-xl text-gray-500 cursor-pointer"
                       onClick={() => setOpen(false)}>

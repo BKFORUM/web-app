@@ -85,8 +85,6 @@ const ModalEditForum: FC<Props> = ({
     resolver: yupResolver(schema) as any,
   })
 
-  
-
   const [optionsTopic, setOptionsTopic] = useState<IOption[]>([])
 
   const getAllTopicForum = async (): Promise<void> => {
@@ -196,7 +194,7 @@ const ModalEditForum: FC<Props> = ({
                 <Dialog.Panel className="relative w-full max-w-[700px] flex flex-col transform  rounded-xl bg-white p-4 text-left align-middle shadow-xl transition-all">
                   <div className="flex flex-col gap-2 relative">
                     <h2 className="m-auto text-xl font-semibold">
-                      {!forum ? 'Add' : 'Edit'} Forum
+                      {!forum ? 'Thêm' : 'Chỉnh sửa thông tin'} Forum
                     </h2>
                     <span
                       className="absolute top-0 right-0 text-xl text-gray-500 cursor-pointer"
