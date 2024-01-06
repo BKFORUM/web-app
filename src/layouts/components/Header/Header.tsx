@@ -124,10 +124,10 @@ const Header: FC<Props> = (): JSX.Element => {
   }
 
   const handleNewMessage = (response: IMessage) => {
-    // console.log(response)
+    console.log(response)
     const location = pathname.split('/')[1]
 
-    if (location !== 'message') {
+    if (location !== 'message' && response?.author.id !== currentUserSuccess?.id) {
       setNotifyRealtime({ show: true, message: response, type: 'message' })
     } else {
       if (

@@ -5,7 +5,7 @@ import { GrUserSettings } from 'react-icons/gr'
 import { HiUser } from 'react-icons/hi2'
 import { FC, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import defaultImage from '../../../../assets/images/bg-login-default.jpg'
+import defaultImage from '../../../../assets/images/default_forum.png'
 
 interface Props {
   dataForum: IUserForumResponse[]

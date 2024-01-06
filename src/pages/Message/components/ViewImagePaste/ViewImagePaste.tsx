@@ -9,7 +9,7 @@ const ViewImagePaste: FC<Props> = ({ imageFile, setImageFile }: Props): JSX.Elem
   return (
     <div className="h-full w-full relative">
       <img
-        className="h-full w-full border border-gray-200 object-contain"
+        className="h-full w-full border border-gray-200 object-contain rounded-md"
         src={(imageFile && URL.createObjectURL(imageFile)) || ''}
         alt="image"
       />
