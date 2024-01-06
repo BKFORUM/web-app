@@ -111,6 +111,7 @@ const NotifyRealtime: FC<Props> = ({
                         setCurrentConversation(
                           notifyRealtime?.message?.conversation || null,
                         )
+                        console.log(notifyRealtime)
                         setIsReadConversation(
                           notifyRealtime?.message?.conversationId || '',
                         )

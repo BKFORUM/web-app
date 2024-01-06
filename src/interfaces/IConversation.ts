@@ -19,7 +19,7 @@ export interface IMessage {
     id?: string
     type: string
     content: string,
-    author: IUserData,
+    author: IUserData ,
     createdAt: string,
     updatedAt: string,
     conversationId?: string,

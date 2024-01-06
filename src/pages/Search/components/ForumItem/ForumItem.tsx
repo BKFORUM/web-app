@@ -51,7 +51,7 @@ const ForumItem: FC<Props> = ({ item, requestForumUser }: Props): JSX.Element =>
       {(item.yourStatus === 'NOT MEMBER' || item.yourStatus === 'DELETED') && (
         <div
           onClick={() => requestForumUser(item.id || '', 'NOT MEMBER')}
-          className="">
+          className="flex-shrink-0">
           <Button>Gửi yêu cầu tham gia</Button>
         </div>
       )}
@@ -59,7 +59,7 @@ const ForumItem: FC<Props> = ({ item, requestForumUser }: Props): JSX.Element =>
       {item.yourStatus === 'PENDING' && (
         <div
           onClick={() => requestForumUser(item.id || '', 'PENDING')}
-          className="">
+          className="flex-shrink-0">
           <Button typeButton="cancel">Đã gửi yêu câu</Button>
         </div>
       )}

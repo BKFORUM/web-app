@@ -42,6 +42,7 @@ const Event: FC<Props> = (_props): JSX.Element => {
         <div className="col-span-7 ml-40 mr-16 ">
           <div>
             <InfiniteScroll
+              style={{ overflowY: 'hidden' }}
               dataLength={dataEvents.length}
               next={() =>
                 setPaginationModel({

@@ -40,7 +40,7 @@ const today = new Date()
 const minDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate())
 
 const schema = yup.object().shape({
-  fullName: yup.string().required('Name is valid!'),
+  fullName: yup.string().required('Name is required!'),
   dateOfBirth: yup
     .string()
     .required('Date of birth is required!')
@@ -48,15 +48,15 @@ const schema = yup.object().shape({
       const birthDate = new Date(value)
       return birthDate <= minDate
     }),
-  gender: yup.string().required('Gender is valid!'),
-  type: yup.string().required('Role is valid!'),
+  gender: yup.string().required('Gender is required!'),
+  type: yup.string().required('Role is required!'),
   email: yup
     .string()
+    .required('Email is required')
     .matches(
       /[0-9]{9}@sv1.dut.udn.vn/,
       'Invalid email format. Please use the format: 123456789@sv1.dut.udn.vn',
-    )
-    .required('Email is required'),
+    ),
   phoneNumber: yup
     .string()
     .required('Phone number is required!')
@@ -237,6 +237,7 @@ const ModalEditUser: FC<Props> = ({
                                   error={error}
                                   onChange={onChange}
                                   value={value}
+                                  disabled={true}
                                 />
                               )}
                             />
